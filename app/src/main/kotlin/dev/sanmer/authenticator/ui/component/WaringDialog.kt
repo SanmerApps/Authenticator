@@ -32,7 +32,10 @@ fun WaringDialog(
     },
     confirmButton = {
         TextButton(
-            onClick = onOk
+            onClick = {
+                onOk()
+                onCancel()
+            }
         ) {
             Text(
                 text = stringResource(id = R.string.dialog_ok)
