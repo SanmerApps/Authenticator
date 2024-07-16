@@ -1,0 +1,1 @@
+-repackageclasses dev.sanmer.authenticator

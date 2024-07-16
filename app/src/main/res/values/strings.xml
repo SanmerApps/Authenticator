@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="untrusted">Untrusted</string>
+
+    <!-- Crypto -->
+    <string name="crypto_skip">Skip</string>
+    <string name="crypto_encrypt">Encrypt</string>
+    <string name="crypto_encrypting">Encrypting</string>
+    <string name="crypto_decrypt">Decrypt</string>
+    <string name="crypto_decrypting">Decrypting</string>
+
+    <!-- Home -->
+    <string name="home_enter_title">Enter Manually</string>
+    <string name="home_enter_desc">Enter account details manually</string>
+    <string name="home_scant_tile">Scan QR Code</string>
+    <string name="home_scant_desc">Scan QR code to add account</string>
+    <string name="home_import_title">Import from JSON</string>
+    <string name="home_import_desc">Import accounts from JSON file</string>
+    <string name="home_export_title">Export to JSON</string>
+    <string name="home_export_desc">Export accounts to JSON file</string>
+
+    <!-- Edit -->
+    <string name="edit_add_tile">Add Account</string>
+    <string name="edit_edit_tile">Edit Account</string>
+    <string name="edit_name">Name</string>
+    <string name="edit_issuer">Issuer</string>
+    <string name="edit_secret">Secret</string>
+    <string name="edit_type">Type</string>
+    <string name="edit_hash">Hash</string>
+    <string name="edit_digits">Digits</string>
+    <string name="edit_counter">Counter</string>
+    <string name="edit_period">Period</string>
+
+    <!-- Dialog -->
+    <string name="dialog_warning_title">Warning</string>
+    <string name="dialog_warning_desc">Do you want to do this?</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Search…</string>
+    <string name="empty_list">Empty list</string>
+
+    <!-- Message -->
+    <string name="loading">Loading…</string>
+    <string name="unknown_error">Unknown error</string>
+
+</resources>
