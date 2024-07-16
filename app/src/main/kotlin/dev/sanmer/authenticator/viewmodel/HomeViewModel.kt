@@ -61,6 +61,9 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
+
+            if (!isEditing) isEditing = source.isEmpty()
+
         }.launchIn(viewModelScope)
     }
 

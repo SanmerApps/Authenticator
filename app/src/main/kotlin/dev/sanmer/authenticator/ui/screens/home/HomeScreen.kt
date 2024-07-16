@@ -76,10 +76,14 @@ fun HomeScreen(
             TopBar(
                 isSearch = viewModel.isSearch,
                 onQueryChange = viewModel::search,
-                onOpenSearch = viewModel::openSearch,
+                onOpenSearch = {
+                    if (auths.isNotEmpty()) viewModel.openSearch()
+                },
                 onCloseSearch = viewModel::closeSearch,
                 isEditing = viewModel.isEditing,
-                toggleEditing = { viewModel.updateEditing { !it } },
+                toggleEditing = {
+                    viewModel.updateEditing { if (auths.isNotEmpty()) !it else true }
+                },
                 scrollBehavior = scrollBehavior
             )
         },
