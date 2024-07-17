@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.ui.screens.home.edit.items
+package dev.sanmer.authenticator.ui.screens.edit.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.DropdownMenu
@@ -84,7 +84,7 @@ fun BaseOutlinedTextField(
     readOnly = readOnly,
     label = { Text(text = label) },
     trailingIcon = trailingIcon,
-    shape = RoundedCornerShape(10.dp),
+    shape = MaterialTheme.shapes.medium,
     isError = isError,
     visualTransformation = visualTransformation,
     keyboardOptions = keyboardOptions,
@@ -117,6 +117,7 @@ fun <T> BaseDropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
         contentAlignment = Alignment.BottomStart,
+        offset = DpOffset(0.dp, 3.dp),
         surface = {
             BaseOutlinedTextField(
                 value = value.toString(),

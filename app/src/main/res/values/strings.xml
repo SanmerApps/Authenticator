@@ -9,16 +9,6 @@
     <string name="crypto_decrypt">Decrypt</string>
     <string name="crypto_decrypting">Decrypting</string>
 
-    <!-- Home -->
-    <string name="home_enter_title">Enter Manually</string>
-    <string name="home_enter_desc">Enter account details manually</string>
-    <string name="home_scant_tile">Scan QR Code</string>
-    <string name="home_scant_desc">Scan QR code to add account</string>
-    <string name="home_import_title">Import from JSON</string>
-    <string name="home_import_desc">Import accounts from JSON file</string>
-    <string name="home_export_title">Export to JSON</string>
-    <string name="home_export_desc">Export accounts to JSON file</string>
-
     <!-- Edit -->
     <string name="edit_add_tile">Add Account</string>
     <string name="edit_edit_tile">Edit Account</string>
@@ -30,6 +20,14 @@
     <string name="edit_digits">Digits</string>
     <string name="edit_counter">Counter</string>
     <string name="edit_period">Period</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_enter">Enter Manually</string>
+    <string name="settings_scan">Scan QR Code</string>
+    <string name="settings_import">Import from JSON</string>
+    <string name="settings_export">Export to JSON</string>
+    <string name="settings_recycle">Recycle Bin</string>
 
     <!-- Dialog -->
     <string name="dialog_warning_title">Warning</string>

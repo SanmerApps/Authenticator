@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.ui.screens.home.edit.items
+package dev.sanmer.authenticator.ui.screens.edit.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.text.KeyboardOptions

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -67,7 +66,7 @@ fun CryptoScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            shape = RoundedCornerShape(10.dp),
+            shape = MaterialTheme.shapes.medium,
             value = viewModel.password,
             onValueChange = viewModel::updatePassword,
             isError = viewModel.state.isFailed,

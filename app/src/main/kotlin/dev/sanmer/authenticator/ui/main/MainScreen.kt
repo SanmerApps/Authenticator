@@ -1,5 +1,8 @@
 package dev.sanmer.authenticator.ui.main
 
+import android.net.Uri
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,14 +19,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dev.sanmer.attestation.KeyAttestation
 import dev.sanmer.authenticator.BuildConfig
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.BottomCornerLabel
-import dev.sanmer.authenticator.ui.navigation.MainScreen
-import dev.sanmer.authenticator.ui.navigation.graphs.homeScreen
+import dev.sanmer.authenticator.ui.main.Screen.Companion.edit
+import dev.sanmer.authenticator.ui.main.Screen.Companion.home
+import dev.sanmer.authenticator.ui.main.Screen.Companion.recycle
+import dev.sanmer.authenticator.ui.main.Screen.Companion.scan
+import dev.sanmer.authenticator.ui.screens.edit.EditScreen
+import dev.sanmer.authenticator.ui.screens.home.HomeScreen
+import dev.sanmer.authenticator.ui.screens.recycle.RecycleScreen
+import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -43,15 +57,16 @@ fun MainScreen() {
     ) {
         Scaffold(
             contentWindowInsets = WindowInsets.navigationBars
-        ) { innerPadding ->
+        ) { contentPadding ->
             NavHost(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.padding(contentPadding),
                 navController = navController,
-                startDestination = MainScreen.Home.route
+                startDestination = Screen.Home.route
             ) {
-                homeScreen(
-                    navController = navController
-                )
+                home(navController)
+                edit(navController)
+                scan(navController)
+                recycle(navController)
             }
         }
 
@@ -60,6 +75,67 @@ fun MainScreen() {
                 text = stringResource(id = R.string.untrusted),
                 modifier = Modifier.align(Alignment.BottomEnd),
                 width = 150.dp
+            )
+        }
+    }
+}
+
+enum class Screen(val route: String) {
+    Home("Home"),
+    Edit("Edit/{secret}"),
+    Scan("Scan"),
+    Recycle("Recycle");
+
+    companion object {
+        @Suppress("FunctionName")
+        fun Edit(secret: String = " ") = "Edit/${Uri.encode(secret)}"
+
+        fun NavGraphBuilder.home(
+            navController: NavController
+        ) = composable(
+            route = Home.route,
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() }
+        ) {
+            HomeScreen(
+                navController = navController
+            )
+        }
+
+        fun NavGraphBuilder.edit(
+            navController: NavController
+        ) = composable(
+            route = Edit.route,
+            arguments = listOf(navArgument("secret") { type = NavType.StringType }),
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() }
+        ) {
+            EditScreen(
+                navController = navController
+            )
+        }
+
+        fun NavGraphBuilder.scan(
+            navController: NavController
+        ) = composable(
+            route = Scan.route,
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() }
+        ) {
+            ScanScreen(
+                navController = navController
+            )
+        }
+
+        fun NavGraphBuilder.recycle(
+            navController: NavController
+        ) = composable(
+            route = Recycle.route,
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() }
+        ) {
+            RecycleScreen(
+                navController = navController
             )
         }
     }

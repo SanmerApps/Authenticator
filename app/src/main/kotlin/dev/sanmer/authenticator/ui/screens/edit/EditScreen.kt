@@ -1,7 +1,6 @@
-package dev.sanmer.authenticator.ui.screens.home.edit
+package dev.sanmer.authenticator.ui.screens.edit
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
@@ -22,12 +20,10 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -43,11 +39,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
-import dev.sanmer.authenticator.ui.component.WaringDialog
 import dev.sanmer.authenticator.ui.ktx.setSensitiveText
-import dev.sanmer.authenticator.ui.screens.home.edit.items.DigitsItem
-import dev.sanmer.authenticator.ui.screens.home.edit.items.TextFieldItem
-import dev.sanmer.authenticator.ui.screens.home.edit.items.TypeItem
+import dev.sanmer.authenticator.ui.ktx.surface
+import dev.sanmer.authenticator.ui.screens.edit.component.DigitsItem
+import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
+import dev.sanmer.authenticator.ui.screens.edit.component.TypeItem
 import dev.sanmer.authenticator.viewmodel.EditViewModel
 import dev.sanmer.qrcode.QrCodeCompat
 
@@ -66,20 +62,19 @@ fun EditScreen(
                 uri = viewModel.uriString,
                 fromUri = viewModel::decodeFromUri,
                 onSave = {
-                    viewModel.save { if (viewModel.addAccount) navController.popBackStack() }
-                },
-                onDelete = {
-                    viewModel.delete { navController.popBackStack() }
+                    viewModel.save {
+                        if (viewModel.addAccount) navController.popBackStack()
+                    }
                 },
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
         },
         contentWindowInsets = WindowInsets(0.dp)
-    ) { innerPadding ->
+    ) { contentPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(contentPadding)
                 .padding(vertical = 15.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -169,14 +164,15 @@ fun EditScreen(
 private fun QrCodeItem(
     uri: String,
     modifier: Modifier = Modifier,
-    size: Dp = 230.dp
+    size: Dp = 230.dp,
+    shape: Shape = MaterialTheme.shapes.small
 ) = Box(
     modifier = modifier
-        .size(240.dp)
-        .clip(RoundedCornerShape(10.dp))
-        .border(
-            border = CardDefaults.outlinedCardBorder(),
-            shape = RoundedCornerShape(10.dp)
+        .size(size = 240.dp)
+        .surface(
+            shape = shape,
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            border = CardDefaults.outlinedCardBorder()
         ),
     contentAlignment = Alignment.Center
 ) {
@@ -230,7 +226,6 @@ private fun TopBar(
     uri: String,
     fromUri: (String) -> Unit,
     onSave: () -> Unit,
-    onDelete: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = NavigateUpTopBar(
@@ -271,21 +266,6 @@ private fun TopBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.device_floppy),
-                contentDescription = null
-            )
-        }
-
-        var delete by remember { mutableStateOf(false) }
-        if (delete) WaringDialog(
-            onOk = onDelete,
-            onCancel = { delete = false }
-        )
-
-        if (!addAccount) IconButton(
-            onClick = { delete = true }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.trash_x),
                 contentDescription = null
             )
         }

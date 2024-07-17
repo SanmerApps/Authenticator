@@ -31,7 +31,7 @@ fun NavigateUpTopBar(
 ) = NavigateUpTopBar(
     modifier = modifier,
     title = title,
-    onBack = { navController.popBackStack() },
+    onBack = { navController.navigateUp() },
     actions = actions,
     windowInsets = windowInsets,
     colors = colors,
@@ -96,7 +96,8 @@ fun NavigateUpTopBar(
     modifier = modifier,
     navigationIcon = {
         IconButton(
-            onClick = { if (enable) onBack() }
+            onClick = onBack,
+            enabled = enable
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),

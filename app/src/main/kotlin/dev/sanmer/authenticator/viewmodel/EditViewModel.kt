@@ -109,15 +109,6 @@ class EditViewModel @Inject constructor(
         }
     }
 
-    fun delete(block: () -> Unit = {}) {
-        if (addAccount) return
-
-        viewModelScope.launch {
-            dbRepository.delete(input.auth)
-            block()
-        }
-    }
-
     fun updateShowQrCode(block: (Boolean) -> Boolean) {
         showQrCode = block(showQrCode)
     }
