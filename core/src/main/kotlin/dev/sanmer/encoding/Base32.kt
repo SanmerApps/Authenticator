@@ -14,10 +14,10 @@ inline fun String.decodeBase32(): ByteArray {
 }
 
 inline fun String.isBase32(): Boolean {
-    return decodeToByteArrayOrNull(Base32.Default) != null
-            || decodeToByteArrayOrNull(Base32.Hex) != null
+    return isNotBlank() && (decodeToByteArrayOrNull(Base32.Default) != null
+            || decodeToByteArrayOrNull(Base32.Hex) != null)
 }
 
-fun ByteArray.encodeBase32Default() = encodeToString(Base32.Default)
+inline fun ByteArray.encodeBase32Default() = encodeToString(Base32.Default)
 
-fun ByteArray.encodeBase32Hex() = encodeToString(Base32.Hex)
+inline fun ByteArray.encodeBase32Hex() = encodeToString(Base32.Hex)
