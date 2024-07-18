@@ -78,7 +78,9 @@ fun SearchTopBar(
                     imeAction = ImeAction.Search
                 ),
                 keyboardActions = KeyboardActions {
-                    defaultKeyboardAction(ImeAction.Search)
+                    if (query.isNotBlank()) {
+                        defaultKeyboardAction(ImeAction.Done)
+                    }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
