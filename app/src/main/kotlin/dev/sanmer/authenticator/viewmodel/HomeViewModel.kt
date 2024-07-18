@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.database.entity.TrashEntity
 import dev.sanmer.authenticator.model.auth.Auth
-import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,11 +32,12 @@ class HomeViewModel @Inject constructor(
     init {
         Timber.d("HomeViewModel init")
         dataObserver()
+        clearTrash()
     }
 
     private fun dataObserver() {
         combine(
-            dbRepository.authsFlow,
+            dbRepository.getAuthAllAsFlow(enable = true),
             keyFlow
         ) { source, key ->
             authsFlow.update {
@@ -47,10 +48,20 @@ class HomeViewModel @Inject constructor(
                     } else {
                         true
                     }
+                }.sortedBy {
+                    it.issuer.lowercase()
                 }
             }
 
         }.launchIn(viewModelScope)
+    }
+
+    private fun clearTrash() {
+        viewModelScope.launch {
+            val secrets = dbRepository.getTrashByTimestamp(TrashEntity.lifetime)
+            dbRepository.deleteAuth(secrets)
+            dbRepository.deleteTrash(secrets)
+        }
     }
 
     fun search(key: String) {
@@ -66,9 +77,15 @@ class HomeViewModel @Inject constructor(
         keyFlow.update { "" }
     }
 
-    fun updateHotp(auth: HotpAuth) {
+    fun updateAuth(auth: Auth) {
         viewModelScope.launch {
-            dbRepository.updateHotp(auth)
+            dbRepository.updateAuth(auth)
+        }
+    }
+
+    fun recycleAuth(auth: Auth) {
+        viewModelScope.launch {
+            dbRepository.insertTrash(auth.secret)
         }
     }
 }

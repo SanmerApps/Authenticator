@@ -1,12 +1,11 @@
 package dev.sanmer.authenticator.database.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import dev.sanmer.authenticator.database.entity.TotpEntity
+import dev.sanmer.authenticator.database.entity.TrashEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,20 +16,20 @@ interface TotpDao {
     @Query("SELECT * FROM totp WHERE secret = :secret")
     fun getBySecretAsFlow(secret: String): Flow<TotpEntity?>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(value: TotpEntity)
+    @Query("SELECT * FROM totp LEFT JOIN trash ON trash.secret = totp.secret")
+    fun getMapToTrashAsFlow(): Flow<Map<TotpEntity, TrashEntity?>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(values: List<TotpEntity>)
+    suspend fun insert(entities: List<TotpEntity>)
 
-    @Update
-    suspend fun update(value: TotpEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(entity: TotpEntity)
 
-    @Delete
-    suspend fun delete(value: TotpEntity)
+    @Query("DELETE FROM totp WHERE secret = :secret")
+    suspend fun delete(secret: String)
 
-    @Delete
-    suspend fun delete(values: List<TotpEntity>)
+    @Query("DELETE FROM totp WHERE secret IN (:secret)")
+    suspend fun delete(secret: List<String>)
 
     @Query("SELECT EXISTS(SELECT 1 FROM totp WHERE secret = :secret)")
     suspend fun exists(secret: String): Boolean

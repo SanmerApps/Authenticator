@@ -36,7 +36,7 @@ import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
 
 @Composable
-fun <T> OtpItem(
+fun <T> AuthItem(
     auth: T,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -45,18 +45,19 @@ fun <T> OtpItem(
 ) where T : Auth, T : Otp {
     SwipeContent(
         content = { release ->
-            OtpItemButtons(
+            AuthItemButtons(
                 onEdit = {
                     release()
                     onEdit()
                 },
-                onDelete =  {
+                onDelete = {
                     release()
+                    onDelete()
                 }
             )
         },
         surface = {
-            OtpItemContent(
+            AuthItemContent(
                 auth = auth,
                 enabled = enabled,
                 onClick = onClick
@@ -66,7 +67,7 @@ fun <T> OtpItem(
 }
 
 @Composable
-private fun <T> OtpItemContent(
+private fun <T> AuthItemContent(
     auth: T,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
@@ -126,7 +127,7 @@ private fun <T> OtpItemContent(
 }
 
 @Composable
-private fun OtpItemButtons(
+private fun AuthItemButtons(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) = Row(

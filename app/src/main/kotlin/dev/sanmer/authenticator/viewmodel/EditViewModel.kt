@@ -10,8 +10,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ktx.toIntOr
-import dev.sanmer.authenticator.ktx.toLongOr
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
@@ -53,7 +51,7 @@ class EditViewModel @Inject constructor(
 
     private fun authObserver() {
         viewModelScope.launch {
-            dbRepository.getBySecretAsFlow(secret)
+            dbRepository.getAuthBySecretAsFlow(secret)
                 .collect { auth ->
                     updateFromAuth(auth)
                     updateUriString(auth)
@@ -104,7 +102,7 @@ class EditViewModel @Inject constructor(
         if (!check()) return
 
         viewModelScope.launch {
-            dbRepository.update(input.auth)
+            dbRepository.updateAuth(input.auth)
             block()
         }
     }
@@ -143,31 +141,28 @@ class EditViewModel @Inject constructor(
             period = totp.period.toString()
         )
 
-        val hotp
-            get() = HotpAuth(
-                name = name,
-                issuer = issuer,
-                secret = secret,
-                hash = hash,
-                digits = digits.toIntOr(6),
-                count = counter.toLongOr(0L)
-            )
+        val hotp get() = HotpAuth(
+            name = name,
+            issuer = issuer,
+            secret = secret,
+            hash = hash,
+            digits = digits.toIntOrNull() ?: 6,
+            count = counter.toLongOrNull() ?: 0L
+        )
 
-        val totp
-            get() = TotpAuth(
-                name = name,
-                issuer = issuer,
-                secret = secret,
-                hash = hash,
-                digits = digits.toIntOr(6),
-                period = period.toLongOr(30L)
-            )
+        val totp get() = TotpAuth(
+            name = name,
+            issuer = issuer,
+            secret = secret,
+            hash = hash,
+            digits = digits.toIntOrNull() ?: 6,
+            period = period.toLongOrNull() ?: 30L
+        )
 
-        val auth: Auth
-            get() = when (type) {
-                Auth.Type.HOTP -> hotp
-                Auth.Type.TOTP -> totp
-            }
+        val auth: Auth get() = when (type) {
+            Auth.Type.HOTP -> hotp
+            Auth.Type.TOTP -> totp
+        }
     }
 
     enum class Check(val ok: (String) -> Boolean) {
@@ -184,7 +179,6 @@ class EditViewModel @Inject constructor(
 
     companion object {
         private val SavedStateHandle.secret: String
-            get() =
-                checkNotNull(Uri.decode(get("secret")))
+            inline get() = checkNotNull(Uri.decode(get("secret")))
     }
 }

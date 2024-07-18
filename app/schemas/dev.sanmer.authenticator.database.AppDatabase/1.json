@@ -2,8 +2,34 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6325041a4f0d916a83ae7d164ab6c386",
+    "identityHash": "b9e968977bedf9a62e9d1cdaf09dd52d",
     "entities": [
+      {
+        "tableName": "trash",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`secret` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`secret`))",
+        "fields": [
+          {
+            "fieldPath": "secret",
+            "columnName": "secret",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "secret"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
       {
         "tableName": "hotp",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`issuer` TEXT NOT NULL, `name` TEXT NOT NULL, `secret` TEXT NOT NULL, `hash` TEXT NOT NULL, `digits` INTEGER NOT NULL, `counter` INTEGER NOT NULL, PRIMARY KEY(`secret`))",
@@ -108,7 +134,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6325041a4f0d916a83ae7d164ab6c386')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b9e968977bedf9a62e9d1cdaf09dd52d')"
     ]
   }
 }

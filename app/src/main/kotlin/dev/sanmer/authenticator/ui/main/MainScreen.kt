@@ -32,12 +32,12 @@ import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.BottomCornerLabel
 import dev.sanmer.authenticator.ui.main.Screen.Companion.edit
 import dev.sanmer.authenticator.ui.main.Screen.Companion.home
-import dev.sanmer.authenticator.ui.main.Screen.Companion.recycle
 import dev.sanmer.authenticator.ui.main.Screen.Companion.scan
+import dev.sanmer.authenticator.ui.main.Screen.Companion.trash
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
-import dev.sanmer.authenticator.ui.screens.recycle.RecycleScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
+import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -66,7 +66,7 @@ fun MainScreen() {
                 home(navController)
                 edit(navController)
                 scan(navController)
-                recycle(navController)
+                trash(navController)
             }
         }
 
@@ -84,7 +84,7 @@ enum class Screen(val route: String) {
     Home("Home"),
     Edit("Edit/{secret}"),
     Scan("Scan"),
-    Recycle("Recycle");
+    Trash("Trash");
 
     companion object {
         @Suppress("FunctionName")
@@ -127,14 +127,14 @@ enum class Screen(val route: String) {
             )
         }
 
-        fun NavGraphBuilder.recycle(
+        fun NavGraphBuilder.trash(
             navController: NavController
         ) = composable(
-            route = Recycle.route,
+            route = Trash.route,
             enterTransition = { fadeIn() },
             exitTransition = { fadeOut() }
         ) {
-            RecycleScreen(
+            TrashScreen(
                 navController = navController
             )
         }

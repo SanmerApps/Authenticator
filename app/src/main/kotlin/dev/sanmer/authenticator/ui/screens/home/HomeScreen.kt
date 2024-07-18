@@ -118,7 +118,8 @@ private fun HomeContent(
                 state = listState,
                 navController = navController,
                 auths = auths,
-                updateHotp = viewModel::updateHotp
+                recycleAuth = viewModel::recycleAuth,
+                updateAuth = viewModel::updateAuth
             )
         }
     }

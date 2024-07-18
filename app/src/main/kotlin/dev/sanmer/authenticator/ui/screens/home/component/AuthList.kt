@@ -25,7 +25,8 @@ fun AuthList(
     state: LazyListState,
     navController: NavController,
     auths: List<Auth>,
-    updateHotp: (HotpAuth) -> Unit,
+    recycleAuth: (Auth) -> Unit,
+    updateAuth: (Auth) -> Unit
 ) {
     val hotp by remember(auths) {
         derivedStateOf { auths.filterIsInstance<HotpAuth>() }
@@ -41,25 +42,25 @@ fun AuthList(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         items(totp) {
-            OtpItem(
+            AuthItem(
                 auth = it,
                 enabled = false,
                 onEdit = { navController.navigateSingleTopTo(Screen.Edit(it.secret)) },
-                onDelete = {}
+                onDelete = { recycleAuth(it) }
             )
         }
 
         items(hotp) {
             DisposableEffect(true) {
-                onDispose { updateHotp(it) }
+                onDispose { updateAuth(it) }
             }
 
-            OtpItem(
+            AuthItem(
                 auth = it,
                 enabled = true,
                 onClick = { it.new() },
                 onEdit = { navController.navigateSingleTopTo(Screen.Edit(it.secret)) },
-                onDelete = {}
+                onDelete = { recycleAuth(it) }
             )
         }
     }

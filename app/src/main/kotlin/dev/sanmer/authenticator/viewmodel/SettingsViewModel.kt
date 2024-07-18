@@ -28,7 +28,7 @@ class SettingsViewModel @Inject constructor(
 
     fun encrypt(context: Context, callback: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val auths = dbRepository.authsFlow.first()
+            val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
 
             CryptoActivity.encrypt(
                 context = context,
@@ -70,7 +70,7 @@ class SettingsViewModel @Inject constructor(
                 ) { decrypted ->
                     val ok = decrypted.all { it.secret.isBase32() }
                     if (ok) viewModelScope.launch {
-                        dbRepository.insert(decrypted)
+                        dbRepository.insertAuth(decrypted)
                     }
                 }
 

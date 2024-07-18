@@ -27,13 +27,7 @@
     <string name="settings_scan">Scan QR Code</string>
     <string name="settings_import">Import from JSON</string>
     <string name="settings_export">Export to JSON</string>
-    <string name="settings_recycle">Recycle Bin</string>
-
-    <!-- Dialog -->
-    <string name="dialog_warning_title">Warning</string>
-    <string name="dialog_warning_desc">Do you want to do this?</string>
-    <string name="dialog_ok">OK</string>
-    <string name="dialog_cancel">Cancel</string>
+    <string name="settings_trash">Trash</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>
