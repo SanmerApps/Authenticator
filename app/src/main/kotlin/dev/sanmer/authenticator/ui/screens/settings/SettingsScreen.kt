@@ -52,7 +52,6 @@ fun SettingsScreen(
     BackHandler(onBack = onBack)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopBar(
                 onBack = onBack,
@@ -63,8 +62,9 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .padding(contentPadding)
-                .padding(all = 15.dp)
-                .verticalScroll(rememberScrollState()),
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .verticalScroll(rememberScrollState())
+                .padding(all = 15.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             SettingItem(

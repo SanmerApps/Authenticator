@@ -87,7 +87,6 @@ private fun HomeContent(
     val listState = rememberLazyListState()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopBar(
                 isSearch = viewModel.isSearch,
@@ -106,6 +105,7 @@ private fun HomeContent(
             modifier = Modifier
                 .padding(contentPadding)
                 .imePadding()
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(

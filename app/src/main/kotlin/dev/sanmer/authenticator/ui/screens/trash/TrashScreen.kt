@@ -32,7 +32,6 @@ fun TrashScreen(
     val listState = rememberLazyListState()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopBar(
                 navController = navController,
@@ -42,7 +41,9 @@ fun TrashScreen(
         contentWindowInsets = WindowInsets(0.dp)
     ) { contentPadding ->
         Box(
-            modifier = Modifier.padding(contentPadding)
+            modifier = Modifier
+                .padding(contentPadding)
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(
