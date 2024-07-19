@@ -2,6 +2,7 @@ package dev.sanmer.attestation
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Log
 import dev.sanmer.ktx.getObjectAtOrNull
 import dev.sanmer.ktx.toASN1Sequence
 import org.bouncycastle.asn1.ASN1Sequence
@@ -14,7 +15,7 @@ import java.security.cert.X509Certificate
 
 class KeyAttestation private constructor(
     private val alias: String
-) {
+) : Attestation {
     private val keyStore by lazy { KeyStore.getInstance("AndroidKeyStore") }
     private val certificateFactory by lazy { CertificateFactory.getInstance("X.509") }
 
@@ -31,11 +32,9 @@ class KeyAttestation private constructor(
         certs.getAuthorizationList(TEE_ENFORCED_INDEX) ?: AuthorizationList.EMPTY
     }
 
-    inline val isTrusted: Boolean
+    override val isTrusted: Boolean
         get() = hardwareEnforced.rootOfTrust.deviceLocked
                 && hardwareEnforced.rootOfTrust.verifiedBootState == RootOfTrust.BootState.Verified
-
-    inline val isUntrusted: Boolean get() = !isTrusted
 
     init {
         keyStore.load(null)
@@ -80,12 +79,16 @@ class KeyAttestation private constructor(
                 it.toASN1Sequence()?.getObjectAtOrNull(index)?.let(::AuthorizationList)
             }
 
-        private val attestations = hashMapOf<String, KeyAttestation>()
+        private val attestations = hashMapOf<String, Attestation>()
 
-        fun getInstance(alias: String): KeyAttestation {
-            return attestations.getOrPut(alias) {
-                KeyAttestation(alias)
+        fun getInstance(alias: String) =
+            attestations.getOrPut(alias) {
+                try {
+                    KeyAttestation(alias)
+                } catch (e: Throwable) {
+                    Log.w("KeyAttestation", Log.getStackTraceString(e))
+                    Attestation.Empty()
+                }
             }
-        }
     }
 }
