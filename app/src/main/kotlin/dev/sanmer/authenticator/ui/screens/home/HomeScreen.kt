@@ -98,19 +98,18 @@ private fun HomeContent(
                 onCloseSearch = viewModel::closeSearch,
                 scrollBehavior = scrollBehavior
             )
-        },
-        contentWindowInsets = WindowInsets(0.dp)
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier
-                .padding(contentPadding)
                 .imePadding()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(
                     icon = if (viewModel.isSearch) R.drawable.list_search else R.drawable.list,
-                    text = stringResource(id = R.string.empty_list)
+                    text = stringResource(id = R.string.empty_list),
+                    modifier = Modifier.padding(contentPadding)
                 )
             }
 
@@ -119,7 +118,8 @@ private fun HomeContent(
                 navController = navController,
                 auths = auths,
                 recycleAuth = viewModel::recycleAuth,
-                updateAuth = viewModel::updateAuth
+                updateAuth = viewModel::updateAuth,
+                contentPadding = contentPadding
             )
         }
     }

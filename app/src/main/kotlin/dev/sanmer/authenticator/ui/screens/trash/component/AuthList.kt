@@ -10,18 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.ui.ktx.plus
 
 @Composable
 fun AuthList(
     state: LazyListState,
     auths: List<Auth>,
     restoreAuth: (Auth) -> Unit,
-    deleteAuth: (Auth) -> Unit
+    deleteAuth: (Auth) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyColumn(
         modifier = Modifier.animateContentSize(),
         state = state,
-        contentPadding = PaddingValues(15.dp),
+        contentPadding = contentPadding + PaddingValues(15.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         items(auths) {

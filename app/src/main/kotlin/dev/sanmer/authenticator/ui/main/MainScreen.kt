@@ -3,12 +3,10 @@ package dev.sanmer.authenticator.ui.main
 import android.net.Uri
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,21 +51,18 @@ fun MainScreen() {
     val navController = rememberNavController()
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxSize()
     ) {
-        Scaffold(
-            contentWindowInsets = WindowInsets.navigationBars
-        ) { contentPadding ->
-            NavHost(
-                modifier = Modifier.padding(contentPadding),
-                navController = navController,
-                startDestination = Screen.Home.route
-            ) {
-                home(navController)
-                edit(navController)
-                scan(navController)
-                trash(navController)
-            }
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route
+        ) {
+            home(navController)
+            edit(navController)
+            scan(navController)
+            trash(navController)
         }
 
         if (isUntrusted) {

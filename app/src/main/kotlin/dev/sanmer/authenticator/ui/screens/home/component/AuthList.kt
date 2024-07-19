@@ -18,6 +18,7 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
+import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.main.Screen
 
 @Composable
@@ -26,7 +27,8 @@ fun AuthList(
     navController: NavController,
     auths: List<Auth>,
     recycleAuth: (Auth) -> Unit,
-    updateAuth: (Auth) -> Unit
+    updateAuth: (Auth) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val hotp by remember(auths) {
         derivedStateOf { auths.filterIsInstance<HotpAuth>() }
@@ -38,7 +40,7 @@ fun AuthList(
     LazyColumn(
         modifier = Modifier.animateContentSize(),
         state = state,
-        contentPadding = PaddingValues(15.dp),
+        contentPadding = contentPadding + PaddingValues(15.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         items(totp) {

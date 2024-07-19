@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -69,15 +68,14 @@ fun EditScreen(
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
-        },
-        contentWindowInsets = WindowInsets(0.dp)
+        }
     ) { contentPadding ->
         Column(
             modifier = Modifier
-                .padding(contentPadding)
                 .imePadding()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
                 .padding(vertical = 15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally

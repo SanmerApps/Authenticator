@@ -1,7 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.trash
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
@@ -12,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -37,18 +35,17 @@ fun TrashScreen(
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
-        },
-        contentWindowInsets = WindowInsets(0.dp)
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier
-                .padding(contentPadding)
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(
                     icon = R.drawable.trash,
-                    text = stringResource(id = R.string.empty_list)
+                    text = stringResource(id = R.string.empty_list),
+                    modifier = Modifier.padding(contentPadding)
                 )
             }
 
@@ -56,7 +53,8 @@ fun TrashScreen(
                 state = listState,
                 auths = auths,
                 restoreAuth = viewModel::restoreAuth,
-                deleteAuth = viewModel::deleteAuth
+                deleteAuth = viewModel::deleteAuth,
+                contentPadding = contentPadding
             )
         }
     }
