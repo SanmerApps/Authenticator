@@ -3,15 +3,13 @@ package dev.sanmer.authenticator.viewmodel
 import android.Manifest
 import android.app.Application
 import android.content.Context
-import android.graphics.ImageFormat.YUV_420_888
-import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraInfo
-import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraState
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -46,47 +44,19 @@ class ScanViewModel @Inject constructor(
     var isAllowed by mutableStateOf(_isAllowed)
         private set
 
-    private var cameraProviderOrNull: ProcessCameraProvider? = null
-    private val cameraProvider: ProcessCameraProvider
-        get() = checkNotNull(cameraProviderOrNull) {
-            "CameraProvider haven't been received"
-        }
+    val cameraController by lazy { LifecycleCameraController(context) }
 
-    private val imageAnalyzer by lazy {
-        ImageAnalysis.Builder()
-            .build()
-            .also {
-                it.setAnalyzer(Executors.newSingleThreadExecutor(), this)
-            }
-    }
-
-    val preview by lazy {
-        Preview.Builder()
-            .build()
-    }
-
-    var cameraType by mutableStateOf(CameraState.Type.CLOSED)
+    var cameraType by mutableStateOf(CameraState.Type.PENDING_OPEN)
         private set
+
+    val isShowing: Boolean
+        inline get() = cameraType == CameraState.Type.OPEN
 
     private val uriFlow = MutableStateFlow("")
     val uri get() = uriFlow.asStateFlow()
 
     init {
         Timber.d("ScanViewModel init")
-    }
-
-    private fun getInstance(block: ProcessCameraProvider.() -> Unit) {
-        ProcessCameraProvider.getInstance(context).apply {
-            addListener({
-                cameraProviderOrNull = get()
-                block(cameraProvider)
-
-            }, context.mainExecutor)
-        }
-    }
-
-    private fun updateCameraControl(cameraControl: CameraControl) {
-        cameraControl.setLinearZoom(0.6f)
     }
 
     private fun updateCameraInfo(cameraInfo: CameraInfo) {
@@ -104,33 +74,23 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun bindToLifecycle(context: Context, lifecycleOwner: LifecycleOwner) {
+    fun bindToLifecycle(context: Context, lifecycleOwner: LifecycleOwner) =
         requestPermission(context) {
-            runCatching {
-                getInstance {
-                    val camera = bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview,
-                        imageAnalyzer
-                    )
+            cameraController.previewResolutionSelector =
+                ResolutionSelector.Builder()
+                    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                    .build()
 
-                    updateCameraControl(camera.cameraControl)
-                    updateCameraInfo(camera.cameraInfo)
-                }
+            cameraController.setEnabledUseCases(LifecycleCameraController.IMAGE_ANALYSIS)
+            cameraController.setImageAnalysisBackgroundExecutor(Executors.newSingleThreadExecutor())
+            cameraController.setImageAnalysisAnalyzer(context.mainExecutor, this)
 
-            }.onFailure {
-                Timber.e(it)
-            }
+            cameraController.bindToLifecycle(lifecycleOwner)
+            cameraController.cameraInfo?.let(::updateCameraInfo)
         }
-    }
 
-    fun unbindAll() {
-        runCatching {
-            cameraProvider.unbindAll()
-        }.onFailure {
-            Timber.e(it)
-        }
+    fun unbind() {
+        cameraController.unbind()
     }
 
     fun rewind() {
@@ -138,11 +98,6 @@ class ScanViewModel @Inject constructor(
     }
 
     override fun analyze(image: ImageProxy) {
-        if (image.format != YUV_420_888) {
-            image.close()
-            return
-        }
-
         try {
             val plane = image.planes.first()
             val data = plane.buffer.asByteArray()
