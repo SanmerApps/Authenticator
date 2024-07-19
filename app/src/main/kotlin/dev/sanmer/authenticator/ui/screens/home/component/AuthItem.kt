@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -73,6 +74,8 @@ private fun <T> AuthItemContent(
     onClick: () -> Unit = {}
 ) where T : Auth, T : Otp = Row(
     modifier = Modifier
+        .sizeIn(maxWidth = 450.dp)
+        .fillMaxWidth()
         .surface(
             shape = MaterialTheme.shapes.large,
             backgroundColor = MaterialTheme.colorScheme.surface,
@@ -82,8 +85,7 @@ private fun <T> AuthItemContent(
             enabled = enabled,
             onClick = onClick
         )
-        .padding(all = 15.dp)
-        .fillMaxWidth(),
+        .padding(all = 15.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {

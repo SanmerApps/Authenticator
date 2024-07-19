@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -55,13 +56,14 @@ private fun AuthItemContent(
     auth: Auth
 ) = Row(
     modifier = Modifier
+        .sizeIn(maxWidth = 450.dp)
+        .fillMaxWidth()
         .surface(
             shape = MaterialTheme.shapes.large,
             backgroundColor = MaterialTheme.colorScheme.surface,
             border = CardDefaults.outlinedCardBorder()
         )
-        .padding(all = 15.dp)
-        .fillMaxWidth(),
+        .padding(all = 15.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {

@@ -2,6 +2,7 @@ package dev.sanmer.authenticator.ui.screens.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -23,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
@@ -104,6 +106,8 @@ private fun HomeContent(
             modifier = Modifier
                 .imePadding()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(

@@ -1,6 +1,7 @@
 package dev.sanmer.authenticator.ui.screens.trash
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
@@ -8,6 +9,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,8 @@ fun TrashScreen(
         Box(
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(
