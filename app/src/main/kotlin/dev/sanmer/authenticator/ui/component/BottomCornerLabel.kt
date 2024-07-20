@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import dev.sanmer.authenticator.ui.theme.TrapezoidShape
+import dev.sanmer.authenticator.ui.ktx.TrapezoidShape
 import kotlin.math.sqrt
 
 @Composable
