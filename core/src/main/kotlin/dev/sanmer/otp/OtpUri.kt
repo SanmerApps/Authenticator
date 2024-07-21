@@ -114,7 +114,7 @@ class OtpUri private constructor() {
             return OtpUri(uri)
         }
 
-        fun String.toOtpUri() = OtpUri.parse(this)
+        fun String.toOtpUri() = parse(this)
 
         fun String.isOtpUri() = startsWith(SCHEME)
 
