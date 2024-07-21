@@ -15,7 +15,7 @@ class OtpUri private constructor() {
     ) : this() {
         this.issuer = issuer
         this.name = name
-        this.type = type.lowercase()
+        this.type = type.uppercase()
         this.secret = secret
         this.algorithm = algorithm.uppercase()
         this.digits = digits
@@ -39,9 +39,9 @@ class OtpUri private constructor() {
             name = label
         }
 
-        type = uri.getOrDefault("") { host }
+        type = uri.getOrDefault("") { host }.uppercase()
         secret = uri.getQueryParameterOrDefault("secret", "")
-        algorithm = uri.getQueryParameterOrDefault("algorithm", "")
+        algorithm = uri.getQueryParameterOrDefault("algorithm", "").uppercase()
         digits = uri.getQueryParameterOrDefault("digits", "0").let(String::toInt)
 
         counter = uri.getQueryParameter("counter")?.let(String::toLong)
@@ -75,7 +75,7 @@ class OtpUri private constructor() {
     fun toUri(): Uri {
         val builder = Uri.Builder()
         builder.scheme(SCHEME)
-        builder.authority(type)
+        builder.authority(type.lowercase())
 
         if (issuer.isNotEmpty()) {
             builder.appendQueryParameter("issuer", issuer)
@@ -107,16 +107,18 @@ class OtpUri private constructor() {
 
         fun parse(uriString: String): OtpUri {
             val uri = Uri.parse(uriString)
-            if (!uri.isOtpAuthUri()) {
+            if (!uri.isOtpUri()) {
                 throw IllegalArgumentException("Unsupported ${uri.scheme}")
             }
 
             return OtpUri(uri)
         }
 
-        fun String.isOtpAuthUri() = startsWith(SCHEME)
+        fun String.toOtpUri() = OtpUri.parse(this)
 
-        fun Uri.isOtpAuthUri() = scheme == SCHEME
+        fun String.isOtpUri() = startsWith(SCHEME)
+
+        fun Uri.isOtpUri() = scheme == SCHEME
 
         internal inline fun <T> Uri.getOrDefault(default: T, block: Uri.() -> T?) =
             block(this) ?: default

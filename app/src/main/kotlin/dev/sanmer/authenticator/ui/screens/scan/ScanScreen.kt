@@ -35,7 +35,7 @@ import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.viewmodel.ScanViewModel
-import dev.sanmer.otp.OtpUri.Companion.isOtpAuthUri
+import dev.sanmer.otp.OtpUri.Companion.isOtpUri
 
 @Composable
 fun ScanScreen(
@@ -47,7 +47,7 @@ fun ScanScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(uri) {
-        if (uri.isOtpAuthUri()) navController.navigateSingleTopTo(Screen.Edit(uri))
+        if (uri.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(uri))
         onDispose { viewModel.rewind() }
     }
 

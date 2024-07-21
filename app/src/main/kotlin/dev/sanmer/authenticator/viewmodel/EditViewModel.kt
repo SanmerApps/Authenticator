@@ -10,16 +10,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.ktx.decodeOtpAuth
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.model.auth.TotpAuth
-import dev.sanmer.authenticator.model.serializer.OtpSerializable.Companion.decodeOtpAuth
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.viewmodel.EditViewModel.Check.Companion.check
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
-import dev.sanmer.otp.OtpUri.Companion.isOtpAuthUri
+import dev.sanmer.otp.OtpUri.Companion.isOtpUri
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class EditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var secret by mutableStateOf(savedStateHandle.secret)
-    val addAccount by derivedStateOf { secret.isBlank() || secret.isOtpAuthUri() }
+    val addAccount by derivedStateOf { secret.isBlank() || secret.isOtpUri() }
 
     var input by mutableStateOf(Input())
         private set
@@ -83,7 +83,7 @@ class EditViewModel @Inject constructor(
     }
 
     fun decodeFromUri(uri: String) {
-        if (!uri.isOtpAuthUri()) return
+        if (!uri.isOtpUri()) return
 
         runCatching {
             uri.decodeOtpAuth()
