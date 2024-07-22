@@ -45,7 +45,7 @@ import dev.sanmer.authenticator.ui.screens.edit.component.DigitsItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeItem
 import dev.sanmer.authenticator.viewmodel.EditViewModel
-import dev.sanmer.qrcode.QrCodeCompat
+import dev.sanmer.qrcode.QRCode
 
 @Composable
 fun EditScreen(
@@ -185,7 +185,7 @@ private fun QrCodeItem(
 
     val bitmap by remember {
         derivedStateOf {
-            QrCodeCompat.encodeToBitmap(
+            QRCode.encodeToBitmap(
                 contents = uri,
                 width = sizePx,
                 height = sizePx,

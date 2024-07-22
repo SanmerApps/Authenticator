@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.sanmer.ktx
+package dev.sanmer.attestation
 
 import org.bouncycastle.asn1.ASN1Boolean
 import org.bouncycastle.asn1.ASN1Encodable
@@ -37,9 +37,7 @@ internal fun ByteArray.toASN1Sequence(): ASN1Sequence {
 
 internal inline fun ASN1Encodable.asSequence() = when (this) {
     is ASN1Sequence -> this
-    else -> throw CertificateParsingException(
-        "Expected ASN1Sequence"
-    )
+    else -> throw CertificateParsingException("Expected ASN1Sequence")
 }
 
 internal fun ASN1Encodable.asByteArray() = when (this) {

@@ -2,11 +2,6 @@ package dev.sanmer.attestation
 
 import dev.sanmer.attestation.RootOfTrust.BootState.Companion.asState
 import dev.sanmer.encoding.encodeBase64
-import dev.sanmer.ktx.asBoolean
-import dev.sanmer.ktx.asByteArray
-import dev.sanmer.ktx.asInt
-import dev.sanmer.ktx.asSequence
-import dev.sanmer.ktx.getObjectAtOrNull
 import org.bouncycastle.asn1.ASN1Encodable
 import org.bouncycastle.asn1.ASN1Sequence
 
@@ -16,19 +11,7 @@ class RootOfTrust private constructor(
     private val verifiedBootKey: ByteArray,
     private val verifiedBootHash: ByteArray?
 ) {
-    internal constructor(sequence: ASN1Sequence) : this(
-        deviceLocked = sequence.getObjectAt(DEVICE_LOCKED_INDEX).asBoolean(),
-        verifiedBootState = sequence.getObjectAt(VERIFIED_BOOT_STATE_INDEX).asInt().asState(),
-        verifiedBootKey = sequence.getObjectAt(VERIFIED_BOOT_KEY_INDEX).asByteArray(),
-        verifiedBootHash = sequence.getObjectAtOrNull(VERIFIED_BOOT_HASH_INDEX)?.asByteArray()
-    )
-
-    internal constructor(value: ASN1Encodable) : this(
-        sequence = value.asSequence()
-    )
-
     val verifiedBootKeyString by lazy { verifiedBootKey.encodeBase64() }
-
     val verifiedBootHashString by lazy { verifiedBootHash?.encodeBase64() }
 
     enum class BootState(internal val value: Int) {
@@ -49,6 +32,7 @@ class RootOfTrust private constructor(
         }
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     internal companion object {
         const val VERIFIED_BOOT_KEY_INDEX = 0
         const val DEVICE_LOCKED_INDEX = 1
@@ -61,5 +45,20 @@ class RootOfTrust private constructor(
             verifiedBootKey = byteArrayOf(),
             verifiedBootHash = null
         )
+
+        fun parse(values: ASN1Sequence): RootOfTrust {
+            return RootOfTrust(
+                deviceLocked = values.getObjectAt(DEVICE_LOCKED_INDEX).asBoolean(),
+                verifiedBootState = values.getObjectAt(VERIFIED_BOOT_STATE_INDEX).asInt().asState(),
+                verifiedBootKey = values.getObjectAt(VERIFIED_BOOT_KEY_INDEX).asByteArray(),
+                verifiedBootHash = values.getObjectAtOrNull(VERIFIED_BOOT_HASH_INDEX)?.asByteArray()
+            )
+        }
+
+        inline fun ASN1Sequence.toRootOfTrust() =
+            parse(this)
+
+        inline fun ASN1Encodable.toRootOfTrust() =
+            parse(asSequence())
     }
 }

@@ -20,7 +20,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.compat.PermissionCompat
 import dev.sanmer.authenticator.ktx.updateDistinct
-import dev.sanmer.qrcode.QrCodeCompat
+import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -101,7 +101,7 @@ class ScanViewModel @Inject constructor(
         try {
             val plane = image.planes.first()
             val data = plane.buffer.asByteArray()
-            val content = QrCodeCompat.decodeFromYuv(
+            val content = QRCode.decodeFromYuv(
                 yuvData = data,
                 dataWidth = plane.rowStride,
                 dataHeight = image.height,

@@ -3,8 +3,7 @@ package dev.sanmer.attestation
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
-import dev.sanmer.ktx.getObjectAtOrNull
-import dev.sanmer.ktx.toASN1Sequence
+import dev.sanmer.attestation.AuthorizationList.Companion.toAuthorizationList
 import org.bouncycastle.asn1.ASN1Sequence
 import java.security.KeyPair
 import java.security.KeyPairGenerator
@@ -76,7 +75,7 @@ class KeyAttestation private constructor(
 
         internal inline fun List<X509Certificate>.getAuthorizationList(index: Int) =
             firstNotNullOfOrNull {
-                it.toASN1Sequence()?.getObjectAtOrNull(index)?.let(::AuthorizationList)
+                it.toASN1Sequence()?.getObjectAtOrNull(index)?.toAuthorizationList()
             }
 
         private val attestations = hashMapOf<String, Attestation>()

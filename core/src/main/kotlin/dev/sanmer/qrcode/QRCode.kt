@@ -14,7 +14,7 @@ import com.google.zxing.common.BitMatrix
 import com.google.zxing.common.HybridBinarizer
 
 @Suppress("NOTHING_TO_INLINE")
-object QrCodeCompat {
+object QRCode {
     private val hints by lazy {
         hashMapOf<DecodeHintType, Any>().apply {
             put(DecodeHintType.POSSIBLE_FORMATS, listOf(BarcodeFormat.QR_CODE))

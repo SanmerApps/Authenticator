@@ -102,8 +102,15 @@ class OtpUri private constructor() {
         return toUri().toString()
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     companion object {
         const val SCHEME = "otpauth"
+
+        internal inline fun <T> Uri.getOrDefault(default: T, block: Uri.() -> T?) =
+            block(this) ?: default
+
+        internal inline fun Uri.getQueryParameterOrDefault(key: String, default: String) =
+            getQueryParameter(key) ?: default
 
         fun parse(uriString: String): OtpUri {
             val uri = Uri.parse(uriString)
@@ -114,17 +121,10 @@ class OtpUri private constructor() {
             return OtpUri(uri)
         }
 
-        fun String.toOtpUri() = parse(this)
+        inline fun String.toOtpUri() = parse(this)
 
-        fun String.isOtpUri() = startsWith(SCHEME)
+        inline fun String.isOtpUri() = startsWith(SCHEME)
 
-        fun Uri.isOtpUri() = scheme == SCHEME
-
-        internal inline fun <T> Uri.getOrDefault(default: T, block: Uri.() -> T?) =
-            block(this) ?: default
-
-        @Suppress("NOTHING_TO_INLINE")
-        internal inline fun Uri.getQueryParameterOrDefault(key: String, default: String) =
-            getQueryParameter(key) ?: default
+        inline fun Uri.isOtpUri() = scheme == SCHEME
     }
 }
