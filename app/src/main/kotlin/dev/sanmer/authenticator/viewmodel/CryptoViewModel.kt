@@ -11,8 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.ui.CryptoActivity.Action
 import dev.sanmer.authenticator.ui.CryptoActivity.Companion.input
 import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Companion.isRunning
-import dev.sanmer.crypto.decryptBy
-import dev.sanmer.crypto.encryptBy
+import dev.sanmer.crypto.CryptoFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -40,27 +39,25 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
         Timber.d("CryptoViewModel init")
     }
 
+    private fun run() = viewModelScope.launch(Dispatchers.Default) {
+        runCatching {
+            val factory = CryptoFactory(password)
+            state = State.Running
+            data = when (action) {
+                Action.Encrypt -> data.map(factory::encrypt)
+                Action.Decrypt -> data.map(factory::decrypt)
+            }
+        }.onSuccess {
+            state = State.Ok
+        }.onFailure {
+            state = State.Failed
+        }
+    }
+
     operator fun invoke() = when {
         state.isRunning -> false
         isSkip -> true
-        else -> {
-            viewModelScope.launch(Dispatchers.Default) {
-                runCatching {
-                    val pw = password
-                    state = State.Running
-                    data = when (action) {
-                        Action.Encrypt -> data.map { it.encryptBy(pw) }
-                        Action.Decrypt -> data.map { it.decryptBy(pw) }
-                    }
-                }.onSuccess {
-                    state = State.Ok
-                }.onFailure {
-                    state = State.Failed
-                }
-            }
-
-            false
-        }
+        else -> run().isCompleted
     }
 
     fun updateFromIntent(block: () -> Intent) {
