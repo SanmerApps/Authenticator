@@ -3,7 +3,7 @@ package dev.sanmer.authenticator.viewmodel
 import android.net.Uri
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
@@ -16,7 +16,6 @@ import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
-import dev.sanmer.authenticator.viewmodel.EditViewModel.Check.Companion.check
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Companion.isOtpUri
@@ -38,14 +37,14 @@ class EditViewModel @Inject constructor(
     var uriString by mutableStateOf("")
         private set
 
-    var showQrCode by mutableStateOf(false)
+    var showQr by mutableStateOf(false)
         private set
 
-    private val checkFailed = mutableStateListOf<Check>()
+    private val checks = mutableStateMapOf<Check, Boolean>()
 
     init {
         Timber.d("EditViewModel init")
-        decodeFromUri(secret)
+        updateFromUri(secret)
         authObserver()
     }
 
@@ -73,16 +72,15 @@ class EditViewModel @Inject constructor(
     }
 
     private fun check(): Boolean {
-        checkFailed.clear()
-
-        Check.Name.check(input.name, checkFailed::add)
-        Check.Issuer.check(input.issuer, checkFailed::add)
-        Check.Secret.check(input.secret, checkFailed::add)
-
-        return checkFailed.isEmpty()
+        Check.Name.check(input.name, checks::put)
+        Check.Issuer.check(input.issuer, checks::put)
+        Check.Secret.check(input.secret, checks::put)
+        return checks.all { it.value }
     }
 
-    fun decodeFromUri(uri: String) {
+    fun isFailed(value: Check) = !checks.getOrDefault(value, true)
+
+    fun updateFromUri(uri: String) {
         if (!uri.isOtpUri()) return
 
         runCatching {
@@ -96,8 +94,6 @@ class EditViewModel @Inject constructor(
         input = block(input)
     }
 
-    fun isFailed(value: Check) = checkFailed.contains(value)
-
     fun save(block: () -> Unit = {}) {
         if (!check()) return
 
@@ -107,8 +103,12 @@ class EditViewModel @Inject constructor(
         }
     }
 
-    fun updateShowQrCode(block: (Boolean) -> Boolean) {
-        showQrCode = block(showQrCode)
+    fun updateShowQr(block: (Boolean) -> Boolean) {
+        showQr = block(showQr)
+    }
+
+    private inline fun Check.check(value: String, block: (Check, Boolean) -> Unit) {
+        block(this, ok(value))
     }
 
     data class Input(
@@ -168,13 +168,7 @@ class EditViewModel @Inject constructor(
     enum class Check(val ok: (String) -> Boolean) {
         Issuer(String::isNotBlank),
         Name(String::isNotBlank),
-        Secret(String::isBase32);
-
-        companion object {
-            fun Check.check(value: String, failed: (Check) -> Unit) {
-                if (!ok(value)) failed(this)
-            }
-        }
+        Secret(String::isBase32)
     }
 
     companion object {

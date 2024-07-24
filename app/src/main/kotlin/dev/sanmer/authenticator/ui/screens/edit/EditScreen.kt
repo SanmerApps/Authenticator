@@ -59,7 +59,7 @@ fun EditScreen(
             TopBar(
                 addAccount = viewModel.addAccount,
                 uri = viewModel.uriString,
-                fromUri = viewModel::decodeFromUri,
+                fromUri = viewModel::updateFromUri,
                 onSave = {
                     viewModel.save {
                         if (viewModel.addAccount) navController.popBackStack()
@@ -110,9 +110,9 @@ fun EditScreen(
                 isError = viewModel.isFailed(EditViewModel.Check.Secret),
                 trailingIcon = if (viewModel.addAccount) null else {
                     {
-                        ToggleQrCode(
-                            show = viewModel.showQrCode,
-                            onClick = { viewModel.updateShowQrCode { !it } }
+                        ToggleQRCode(
+                            show = viewModel.showQr,
+                            onClick = { viewModel.updateShowQr { !it } }
                         )
                     }
                 },
@@ -151,8 +151,8 @@ fun EditScreen(
                 readOnly = !viewModel.addAccount
             )
 
-            if (viewModel.showQrCode && viewModel.uriString.isNotEmpty()) {
-                QrCodeItem(
+            if (viewModel.showQr && viewModel.uriString.isNotEmpty()) {
+                QRCodeItem(
                     uri = viewModel.uriString
                 )
             }
@@ -161,7 +161,7 @@ fun EditScreen(
 }
 
 @Composable
-private fun QrCodeItem(
+private fun QRCodeItem(
     uri: String,
     modifier: Modifier = Modifier,
     size: Dp = 230.dp,
@@ -202,7 +202,7 @@ private fun QrCodeItem(
 }
 
 @Composable
-private fun ToggleQrCode(
+private fun ToggleQRCode(
     show: Boolean,
     onClick: () -> Unit
 ) = IconButton(
@@ -252,7 +252,7 @@ private fun TopBar(
             Icon(
                 painter = painterResource(
                     id = if (addAccount) {
-                        R.drawable.clipboard_list
+                        R.drawable.clipboard_text
                     } else {
                         R.drawable.clipboard_copy
                     }
