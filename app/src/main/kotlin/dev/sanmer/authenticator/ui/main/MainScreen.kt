@@ -44,13 +44,13 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MainScreen() {
     var isUntrusted by remember { mutableStateOf(false) }
+    val navController = rememberNavController()
+
     LaunchedEffect(true) {
         isUntrusted = withContext(Dispatchers.IO) {
             KeyAttestation.getInstance(BuildConfig.APPLICATION_ID).isUntrusted
         }
     }
-
-    val navController = rememberNavController()
 
     Box(
         modifier = Modifier

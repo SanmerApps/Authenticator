@@ -123,12 +123,6 @@ fun SettingsScreen(
                 }
             )
 
-            SettingItem(
-                icon = R.drawable.json,
-                title = stringResource(id = R.string.settings_decrypt),
-                onClick = { jsonEncrypt.launch(AuthJson.MIME_TYPE) }
-            )
-
             Spacer(modifier = Modifier.height(10.dp))
 
             SettingItem(
@@ -152,11 +146,16 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             SettingItem(
-                icon = R.drawable.code_asterisk,
+                icon = R.drawable.lock_open,
+                title = stringResource(id = R.string.settings_decrypt),
+                onClick = { jsonEncrypt.launch(AuthJson.MIME_TYPE) }
+            )
+
+            SettingItem(
+                icon = R.drawable.a_b,
                 title = stringResource(id = R.string.settings_encode_decode),
                 onClick = { navController.navigateSingleTopTo(Screen.Encode.route) }
             )
-
         }
     }
 }
