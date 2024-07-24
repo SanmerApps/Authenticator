@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,10 +29,13 @@ import dev.sanmer.authenticator.ktx.hidden
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 @Composable
 fun AuthItem(
     auth: Auth,
+    lifetime: Duration,
     onRestore: () -> Unit,
     onDelete: () -> Unit
 ) = SwipeContent(
@@ -47,14 +53,16 @@ fun AuthItem(
     },
     surface = {
         AuthItemContent(
-            auth = auth
+            auth = auth,
+            lifetime = lifetime
         )
     }
 )
 
 @Composable
 private fun AuthItemContent(
-    auth: Auth
+    auth: Auth,
+    lifetime: Duration
 ) = Row(
     modifier = Modifier
         .sizeIn(maxWidth = 450.dp)
@@ -72,15 +80,34 @@ private fun AuthItemContent(
         derivedStateOf { auth.secret.hidden() }
     }
 
+    val lifetimeString by remember {
+        derivedStateOf {
+            lifetime.toString(unit = DurationUnit.HOURS, decimals = 2)
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = hiddenSecret,
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontFamily = FontFamily.Monospace
+        Row(
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = hiddenSecret,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontFamily = FontFamily.Monospace
+                ),
+                modifier = Modifier.weight(1f)
             )
-        )
+
+            FilterChip(
+                selected = true,
+                onClick = {},
+                label = { Text(text = lifetimeString) },
+                modifier = Modifier.height(FilterChipDefaults.Height)
+            )
+        }
 
         Text(
             text = auth.displayName,

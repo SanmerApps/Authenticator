@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.database.entity.TrashEntity
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,12 +14,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private val authsFlow = MutableStateFlow(emptyList<Auth>())
+    private val authsFlow = MutableStateFlow(emptyList<AuthWrapper>())
     val auths get() = authsFlow.asStateFlow()
 
     init {
@@ -27,11 +29,11 @@ class TrashViewModel @Inject constructor(
     }
 
     private fun dataObserver() {
-        dbRepository.getAuthAllAsFlow(enable = false)
+        dbRepository.getAuthInTrashAllAsFlow()
             .onEach { source ->
                 authsFlow.update {
-                    source.sortedBy {
-                        it.issuer.lowercase()
+                    source.map(::AuthWrapper).sortedBy {
+                        it.auth.issuer.lowercase()
                     }
                 }
 
@@ -49,5 +51,15 @@ class TrashViewModel @Inject constructor(
             dbRepository.deleteAuth(auth)
             dbRepository.deleteTrash(auth.secret)
         }
+    }
+
+    class AuthWrapper(
+        val auth: Auth,
+        val lifetime: Duration
+    ) {
+        constructor(value: Pair<Auth, TrashEntity>) : this(
+            auth = value.first,
+            lifetime = value.second.lifetime
+        )
     }
 }

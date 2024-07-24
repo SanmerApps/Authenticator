@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.database.entity.TrashEntity
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,7 +57,7 @@ class HomeViewModel @Inject constructor(
 
     private fun clearTrash() {
         viewModelScope.launch {
-            val secrets = dbRepository.getTrashByTimestamp(TrashEntity.lifetime)
+            val secrets = dbRepository.getTrashAll(dead = true).map { it.secret }
             dbRepository.deleteAuth(secrets)
             dbRepository.deleteTrash(secrets)
         }

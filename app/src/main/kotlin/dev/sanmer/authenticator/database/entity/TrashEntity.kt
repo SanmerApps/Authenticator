@@ -1,6 +1,8 @@
 package dev.sanmer.authenticator.database.entity
 
 import androidx.room.Entity
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 @Entity(
     tableName = "trash",
@@ -10,8 +12,11 @@ data class TrashEntity(
     val secret: String,
     val timestamp: Long = System.currentTimeMillis()
 ) {
+    val lifetime by lazy {
+        (System.currentTimeMillis() - timestamp).milliseconds
+    }
+
     companion object {
-        const val LIFETIME = 604_800_000L
-        val lifetime: Long inline get() = System.currentTimeMillis() - LIFETIME
+        val LIFETIME_MAX = 7.days
     }
 }

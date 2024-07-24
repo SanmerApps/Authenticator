@@ -8,8 +8,8 @@ import dev.sanmer.authenticator.database.entity.TrashEntity
 
 @Dao
 interface TrashDao {
-    @Query("SELECT * FROM trash WHERE timestamp < :before")
-    suspend fun getByTimestamp(before: Long): List<TrashEntity>
+    @Query("SELECT * FROM trash")
+    suspend fun getAll(): List<TrashEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(value: TrashEntity)

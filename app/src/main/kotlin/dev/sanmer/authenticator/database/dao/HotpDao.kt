@@ -19,6 +19,9 @@ interface HotpDao {
     @Query("SELECT * FROM hotp LEFT JOIN trash ON trash.secret = hotp.secret")
     fun getMapToTrashAsFlow(): Flow<Map<HotpEntity, TrashEntity?>>
 
+    @Query("SELECT * FROM hotp JOIN trash ON trash.secret = hotp.secret")
+    fun getAllWithTrashAsFlow(): Flow<Map<HotpEntity, TrashEntity>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entities: List<HotpEntity>)
 

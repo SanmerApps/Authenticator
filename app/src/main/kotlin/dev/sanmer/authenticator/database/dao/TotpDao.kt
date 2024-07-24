@@ -19,6 +19,9 @@ interface TotpDao {
     @Query("SELECT * FROM totp LEFT JOIN trash ON trash.secret = totp.secret")
     fun getMapToTrashAsFlow(): Flow<Map<TotpEntity, TrashEntity?>>
 
+    @Query("SELECT * FROM totp JOIN trash ON trash.secret = totp.secret")
+    fun getAllWithTrashAsFlow(): Flow<Map<TotpEntity, TrashEntity>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entities: List<TotpEntity>)
 

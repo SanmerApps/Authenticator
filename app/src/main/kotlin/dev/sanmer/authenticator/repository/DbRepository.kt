@@ -61,8 +61,11 @@ class DbRepository @Inject constructor(
         totp.exists(secret)
     }
 
-    suspend fun getTrashByTimestamp(before: Long) = withContext(Dispatchers.IO) {
-        trash.getByTimestamp(before).map { it.secret }
+    suspend fun getTrashAll(dead: Boolean = false) = withContext(Dispatchers.IO) {
+        when {
+            dead -> trash.getAll().filter { it.lifetime >= TrashEntity.LIFETIME_MAX }
+            else -> trash.getAll()
+        }
     }
 
     suspend fun insertTrash(secret: String) = withContext(Dispatchers.IO) {
@@ -91,6 +94,13 @@ class DbRepository @Inject constructor(
         getTotpAllAsFlow(enable)
     ) { hotp, totp ->
         hotp.toMutableList<Auth>().apply { addAll(totp) }.toList()
+    }
+
+    fun getAuthInTrashAllAsFlow() = combine(
+        hotp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth }.toList() },
+        totp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth }.toList() }
+    ) { hotp, totp ->
+        hotp.toMutableList<Pair<Auth, TrashEntity>>().apply { addAll(totp) }
     }
 
     suspend fun getAuthBySecretAsFlow(secret: String): Flow<Auth> = when {
