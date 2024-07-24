@@ -52,6 +52,32 @@ fun SettingsScreen(
 
     BackHandler(onBack = onBack)
 
+    val jsonImport = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) viewModel.importFromJson(context, uri)
+    }
+
+    val jsonExport = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE)
+    ) { uri ->
+        if (uri != null) viewModel.exportToJson(context, uri)
+    }
+
+    val jsonDecrypt = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE)
+    ) { uri ->
+        if (uri != null) viewModel.decryptToJson(context, uri)
+    }
+
+    val jsonEncrypt = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) viewModel.encryptFromJson(context, uri) {
+            jsonDecrypt.launch(AuthJson.FILE_NAME)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopBar(
@@ -81,34 +107,26 @@ fun SettingsScreen(
                 onClick = { navController.navigateSingleTopTo(Screen.Scan.route) }
             )
 
-            val jsonImportLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.GetContent()
-            ) { uri ->
-                if (uri != null) viewModel.importFromJson(context, uri)
-            }
-
             SettingItem(
                 icon = R.drawable.database_import,
                 title = stringResource(id = R.string.settings_import),
-                onClick = {
-                    jsonImportLauncher.launch(AuthJson.MIME_TYPE)
-                }
+                onClick = { jsonImport.launch(AuthJson.MIME_TYPE) }
             )
-
-            val jsonExportLauncher = rememberLauncherForActivityResult(
-                ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE)
-            ) { uri ->
-                if (uri != null) viewModel.exportToJson(context, uri)
-            }
 
             SettingItem(
                 icon = R.drawable.database_export,
                 title = stringResource(id = R.string.settings_export),
                 onClick = {
                     viewModel.encrypt(context) {
-                        jsonExportLauncher.launch(AuthJson.FILE_NAME)
+                        jsonExport.launch(AuthJson.FILE_NAME)
                     }
                 }
+            )
+
+            SettingItem(
+                icon = R.drawable.json,
+                title = stringResource(id = R.string.settings_decrypt),
+                onClick = { jsonEncrypt.launch(AuthJson.MIME_TYPE) }
             )
 
             Spacer(modifier = Modifier.height(10.dp))

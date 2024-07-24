@@ -21,9 +21,25 @@ class SettingsViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
     private var encrypted = emptyList<Auth>()
+    private var decrypted = emptyList<Auth>()
 
     init {
         Timber.d("SettingsViewModel init")
+    }
+
+    private fun decrypt(
+        context: Context,
+        auths: List<Auth>,
+        callback: () -> Unit
+    ) = CryptoActivity.decrypt(
+        context = context,
+        input = auths.map { it.secret }
+    ) { decryptedSecrets ->
+        decrypted = auths.mapIndexed { index, auth ->
+            auth.copy(secret = decryptedSecrets[index])
+        }
+
+        callback()
     }
 
     fun encrypt(context: Context, callback: () -> Unit) {
@@ -43,22 +59,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun decrypt(
-        context: Context,
-        auths: List<Auth>,
-        callback: (List<Auth>) -> Unit
-    ) = CryptoActivity.decrypt(
-        context = context,
-        input = auths.map { it.secret }
-    ) { decryptedSecrets ->
-        val decrypted = auths.mapIndexed { index, auth ->
-            auth.copy(secret = decryptedSecrets[index])
-        }
-
-        callback(decrypted)
-    }
-
-    fun importFromJson(context: Context, uri: Uri) {
+    private fun importFromJson(context: Context, uri: Uri, callback: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
@@ -66,13 +67,9 @@ class SettingsViewModel @Inject constructor(
             }.onSuccess { json ->
                 decrypt(
                     context = context,
-                    auths = json.auths.map { it.auth }
-                ) { decrypted ->
-                    val ok = decrypted.all { it.secret.isBase32() }
-                    if (ok) viewModelScope.launch {
-                        dbRepository.insertAuth(decrypted)
-                    }
-                }
+                    auths = json.auths.map { it.auth },
+                    callback = callback
+                )
 
             }.onFailure {
                 Timber.e(it)
@@ -80,16 +77,46 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun exportToJson(context: Context, uri: Uri) {
+    fun importFromJson(context: Context, uri: Uri) =
+        importFromJson(
+            context = context,
+            uri = uri
+        ) {
+            val ok = decrypted.all { it.secret.isBase32() }
+            if (ok) viewModelScope.launch {
+                dbRepository.insertAuth(decrypted)
+            }
+        }
+
+    private fun exportToJson(context: Context, uri: Uri, auths: List<Auth>) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
-                checkNotNull(cr.openOutputStream(uri)).use(AuthJson(encrypted)::encodeTo)
+                checkNotNull(cr.openOutputStream(uri)).use(AuthJson(auths)::encodeTo)
             }.onFailure {
                 Timber.e(it)
             }
-
-            encrypted = emptyList()
         }
     }
+
+    fun exportToJson(context: Context, uri: Uri) =
+        exportToJson(
+            context = context,
+            uri = uri,
+            auths = encrypted
+        )
+
+    fun encryptFromJson(context: Context, uri: Uri, callback: () -> Unit) =
+        importFromJson(
+            context = context,
+            uri = uri,
+            callback = callback
+        )
+
+    fun decryptToJson(context: Context, uri: Uri) =
+        exportToJson(
+            context = context,
+            uri = uri,
+            auths = decrypted
+        )
 }

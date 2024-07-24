@@ -27,6 +27,7 @@
     <string name="settings_scan">Scan QR Code</string>
     <string name="settings_import">Import from JSON</string>
     <string name="settings_export">Export to JSON</string>
+    <string name="settings_decrypt">Decrypt a JSON</string>
     <string name="settings_trash">Trash</string>
 
     <!-- Search -->
