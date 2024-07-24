@@ -31,7 +31,8 @@ class EditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var secret by mutableStateOf(savedStateHandle.secret)
-    val addAccount by derivedStateOf { secret.isBlank() || secret.isOtpUri() }
+    val secretReadOnly by derivedStateOf { secret.isOtpUri() }
+    val addAccount by derivedStateOf { secret.isBlank() || secretReadOnly }
 
     var input by mutableStateOf(Input())
         private set

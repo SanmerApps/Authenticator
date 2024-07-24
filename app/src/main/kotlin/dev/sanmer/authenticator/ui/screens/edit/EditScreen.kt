@@ -85,7 +85,7 @@ fun EditScreen(
                 onValueChange = { name ->
                     viewModel.update { it.copy(name = name) }
                 },
-                icon = R.drawable.user,
+                leadingIcon = R.drawable.user,
                 label = stringResource(id = R.string.edit_name),
                 isError = viewModel.isFailed(EditViewModel.Check.Name)
             )
@@ -104,14 +104,15 @@ fun EditScreen(
                 onValueChange = { secret ->
                     viewModel.update { it.copy(secret = secret) }
                 },
-                icon = R.drawable.key,
+                leadingIcon = R.drawable.key,
                 label = stringResource(id = R.string.edit_secret),
                 hidden = !viewModel.addAccount,
                 isError = viewModel.isFailed(EditViewModel.Check.Secret),
                 trailingIcon = {
                     if (viewModel.addAccount) {
                         IconButton(
-                            onClick = viewModel::randomSecret
+                            onClick = viewModel::randomSecret,
+                            enabled = !viewModel.secretReadOnly
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.arrows_shuffle),

@@ -23,8 +23,9 @@ fun DigitsItem(
     onPeriodChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     readOnly: Boolean = true
-) = BaseItem(
-    modifier = modifier
+) = BaseContent(
+    modifier = modifier,
+    leading = null
 ) {
     BaseOutlinedTextField(
         value = digits,

@@ -18,9 +18,9 @@ fun TypeItem(
     onHashChange: (HOTP.Hash) -> Unit,
     modifier: Modifier = Modifier,
     readOnly: Boolean = true
-) = BaseItem(
+) = BaseContent(
     modifier = modifier,
-    icon = R.drawable.math_function
+    leadingIcon = R.drawable.math_function
 ) {
     BaseDropdownMenu(
         value = type,

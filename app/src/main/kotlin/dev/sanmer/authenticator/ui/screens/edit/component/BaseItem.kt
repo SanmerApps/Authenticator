@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -27,43 +25,64 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.DropdownMenu
+import dev.sanmer.authenticator.ui.ktx.letCompose
 
 @Composable
-fun BaseItem(
+fun BaseContentIcon(
+    @DrawableRes icon: Int
+) = Box(
+    modifier = Modifier.size(48.dp),
+    contentAlignment = Alignment.Center
+) {
+    Icon(
+        painter = painterResource(id = icon),
+        contentDescription = null
+    )
+}
+
+@Composable
+fun BaseContent(
     modifier: Modifier = Modifier,
-    @DrawableRes icon: Int? = null,
-    iconSize: Dp = 24.dp,
-    contentPadding: Dp = 54.dp,
+    leading: @Composable (() -> Unit)? = null,
+    trailing: @Composable (() -> Unit)? = null,
     content: @Composable RowScope.() -> Unit
 ) = Row(
     modifier = modifier,
     verticalAlignment = Alignment.CenterVertically
 ) {
-    when {
-        icon != null -> Box(
-            modifier = Modifier.padding(
-                horizontal = (contentPadding - iconSize) / 2
-            )
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                modifier = Modifier.size(iconSize)
-            )
-        }
-
-        else -> Spacer(modifier = Modifier.width(contentPadding))
+    if (leading != null) {
+        leading()
+    } else {
+        Spacer(modifier = Modifier.size(48.dp))
     }
-
     content()
-
-    Spacer(modifier = Modifier.width(contentPadding))
+    if (trailing != null) {
+        trailing()
+    } else {
+        Spacer(modifier = Modifier.size(48.dp))
+    }
 }
+
+@Composable
+fun BaseContent(
+    modifier: Modifier = Modifier,
+    @DrawableRes leadingIcon: Int? = null,
+    @DrawableRes trailingIcon: Int? = null,
+    content: @Composable RowScope.() -> Unit
+) = BaseContent(
+    modifier = modifier,
+    leading = leadingIcon?.letCompose {
+        BaseContentIcon(icon = it)
+    },
+    trailing = trailingIcon?.letCompose {
+        BaseContentIcon(icon = it)
+    },
+    content = content
+)
 
 @Composable
 fun BaseOutlinedTextField(

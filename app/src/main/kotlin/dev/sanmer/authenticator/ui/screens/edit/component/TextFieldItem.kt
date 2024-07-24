@@ -9,6 +9,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import dev.sanmer.authenticator.ui.ktx.letCompose
 
 @Composable
 fun TextFieldItem(
@@ -16,17 +17,20 @@ fun TextFieldItem(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
+    @DrawableRes leadingIcon: Int? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    @DrawableRes icon: Int? = null,
     hidden: Boolean = false,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
         keyboardType = KeyboardType.Text,
         imeAction = ImeAction.Next
     )
-) = BaseItem(
+) = BaseContent(
     modifier = modifier,
-    icon = icon
+    leading = leadingIcon?.letCompose {
+        BaseContentIcon(icon = it)
+    },
+    trailing = trailingIcon
 ) {
     val passwordVisualTransformation = remember { PasswordVisualTransformation() }
 
@@ -35,7 +39,6 @@ fun TextFieldItem(
         onValueChange = onValueChange,
         label = label,
         modifier = Modifier.weight(1f),
-        trailingIcon = trailingIcon,
         readOnly = hidden,
         isError = isError,
         keyboardOptions = keyboardOptions,
