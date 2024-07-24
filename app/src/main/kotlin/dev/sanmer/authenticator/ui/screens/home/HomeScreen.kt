@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,10 +48,15 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController
 ) {
+    val configuration = LocalConfiguration.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val openDrawer = { scope.launch { drawerState.open() } }
     val closeDrawer = { scope.launch { drawerState.close() } }
+
+    val maxWidth by remember {
+        derivedStateOf { configuration.smallestScreenWidthDp * 0.8f }
+    }
 
     ReversedModalNavigationDrawer(
         drawerState = drawerState,
@@ -59,7 +65,6 @@ fun HomeScreen(
                 drawerShape = MaterialTheme.shapes.large,
                 windowInsets = WindowInsets(0.dp)
             ) {
-                val maxWidth = LocalConfiguration.current.smallestScreenWidthDp * 0.8f
                 Box(
                     modifier = Modifier.width(maxWidth.dp)
                 ) {
