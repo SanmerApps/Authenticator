@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.ui.screens.trash.component
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -22,7 +23,9 @@ fun AuthList(
     deleteAuth: (Auth) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) = LazyColumn(
-    modifier = Modifier.animateContentSize(),
+    modifier = Modifier
+        .fillMaxWidth()
+        .animateContentSize(),
     state = state,
     contentPadding = contentPadding + PaddingValues(15.dp),
     verticalArrangement = Arrangement.spacedBy(15.dp),
