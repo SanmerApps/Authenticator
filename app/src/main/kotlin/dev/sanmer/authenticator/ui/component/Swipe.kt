@@ -32,7 +32,7 @@ fun SwipeContent(
     content: @Composable (() -> Unit) -> Unit,
     surface: @Composable () -> Unit
 ) {
-    var target by remember { mutableStateOf(Target.Start) }
+    var deltaValue by remember { mutableFloatStateOf(0f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     var targetOffsetX = remember { 0f }
 
@@ -69,16 +69,22 @@ fun SwipeContent(
                         if (targetOffsetX == 0f) return@rememberDraggableState
                         val p = 1f - abs(offsetX) / (targetOffsetX * 1.25f)
                         offsetX += delta * min(p, 1f)
-                        target = if (delta > 0) Target.End else Target.Start
+                        deltaValue = delta
                     },
                     onDragStarted = {
                         expanded = false
                         released = false
+                        deltaValue = 0f
                     },
                     onDragStopped = {
-                        when (target) {
-                            Target.Start -> if (!expanded) expanded = true
-                            Target.End -> if (!released) released = true
+                        if (deltaValue > 0) {
+                            released = true
+                        } else {
+                            if (abs(offsetX) / targetOffsetX > 0.35) {
+                                expanded = true
+                            } else {
+                                released = true
+                            }
                         }
                     }
                 )
@@ -86,11 +92,6 @@ fun SwipeContent(
             surface()
         }
     }
-}
-
-private enum class Target {
-    Start,
-    End
 }
 
 @Composable
