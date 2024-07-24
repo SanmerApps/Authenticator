@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.hidden
@@ -76,7 +77,9 @@ private fun AuthItemContent(
     ) {
         Text(
             text = hiddenSecret,
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontFamily = FontFamily.Monospace
+            )
         )
 
         Text(

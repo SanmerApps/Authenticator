@@ -117,7 +117,9 @@ private fun <T> AuthItemContent(
     ) {
         Text(
             text = otp.chunked(3).joinToString(" "),
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontFamily = FontFamily.Monospace
+            )
         )
 
         Text(
