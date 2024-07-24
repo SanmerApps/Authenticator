@@ -161,25 +161,6 @@ fun SettingsScreen(
 }
 
 @Composable
-fun TopBar(
-    onBack: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior
-) = CenterAlignedTopAppBar(
-    title = { Text(text = stringResource(id = R.string.settings_title)) },
-    navigationIcon = {
-        IconButton(
-            onClick = onBack
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = null
-            )
-        }
-    },
-    scrollBehavior = scrollBehavior
-)
-
-@Composable
 private fun SettingItem(
     @DrawableRes icon: Int,
     title: String,
@@ -207,13 +188,26 @@ private fun SettingItem(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.weight(1f)
-        )
-
-        Icon(
-            painter = painterResource(id = R.drawable.chevron_right),
-            contentDescription = null
+            style = MaterialTheme.typography.titleSmall
         )
     }
 }
+
+@Composable
+fun TopBar(
+    onBack: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior
+) = CenterAlignedTopAppBar(
+    title = { Text(text = stringResource(id = R.string.settings_title)) },
+    navigationIcon = {
+        IconButton(
+            onClick = onBack
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
+    scrollBehavior = scrollBehavior
+)
