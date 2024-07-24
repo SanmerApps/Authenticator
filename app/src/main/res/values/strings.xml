@@ -21,6 +21,10 @@
     <string name="edit_counter">Counter</string>
     <string name="edit_period">Period</string>
 
+    <!-- Encode -->
+    <string name="encode_encoded">Encoded</string>
+    <string name="encode_decoded">Decoded</string>
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_enter">Enter Manually</string>
@@ -31,6 +35,7 @@
     <string name="settings_trash">Trash</string>
     <string name="settings_clear_all">Move All to Trash</string>
     <string name="settings_restore_all">Restore All in Trash</string>
+    <string name="settings_encode_decode">Encode &amp; Decode</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>

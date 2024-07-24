@@ -148,6 +148,15 @@ fun SettingsScreen(
                 title = stringResource(id = R.string.settings_restore_all),
                 onClick = viewModel::restoreAuthAll
             )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            SettingItem(
+                icon = R.drawable.code_asterisk,
+                title = stringResource(id = R.string.settings_encode_decode),
+                onClick = { navController.navigateSingleTopTo(Screen.Encode.route) }
+            )
+
         }
     }
 }

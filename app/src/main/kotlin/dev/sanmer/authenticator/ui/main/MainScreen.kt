@@ -29,10 +29,12 @@ import dev.sanmer.authenticator.BuildConfig
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.BottomCornerLabel
 import dev.sanmer.authenticator.ui.main.Screen.Companion.edit
+import dev.sanmer.authenticator.ui.main.Screen.Companion.encode
 import dev.sanmer.authenticator.ui.main.Screen.Companion.home
 import dev.sanmer.authenticator.ui.main.Screen.Companion.scan
 import dev.sanmer.authenticator.ui.main.Screen.Companion.trash
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
+import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
@@ -63,6 +65,7 @@ fun MainScreen() {
             edit(navController)
             scan(navController)
             trash(navController)
+            encode(navController)
         }
 
         if (isUntrusted) {
@@ -79,7 +82,8 @@ enum class Screen(val route: String) {
     Home("Home"),
     Edit("Edit/{secret}"),
     Scan("Scan"),
-    Trash("Trash");
+    Trash("Trash"),
+    Encode("Encode");
 
     companion object {
         @Suppress("FunctionName")
@@ -130,6 +134,18 @@ enum class Screen(val route: String) {
             exitTransition = { fadeOut() }
         ) {
             TrashScreen(
+                navController = navController
+            )
+        }
+
+        fun NavGraphBuilder.encode(
+            navController: NavController
+        ) = composable(
+            route = Encode.route,
+            enterTransition = { fadeIn() },
+            exitTransition = { fadeOut() }
+        ) {
+            EncodeScreen(
                 navController = navController
             )
         }
