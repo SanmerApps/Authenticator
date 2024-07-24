@@ -96,7 +96,8 @@ fun CryptoScreen(
                         contentDescription = null
                     )
                 }
-            }
+            },
+            placeholder = { Text(text = stringResource(id = R.string.password_placeholder)) }
         )
 
         Spacer(modifier = Modifier.height(45.dp))

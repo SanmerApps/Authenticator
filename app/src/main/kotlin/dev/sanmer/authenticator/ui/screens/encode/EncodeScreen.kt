@@ -110,7 +110,7 @@ fun EncodeScreen(
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Encode),
-                label = { Text(text = stringResource(id = R.string.encode_decoded)) }
+                placeholder = { Text(text = stringResource(id = R.string.encode_decoded)) }
             )
 
             Row(
@@ -148,7 +148,7 @@ fun EncodeScreen(
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Decode),
-                label = { Text(text = stringResource(id = R.string.encode_encoded)) }
+                placeholder = { Text(text = stringResource(id = R.string.encode_encoded)) }
             )
         }
     }

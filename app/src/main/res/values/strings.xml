@@ -8,6 +8,7 @@
     <string name="crypto_encrypting">Encrypting</string>
     <string name="crypto_decrypt">Decrypt</string>
     <string name="crypto_decrypting">Decrypting</string>
+    <string name="password_placeholder">Password</string>
 
     <!-- Edit -->
     <string name="edit_add_tile">Add Account</string>
