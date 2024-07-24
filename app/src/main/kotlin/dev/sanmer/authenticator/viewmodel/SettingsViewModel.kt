@@ -119,4 +119,17 @@ class SettingsViewModel @Inject constructor(
             uri = uri,
             auths = decrypted
         )
+
+    fun recycleAuthAll() {
+        viewModelScope.launch {
+            val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
+            dbRepository.insertTrash(auths.map { it.secret })
+        }
+    }
+
+    fun restoreAuthAll() {
+        viewModelScope.launch {
+            dbRepository.deleteTrashAll()
+        }
+    }
 }

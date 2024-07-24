@@ -136,6 +136,18 @@ fun SettingsScreen(
                 title = stringResource(id = R.string.settings_trash),
                 onClick = { navController.navigateSingleTopTo(Screen.Trash.route) }
             )
+
+            SettingItem(
+                icon = R.drawable.clear_all,
+                title = stringResource(id = R.string.settings_clear_all),
+                onClick = viewModel::recycleAuthAll
+            )
+
+            SettingItem(
+                icon = R.drawable.arrow_back_up,
+                title = stringResource(id = R.string.settings_restore_all),
+                onClick = viewModel::restoreAuthAll
+            )
         }
     }
 }

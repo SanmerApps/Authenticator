@@ -69,12 +69,21 @@ class DbRepository @Inject constructor(
         trash.insert(TrashEntity(secret = secret))
     }
 
+    suspend fun insertTrash(secrets: List<String>) = withContext(Dispatchers.IO) {
+        val timestamp: Long = System.currentTimeMillis()
+        trash.insert(secrets.map { TrashEntity(secret = it, timestamp = timestamp) })
+    }
+
     suspend fun deleteTrash(secret: String) = withContext(Dispatchers.IO) {
         trash.delete(secret)
     }
 
     suspend fun deleteTrash(secrets: List<String>) = withContext(Dispatchers.IO) {
         trash.delete(secrets)
+    }
+
+    suspend fun deleteTrashAll() = withContext(Dispatchers.IO) {
+        trash.deleteAll()
     }
 
     fun getAuthAllAsFlow(enable: Boolean = true) = combine(

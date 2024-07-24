@@ -29,6 +29,8 @@
     <string name="settings_export">Export to JSON</string>
     <string name="settings_decrypt">Decrypt a JSON</string>
     <string name="settings_trash">Trash</string>
+    <string name="settings_clear_all">Move All to Trash</string>
+    <string name="settings_restore_all">Restore All in Trash</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>

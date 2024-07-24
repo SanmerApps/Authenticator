@@ -11,12 +11,18 @@ interface TrashDao {
     @Query("SELECT * FROM trash WHERE timestamp < :before")
     suspend fun getByTimestamp(before: Long): List<TrashEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(value: TrashEntity)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(values: List<TrashEntity>)
 
     @Query("DELETE FROM trash WHERE secret = :secret")
     suspend fun delete(secret: String)
 
     @Query("DELETE FROM trash WHERE secret IN (:secrets)")
     suspend fun delete(secrets: List<String>)
+
+    @Query("DELETE FROM trash")
+    suspend fun deleteAll()
 }
