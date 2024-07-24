@@ -108,8 +108,17 @@ fun EditScreen(
                 label = stringResource(id = R.string.edit_secret),
                 hidden = !viewModel.addAccount,
                 isError = viewModel.isFailed(EditViewModel.Check.Secret),
-                trailingIcon = if (viewModel.addAccount) null else {
-                    {
+                trailingIcon = {
+                    if (viewModel.addAccount) {
+                        IconButton(
+                            onClick = viewModel::randomSecret
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.arrows_shuffle),
+                                contentDescription = null
+                            )
+                        }
+                    } else {
                         ToggleQRCode(
                             show = viewModel.showQr,
                             onClick = { viewModel.updateShowQr { !it } }

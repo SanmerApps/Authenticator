@@ -16,11 +16,13 @@ import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
+import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Companion.isOtpUri
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.security.SecureRandom
 import javax.inject.Inject
 
 @HiltViewModel
@@ -105,6 +107,14 @@ class EditViewModel @Inject constructor(
 
     fun updateShowQr(block: (Boolean) -> Boolean) {
         showQr = block(showQr)
+    }
+
+    fun randomSecret() {
+        val secret = ByteArray(32).apply {
+            SecureRandom().nextBytes(this)
+        }.encodeBase32Default()
+
+        update { it.copy(secret = secret) }
     }
 
     private inline fun Check.check(value: String, block: (Check, Boolean) -> Unit) {
