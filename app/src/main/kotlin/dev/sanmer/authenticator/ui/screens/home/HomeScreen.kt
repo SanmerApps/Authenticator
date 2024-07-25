@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,12 +52,15 @@ fun HomeScreen(
     val configuration = LocalConfiguration.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val openDrawer = { scope.launch { drawerState.open() } }
-    val closeDrawer = { scope.launch { drawerState.close() } }
 
     val maxWidth by remember {
         derivedStateOf { configuration.smallestScreenWidthDp * 0.8f }
     }
+
+    BackHandler(
+        enabled = drawerState.isOpen,
+        onBack = { scope.launch { drawerState.close() } }
+    )
 
     ReversedModalNavigationDrawer(
         drawerState = drawerState,
@@ -70,7 +74,7 @@ fun HomeScreen(
                 ) {
                     SettingsScreen(
                         navController = navController,
-                        onBack = { closeDrawer() }
+                        onBack = { scope.launch { drawerState.close() } }
                     )
                 }
             }
@@ -78,7 +82,7 @@ fun HomeScreen(
     ) {
         HomeContent(
             navController = navController,
-            onOpen = { openDrawer() }
+            onOpen = { scope.launch { drawerState.open() } }
         )
     }
 }

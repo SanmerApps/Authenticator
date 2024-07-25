@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.ui.screens.settings
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -49,8 +48,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    BackHandler(onBack = onBack)
 
     val jsonImport = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
