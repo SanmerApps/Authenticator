@@ -37,6 +37,7 @@
     <string name="settings_clear_all">Move All to Trash</string>
     <string name="settings_restore_all">Restore All in Trash</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
+    <string name="settings_source_code">Source Code</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>

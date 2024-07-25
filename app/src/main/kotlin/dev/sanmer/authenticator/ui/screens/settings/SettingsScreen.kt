@@ -34,7 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ktx.viewUrl
 import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
@@ -152,6 +154,14 @@ fun SettingsScreen(
                 icon = R.drawable.a_b,
                 title = stringResource(id = R.string.settings_encode_decode),
                 onClick = { navController.navigateSingleTopTo(Screen.Encode.route) }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            SettingItem(
+                icon = R.drawable.brand_github,
+                title = stringResource(id = R.string.settings_source_code),
+                onClick = { context.viewUrl(Const.GITHUB_URL) }
             )
         }
     }
