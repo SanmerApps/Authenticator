@@ -97,16 +97,24 @@ private fun HomeContent(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val listState = rememberLazyListState()
 
+    BackHandler(
+        enabled = viewModel.isSearch,
+        onBack = viewModel::closeSearch
+    )
+
+    DisposableEffect(true) {
+        onDispose(viewModel::closeSearch)
+    }
+
     Scaffold(
         topBar = {
             TopBar(
                 isSearch = viewModel.isSearch,
+                enableSearch = auths.isNotEmpty(),
                 onQueryChange = viewModel::search,
-                onOpenSearch = {
-                    if (auths.isNotEmpty()) viewModel.openSearch()
-                },
-                onOpenDrawer = onOpen,
+                onOpenSearch = viewModel::openSearch,
                 onCloseSearch = viewModel::closeSearch,
+                onOpenDrawer = onOpen,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -141,6 +149,7 @@ private fun HomeContent(
 @Composable
 private fun TopBar(
     isSearch: Boolean,
+    enableSearch: Boolean,
     onQueryChange: (String) -> Unit,
     onOpenSearch: () -> Unit,
     onCloseSearch: () -> Unit,
@@ -163,7 +172,8 @@ private fun TopBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
             if (!isSearch) IconButton(
-                onClick = onOpenSearch
+                onClick = onOpenSearch,
+                enabled = enableSearch
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.search),
