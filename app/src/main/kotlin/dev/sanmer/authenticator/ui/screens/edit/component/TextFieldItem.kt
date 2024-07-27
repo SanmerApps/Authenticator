@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import dev.sanmer.authenticator.ui.ktx.letCompose
 
 @Composable
 fun TextFieldItem(
@@ -27,8 +26,8 @@ fun TextFieldItem(
     )
 ) = BaseContent(
     modifier = modifier,
-    leading = leadingIcon?.letCompose {
-        BaseContentIcon(icon = it)
+    leading = leadingIcon?.let {
+        { BaseContentIcon(icon = it) }
     },
     trailing = trailingIcon
 ) {

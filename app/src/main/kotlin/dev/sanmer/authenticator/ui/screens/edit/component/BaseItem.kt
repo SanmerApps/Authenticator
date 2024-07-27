@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.DropdownMenu
-import dev.sanmer.authenticator.ui.ktx.letCompose
 
 @Composable
 fun BaseContentIcon(
@@ -75,11 +74,11 @@ fun BaseContent(
     content: @Composable RowScope.() -> Unit
 ) = BaseContent(
     modifier = modifier,
-    leading = leadingIcon?.letCompose {
-        BaseContentIcon(icon = it)
+    leading = leadingIcon?.let {
+        { BaseContentIcon(icon = it) }
     },
-    trailing = trailingIcon?.letCompose {
-        BaseContentIcon(icon = it)
+    trailing = trailingIcon?.let {
+        { BaseContentIcon(icon = it) }
     },
     content = content
 )
