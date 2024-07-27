@@ -128,8 +128,18 @@ private fun HomeContent(
         ) {
             if (auths.isEmpty()) {
                 PageIndicator(
-                    icon = if (viewModel.isSearch) R.drawable.list_search else R.drawable.list,
-                    text = stringResource(id = R.string.empty_list),
+                    icon = if (viewModel.isSearch) {
+                        R.drawable.list_search
+                    } else {
+                        R.drawable.key
+                    },
+                    text = stringResource(
+                        id = if (viewModel.isSearch) {
+                            R.string.empty_list
+                        } else {
+                            R.string.home_empty
+                        }
+                    ),
                     modifier = Modifier.padding(contentPadding)
                 )
             }

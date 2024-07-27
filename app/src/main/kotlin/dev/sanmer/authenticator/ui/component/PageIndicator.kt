@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,11 +38,11 @@ fun PageIndicator(
     icon: @Composable ColumnScope.() -> Unit,
     text: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
-    minHeight: Dp = Dp.Unspecified
+    height: Dp = Dp.Unspecified
 ) = Column(
-    modifier = modifier then (if (minHeight.isSpecified) {
+    modifier = modifier then (if (height.isSpecified) {
         Modifier
-            .defaultMinSize(minHeight = minHeight)
+            .height(height = height)
             .fillMaxWidth()
     } else {
         Modifier.fillMaxSize()
@@ -52,7 +51,7 @@ fun PageIndicator(
     verticalArrangement = Arrangement.Center
 ) {
     icon()
-    Spacer(modifier = Modifier.height(PageIndicatorDefaults.IconSpacing))
+    Spacer(modifier = Modifier.height(20.dp))
     ProvideTextStyle(value = PageIndicatorDefaults.TextStyle) {
         text()
     }
@@ -63,7 +62,7 @@ fun PageIndicator(
     @DrawableRes icon: Int,
     text: String,
     modifier: Modifier = Modifier,
-    minHeight: Dp = Dp.Unspecified
+    height: Dp = Dp.Unspecified
 ) = PageIndicator(
     modifier = modifier,
     icon = {
@@ -82,7 +81,7 @@ fun PageIndicator(
             overflow = TextOverflow.Ellipsis
         )
     },
-    minHeight = minHeight
+    height = height
 )
 
 @Composable
@@ -90,23 +89,22 @@ fun PageIndicator(
     @DrawableRes icon: Int,
     @StringRes text: Int,
     modifier: Modifier = Modifier,
-    minHeight: Dp = Dp.Unspecified
+    height: Dp = Dp.Unspecified
 ) = PageIndicator(
     modifier = modifier,
     icon = icon,
     text = stringResource(id = text),
-    minHeight = minHeight
+    height = height
 )
 
 @Composable
 fun Loading(
     modifier: Modifier = Modifier,
-    minHeight: Dp = Dp.Unspecified
+    height: Dp = Dp.Unspecified
 ) = PageIndicator(
-    modifier = modifier,
     icon = {
         CircularProgressIndicator(
-            modifier = Modifier.size(50.dp),
+            modifier = Modifier.size(PageIndicatorDefaults.IconSize * (3f/4f)),
             strokeWidth = 5.dp,
             strokeCap = StrokeCap.Round
         )
@@ -118,25 +116,24 @@ fun Loading(
             color = MaterialTheme.colorScheme.outline
         )
     },
-    minHeight = minHeight
+    modifier = modifier,
+    height = height
 )
 
 @Composable
 fun Failed(
-    message: String?,
+    error: Throwable?,
     modifier: Modifier = Modifier,
-    minHeight: Dp = Dp.Unspecified
+    height: Dp = Dp.Unspecified
 ) = PageIndicator(
     icon = R.drawable.alert_triangle,
-    text = message ?: stringResource(id = R.string.unknown_error),
+    text = error?.message ?: stringResource(id = R.string.unknown_error),
     modifier = modifier,
-    minHeight = minHeight
+    height = height
 )
 
 object PageIndicatorDefaults {
-    val IconSize = 80.dp
-    val IconSpacing = 20.dp
-
+    val IconSize = 64.dp
     val IconColor @Composable get() = MaterialTheme.colorScheme.outline.copy(0.5f)
 
     val TextStyle @Composable get() = TextStyle(

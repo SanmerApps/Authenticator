@@ -48,7 +48,7 @@ fun TrashScreen(
             if (auths.isEmpty()) {
                 PageIndicator(
                     icon = R.drawable.trash,
-                    text = stringResource(id = R.string.empty_list),
+                    text = stringResource(id = R.string.trash_empty),
                     modifier = Modifier.padding(contentPadding)
                 )
             }

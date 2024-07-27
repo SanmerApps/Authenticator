@@ -10,6 +10,9 @@
     <string name="crypto_decrypting">Decrypting</string>
     <string name="password_placeholder">Password</string>
 
+    <!-- Home -->
+    <string name="home_empty">Empty token</string>
+
     <!-- Edit -->
     <string name="edit_add_tile">Add Account</string>
     <string name="edit_edit_tile">Edit Account</string>
@@ -38,6 +41,9 @@
     <string name="settings_restore_all">Restore All in Trash</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
     <string name="settings_source_code">Source Code</string>
+
+    <!-- Trash -->
+    <string name="trash_empty">Empty trash</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>
