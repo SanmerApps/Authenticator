@@ -122,12 +122,12 @@ fun Loading(
 
 @Composable
 fun Failed(
-    error: Throwable?,
+    message: String?,
     modifier: Modifier = Modifier,
     height: Dp = Dp.Unspecified
 ) = PageIndicator(
     icon = R.drawable.alert_triangle,
-    text = error?.message ?: stringResource(id = R.string.unknown_error),
+    text = message ?: stringResource(id = R.string.unknown_error),
     modifier = modifier,
     height = height
 )
