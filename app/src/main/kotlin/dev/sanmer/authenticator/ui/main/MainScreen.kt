@@ -1,6 +1,10 @@
 package dev.sanmer.authenticator.ui.main
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -17,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -28,11 +34,6 @@ import dev.sanmer.attestation.KeyAttestation
 import dev.sanmer.authenticator.BuildConfig
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.BottomCornerLabel
-import dev.sanmer.authenticator.ui.main.Screen.Companion.edit
-import dev.sanmer.authenticator.ui.main.Screen.Companion.encode
-import dev.sanmer.authenticator.ui.main.Screen.Companion.home
-import dev.sanmer.authenticator.ui.main.Screen.Companion.scan
-import dev.sanmer.authenticator.ui.main.Screen.Companion.trash
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
@@ -59,13 +60,13 @@ fun MainScreen() {
     ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Home.route
+            startDestination = Screen.Home()
         ) {
-            home(navController)
-            edit(navController)
-            scan(navController)
-            trash(navController)
-            encode(navController)
+            Screen.Home(navController).addTo(this)
+            Screen.Edit(navController).addTo(this)
+            Screen.Scan(navController).addTo(this)
+            Screen.Trash(navController).addTo(this)
+            Screen.Encode(navController).addTo(this)
         }
 
         if (isUntrusted) {
@@ -78,76 +79,58 @@ fun MainScreen() {
     }
 }
 
-enum class Screen(val route: String) {
-    Home("Home"),
-    Edit("Edit/{secret}"),
-    Scan("Scan"),
-    Trash("Trash"),
-    Encode("Encode");
+sealed class Screen(
+    private val route: String,
+    private val content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+    private val arguments: List<NamedNavArgument> = emptyList(),
+    private val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) = { fadeIn() },
+    private val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) = { fadeOut() },
+) {
+    fun addTo(builder: NavGraphBuilder) = builder.composable(
+        route = this@Screen.route,
+        arguments = this@Screen.arguments,
+        enterTransition = this@Screen.enterTransition,
+        exitTransition = this@Screen.exitTransition,
+        content = this@Screen.content
+    )
 
-    companion object {
-        @Suppress("FunctionName")
-        fun Edit(secret: String = " ") = "Edit/${Uri.encode(secret)}"
+    @Suppress("FunctionName")
+    companion object Routes {
+        fun Home() = "Home"
 
-        fun NavGraphBuilder.home(
-            navController: NavController
-        ) = composable(
-            route = Home.route,
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() }
-        ) {
-            HomeScreen(
-                navController = navController
-            )
-        }
+        fun Edit(
+            secret: String = " ",
+            encode: Boolean = true
+        ) = if (encode) "Edit/${Uri.encode(secret)}" else "Edit/${secret}"
 
-        fun NavGraphBuilder.edit(
-            navController: NavController
-        ) = composable(
-            route = Edit.route,
-            arguments = listOf(navArgument("secret") { type = NavType.StringType }),
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() }
-        ) {
-            EditScreen(
-                navController = navController
-            )
-        }
-
-        fun NavGraphBuilder.scan(
-            navController: NavController
-        ) = composable(
-            route = Scan.route,
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() }
-        ) {
-            ScanScreen(
-                navController = navController
-            )
-        }
-
-        fun NavGraphBuilder.trash(
-            navController: NavController
-        ) = composable(
-            route = Trash.route,
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() }
-        ) {
-            TrashScreen(
-                navController = navController
-            )
-        }
-
-        fun NavGraphBuilder.encode(
-            navController: NavController
-        ) = composable(
-            route = Encode.route,
-            enterTransition = { fadeIn() },
-            exitTransition = { fadeOut() }
-        ) {
-            EncodeScreen(
-                navController = navController
-            )
-        }
+        fun Scan() = "Scan"
+        fun Trash() = "Trash"
+        fun Encode() = "Encode"
     }
+
+    class Home(navController: NavController) : Screen(
+        route = Home(),
+        content = { HomeScreen(navController = navController) }
+    )
+
+    class Edit(navController: NavController) : Screen(
+        route = Edit("{secret}", false),
+        content = { EditScreen(navController = navController) },
+        arguments = listOf(navArgument("secret") { type = NavType.StringType })
+    )
+
+    class Scan(navController: NavController) : Screen(
+        route = Scan(),
+        content = { ScanScreen(navController = navController) }
+    )
+
+    class Trash(navController: NavController) : Screen(
+        route = Trash(),
+        content = { TrashScreen(navController = navController) }
+    )
+
+    class Encode(navController: NavController) : Screen(
+        route = Encode(),
+        content = { EncodeScreen(navController = navController) }
+    )
 }

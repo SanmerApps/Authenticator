@@ -103,7 +103,7 @@ fun SettingsScreen(
             SettingItem(
                 icon = R.drawable.scan,
                 title = stringResource(id = R.string.settings_scan),
-                onClick = { navController.navigateSingleTopTo(Screen.Scan.route) }
+                onClick = { navController.navigateSingleTopTo(Screen.Scan()) }
             )
 
             SettingItem(
@@ -127,7 +127,7 @@ fun SettingsScreen(
             SettingItem(
                 icon = R.drawable.trash,
                 title = stringResource(id = R.string.settings_trash),
-                onClick = { navController.navigateSingleTopTo(Screen.Trash.route) }
+                onClick = { navController.navigateSingleTopTo(Screen.Trash()) }
             )
 
             SettingItem(
@@ -153,7 +153,7 @@ fun SettingsScreen(
             SettingItem(
                 icon = R.drawable.a_b,
                 title = stringResource(id = R.string.settings_encode_decode),
-                onClick = { navController.navigateSingleTopTo(Screen.Encode.route) }
+                onClick = { navController.navigateSingleTopTo(Screen.Encode()) }
             )
 
             Spacer(modifier = Modifier.height(10.dp))
