@@ -1,16 +1,14 @@
 package dev.sanmer.authenticator.ui.screens.trash.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -101,11 +99,16 @@ private fun AuthItemContent(
                 modifier = Modifier.weight(1f)
             )
 
-            FilterChip(
-                selected = true,
-                onClick = {},
-                label = { Text(text = lifetimeString) },
-                modifier = Modifier.height(FilterChipDefaults.Height)
+            Text(
+                text = lifetimeString,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
             )
         }
 
