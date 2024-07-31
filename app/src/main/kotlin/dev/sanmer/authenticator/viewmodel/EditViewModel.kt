@@ -153,18 +153,18 @@ class EditViewModel @Inject constructor(
         )
 
         val hotp get() = HotpAuth(
-            name = name,
-            issuer = issuer,
-            secret = secret,
+            name = name.trim(),
+            issuer = issuer.trim(),
+            secret = secret.trim(),
             hash = hash,
             digits = digits.toIntOrNull() ?: 6,
             count = counter.toLongOrNull() ?: 0L
         )
 
         val totp get() = TotpAuth(
-            name = name,
-            issuer = issuer,
-            secret = secret,
+            name = name.trim(),
+            issuer = issuer.trim(),
+            secret = secret.trim(),
             hash = hash,
             digits = digits.toIntOrNull() ?: 6,
             period = period.toLongOrNull() ?: 30L
