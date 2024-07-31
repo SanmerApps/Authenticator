@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,26 +18,30 @@ import dev.sanmer.authenticator.database.entity.HotpEntity
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.database.entity.TrashEntity
 import dev.sanmer.authenticator.ktx.deviceProtectedContext
+import dev.sanmer.otp.HOTP
 import javax.inject.Singleton
 
-@Database(
-    entities = [
-        TrashEntity::class,
-        HotpEntity::class,
-        TotpEntity::class
-    ],
-    version = 1
-)
+@Database(version = 1, entities = [TrashEntity::class, HotpEntity::class, TotpEntity::class])
+@TypeConverters(AppDatabase.Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun trash(): TrashDao
     abstract fun hotp(): HotpDao
     abstract fun totp(): TotpDao
 
-    companion object {
+    companion object Default {
         fun build(context: Context) =
             Room.databaseBuilder(
                 context, AppDatabase::class.java, "auth"
             ).build()
+    }
+
+    @Suppress("FunctionName")
+    object Converters {
+        @TypeConverter
+        fun StringToHash(value: String) = HOTP.Hash.valueOf(value)
+
+        @TypeConverter
+        fun HashToString(value: HOTP.Hash) = value.name
     }
 
     @Module

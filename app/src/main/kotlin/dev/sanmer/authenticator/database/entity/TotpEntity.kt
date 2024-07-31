@@ -4,15 +4,12 @@ import androidx.room.Entity
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.otp.HOTP
 
-@Entity(
-    tableName = "totp",
-    primaryKeys = ["secret"]
-)
+@Entity(tableName = "totp", primaryKeys = ["secret"])
 data class TotpEntity(
     val issuer: String,
     val name: String,
     val secret: String,
-    val hash: String,
+    val hash: HOTP.Hash,
     val digits: Int,
     val period: Long
 ) {
@@ -22,7 +19,7 @@ data class TotpEntity(
         issuer = original.issuer,
         name = original.name,
         secret = original.secret,
-        hash = original.hash.name,
+        hash = original.hash,
         digits = original.digits,
         period = original.period
     )
@@ -31,7 +28,7 @@ data class TotpEntity(
         issuer = issuer,
         name = name,
         secret = secret,
-        hash = HOTP.Hash.valueOf(hash),
+        hash = hash,
         digits = digits,
         period = period
     )
