@@ -31,7 +31,7 @@ data class AuthJson(
         endpointJson.encodeToStream(this, output)
     }
 
-    companion object {
+    companion object Util {
         private val endpointJson = Json {
             prettyPrint = true
         }

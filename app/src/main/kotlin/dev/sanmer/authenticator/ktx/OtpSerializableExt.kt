@@ -5,7 +5,7 @@ import dev.sanmer.authenticator.model.serializer.HotpSerializable
 import dev.sanmer.authenticator.model.serializer.OtpSerializable
 import dev.sanmer.authenticator.model.serializer.TotpSerializable
 import dev.sanmer.otp.HOTP
-import dev.sanmer.otp.OtpUri.Companion.toOtpUri
+import dev.sanmer.otp.OtpUri.Default.toOtpUri
 
 fun String.decodeOtpAuth(): OtpSerializable {
     val uri = toOtpUri()

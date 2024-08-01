@@ -13,7 +13,7 @@ data class TrashEntity(
         (System.currentTimeMillis() - timestamp).milliseconds
     }
 
-    companion object {
+    companion object Default {
         val LIFETIME_MAX = 7.days
     }
 }

@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.ui.CryptoActivity.Action
-import dev.sanmer.authenticator.ui.CryptoActivity.Companion.input
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Companion.isRunning
+import dev.sanmer.authenticator.ui.CryptoActivity.Util.input
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Util.isRunning
 import dev.sanmer.crypto.CryptoFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,7 +84,7 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
         Failed,
         Ok;
 
-        companion object {
+        companion object Util {
             val State.isRunning inline get() = this == Running
             val State.isFailed inline get() = this == Failed
             val State.isOk inline get() = this == Ok

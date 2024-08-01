@@ -19,7 +19,7 @@ import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
-import dev.sanmer.otp.OtpUri.Companion.isOtpUri
+import dev.sanmer.otp.OtpUri.Default.isOtpUri
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.security.SecureRandom
@@ -182,7 +182,7 @@ class EditViewModel @Inject constructor(
         Secret(String::isBase32)
     }
 
-    companion object {
+    companion object Util {
         private val SavedStateHandle.secret: String
             inline get() = checkNotNull(Uri.decode(get("secret")))
     }

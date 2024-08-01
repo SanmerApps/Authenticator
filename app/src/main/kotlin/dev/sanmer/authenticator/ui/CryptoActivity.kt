@@ -44,7 +44,7 @@ class CryptoActivity : ComponentActivity() {
         Encrypt,
         Decrypt;
 
-        companion object {
+        companion object Util {
             fun fromStr(action: String?): Action? {
                 return when (action) {
                     ACTION_ENCRYPT -> Encrypt
@@ -55,7 +55,7 @@ class CryptoActivity : ComponentActivity() {
         }
     }
 
-    companion object {
+    companion object Util {
         const val ACTION_ENCRYPT = "dev.sanmer.authenticator.action.ENCRYPT"
         const val ACTION_DECRYPT = "dev.sanmer.authenticator.action.DECRYPT"
         const val EXTRA_INPUT = "dev.sanmer.authenticator.extra.INPUT"

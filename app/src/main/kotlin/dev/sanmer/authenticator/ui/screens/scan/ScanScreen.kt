@@ -35,7 +35,7 @@ import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.viewmodel.ScanViewModel
-import dev.sanmer.otp.OtpUri.Companion.isOtpUri
+import dev.sanmer.otp.OtpUri.Default.isOtpUri
 
 @Composable
 fun ScanScreen(

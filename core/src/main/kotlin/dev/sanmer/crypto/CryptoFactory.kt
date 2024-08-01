@@ -51,7 +51,7 @@ class CryptoFactory(
     fun decrypt(input: String) =
         decrypt(input.decodeBase64()).toString(Charsets.UTF_8)
 
-    internal companion object {
+    internal companion object Default {
         const val FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256"
         const val ALGORITHM = "AES/CBC/PKCS5Padding"
         const val KEY_ALGORITHM = "AES"

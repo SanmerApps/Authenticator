@@ -103,7 +103,7 @@ class OtpUri private constructor() {
     }
 
     @Suppress("NOTHING_TO_INLINE")
-    companion object {
+    companion object Default {
         const val SCHEME = "otpauth"
 
         internal inline fun <T> Uri.getOrDefault(default: T, block: Uri.() -> T?) =

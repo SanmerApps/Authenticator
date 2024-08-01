@@ -35,9 +35,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.finishActivity
 import dev.sanmer.authenticator.viewmodel.CryptoViewModel
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Companion.isFailed
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Companion.isOk
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Companion.isRunning
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Util.isFailed
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Util.isOk
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel.State.Util.isRunning
 
 @Composable
 fun CryptoScreen(
