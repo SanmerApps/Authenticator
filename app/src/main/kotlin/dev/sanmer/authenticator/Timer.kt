@@ -17,23 +17,21 @@ import kotlin.time.Duration.Companion.seconds
 
 object Timer {
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val epochSecondsFlow = MutableStateFlow(Clock.System.now().epochSeconds)
     val epochSeconds get() = epochSecondsFlow.asStateFlow()
 
-    fun start() {
-        coroutineScope.launch {
-            val offset = offset()
-            Timber.d("Time offset: $offset")
-            while (currentCoroutineContext().isActive) {
-                epochSecondsFlow.value = (System.currentTimeMillis() + offset) / 1000
-                delay(1.seconds)
-            }
+    fun start() = coroutineScope.launch {
+        val offset = offset()
+        Timber.d("Time offset: $offset")
+
+        while (currentCoroutineContext().isActive) {
+            epochSecondsFlow.value = (System.currentTimeMillis() + offset) / 1000
+            delay(1.seconds)
         }
     }
 
-    fun stop() {
-        coroutineScope.cancel()
-    }
+    fun stop() = coroutineScope.cancel()
 
     private suspend fun offset() =
         runCatching { NtpServer.Apple.sync() }.getOrElse { 0L }

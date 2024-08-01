@@ -104,7 +104,7 @@ fun Loading(
 ) = PageIndicator(
     icon = {
         CircularProgressIndicator(
-            modifier = Modifier.size(PageIndicatorDefaults.IconSize * (3f/4f)),
+            modifier = Modifier.size(PageIndicatorDefaults.IconSize * (3f / 4f)),
             strokeWidth = 5.dp,
             strokeCap = StrokeCap.Round
         )
