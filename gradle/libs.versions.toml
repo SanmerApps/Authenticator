@@ -9,12 +9,10 @@ androidxComposeMaterial3 = "1.2.1"
 androidxCore = "1.13.1"
 androidxCoreSplashscreen = "1.0.1"
 androidxDataStore = "1.1.1"
-androidxDocumentFile = "1.0.1"
 androidxHiltNavigationCompose = "1.2.0"
 androidxLifecycle = "2.8.4"
 androidxNavigation = "2.7.7"
 androidxRoom = "2.6.1"
-bouncycastle = "1.78.1"
 encoding = "2.2.1"
 googleZxing = "3.5.3"
 hilt = "2.51.1"
@@ -53,7 +51,6 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
-bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 encoding-base32 = { module = "io.matthewnelson.encoding:base32", version.ref = "encoding" }
 encoding-base64 = { module = "io.matthewnelson.encoding:base64", version.ref = "encoding" }
 google-zxing = { module = "com.google.zxing:core", version.ref = "googleZxing" }

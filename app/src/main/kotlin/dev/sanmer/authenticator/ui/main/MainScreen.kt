@@ -12,15 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -30,28 +22,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.sanmer.attestation.KeyAttestation
-import dev.sanmer.authenticator.BuildConfig
-import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.component.BottomCornerLabel
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun MainScreen() {
-    var isUntrusted by remember { mutableStateOf(false) }
     val navController = rememberNavController()
-
-    LaunchedEffect(true) {
-        isUntrusted = withContext(Dispatchers.IO) {
-            KeyAttestation.getInstance(BuildConfig.APPLICATION_ID).isUntrusted
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -67,14 +46,6 @@ fun MainScreen() {
             Screen.Scan(navController).addTo(this)
             Screen.Trash(navController).addTo(this)
             Screen.Encode(navController).addTo(this)
-        }
-
-        if (isUntrusted) {
-            BottomCornerLabel(
-                text = stringResource(id = R.string.untrusted),
-                modifier = Modifier.align(Alignment.BottomEnd),
-                width = 150.dp
-            )
         }
     }
 }
