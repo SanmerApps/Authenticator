@@ -12,8 +12,8 @@
     <string name="home_empty">Empty token</string>
 
     <!-- Edit -->
-    <string name="edit_add_tile">Add Account</string>
-    <string name="edit_edit_tile">Edit Account</string>
+    <string name="edit_add_tile">Add Token</string>
+    <string name="edit_edit_tile">Edit Token</string>
     <string name="edit_name">Name</string>
     <string name="edit_issuer">Issuer</string>
     <string name="edit_secret">Secret</string>
@@ -22,10 +22,6 @@
     <string name="edit_digits">Digits</string>
     <string name="edit_counter">Counter</string>
     <string name="edit_period">Period</string>
-
-    <!-- Encode -->
-    <string name="encode_encoded">Encoded</string>
-    <string name="encode_decoded">Decoded</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -45,6 +41,10 @@
     <!-- Trash -->
     <string name="trash_title">Trash</string>
     <string name="trash_empty">Empty trash</string>
+
+    <!-- Encode -->
+    <string name="encode_encoded">Encoded</string>
+    <string name="encode_decoded">Decoded</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>
