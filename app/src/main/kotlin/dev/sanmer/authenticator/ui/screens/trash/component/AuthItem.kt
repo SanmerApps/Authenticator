@@ -1,12 +1,13 @@
 package dev.sanmer.authenticator.ui.screens.trash.component
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -66,7 +67,7 @@ private fun AuthItemContent(
         .sizeIn(maxWidth = 450.dp)
         .fillMaxWidth()
         .surface(
-            shape = MaterialTheme.shapes.large,
+            shape = MaterialTheme.shapes.medium,
             backgroundColor = MaterialTheme.colorScheme.surface,
             border = CardDefaults.outlinedCardBorder()
         )
@@ -85,30 +86,29 @@ private fun AuthItemContent(
     }
 
     Column(
-        horizontalAlignment = Alignment.Start
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Start
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
                 text = hiddenSecret,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontFamily = FontFamily.Monospace
-                ),
-                modifier = Modifier.weight(1f)
+                )
             )
 
             Text(
                 text = lifetimeString,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.small
+                    .border(
+                        border = CardDefaults.outlinedCardBorder(),
+                        shape = CircleShape
                     )
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                    .padding(horizontal = 10.dp)
             )
         }
 

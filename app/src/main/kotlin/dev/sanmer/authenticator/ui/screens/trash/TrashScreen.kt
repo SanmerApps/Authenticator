@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -12,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +37,7 @@ fun TrashScreen(
     Scaffold(
         topBar = {
             TopBar(
+                onRestore = viewModel::restoreAuthAll,
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
@@ -66,10 +70,21 @@ fun TrashScreen(
 
 @Composable
 private fun TopBar(
+    onRestore: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = NavigateUpTopBar(
-    title = stringResource(id = R.string.settings_trash),
+    title = stringResource(id = R.string.trash_title),
+    actions = {
+        IconButton(
+            onClick = onRestore
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.restore),
+                contentDescription = null
+            )
+        }
+    },
     navController = navController,
     scrollBehavior = scrollBehavior
 )

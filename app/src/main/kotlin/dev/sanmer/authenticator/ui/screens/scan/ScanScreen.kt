@@ -86,7 +86,7 @@ fun ScanScreen(
             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.arrows_minimize),
+                painter = painterResource(id = R.drawable.x),
                 contentDescription = null
             )
         }

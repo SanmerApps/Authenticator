@@ -46,6 +46,12 @@ class TrashViewModel @Inject constructor(
         }
     }
 
+    fun restoreAuthAll() {
+        viewModelScope.launch {
+            dbRepository.deleteTrashAll()
+        }
+    }
+
     fun deleteAuth(auth: Auth) {
         viewModelScope.launch {
             dbRepository.deleteAuth(auth)

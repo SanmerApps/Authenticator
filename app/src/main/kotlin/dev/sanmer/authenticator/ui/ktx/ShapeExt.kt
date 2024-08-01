@@ -1,13 +1,19 @@
 package dev.sanmer.authenticator.ui.ktx
 
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.math.PI
 import kotlin.math.tan
+
+fun CornerBasedShape.bottom(size: Dp) =
+    copy(bottomStart = CornerSize(size), bottomEnd = CornerSize(size))
 
 class TrapezoidShape(
     private val bottomAngle: Float,

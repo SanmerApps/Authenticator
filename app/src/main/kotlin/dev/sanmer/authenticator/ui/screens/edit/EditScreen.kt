@@ -61,9 +61,7 @@ fun EditScreen(
                 uri = viewModel.uriString,
                 fromUri = viewModel::updateFromUri,
                 onSave = {
-                    viewModel.save {
-                        if (viewModel.addAccount) navController.popBackStack()
-                    }
+                    viewModel.save { if (viewModel.addAccount) navController.navigateUp() }
                 },
                 navController = navController,
                 scrollBehavior = scrollBehavior

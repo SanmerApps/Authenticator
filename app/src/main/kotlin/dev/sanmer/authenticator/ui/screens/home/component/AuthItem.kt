@@ -1,6 +1,7 @@
 package dev.sanmer.authenticator.ui.screens.home.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -77,7 +79,7 @@ private fun <T> AuthItemContent(
         .sizeIn(maxWidth = 450.dp)
         .fillMaxWidth()
         .surface(
-            shape = MaterialTheme.shapes.large,
+            shape = MaterialTheme.shapes.medium,
             backgroundColor = MaterialTheme.colorScheme.surface,
             border = CardDefaults.outlinedCardBorder()
         )
@@ -93,18 +95,22 @@ private fun <T> AuthItemContent(
     val progress by auth.progress.collectAsStateWithLifecycle(initialValue = 1f)
 
     Box(
-        modifier = Modifier.size(45.dp),
+        modifier = Modifier.size(40.dp),
         contentAlignment = Alignment.Center
     ) {
         PieProgressIndicator(
             progress = { progress },
-            color = MaterialTheme.colorScheme.secondaryContainer,
+            color = if (isSystemInDarkTheme()) {
+                colorDark(num = otp[0].toString().toInt())
+            } else {
+                colorLight(num = otp[0].toString().toInt())
+            },
             modifier = Modifier.fillMaxSize(),
         )
 
         Logo(
             text = auth.issuer,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleLarge.copy(
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold
@@ -174,4 +180,38 @@ private fun Logo(
         color = color,
         style = style
     )
+}
+
+@Composable
+private fun colorLight(num: Int): Color {
+    return when (num) {
+        1 -> colorResource(id = R.color.material_red_300)
+        2 -> colorResource(id = R.color.material_purple_300)
+        3 -> colorResource(id = R.color.material_blue_300)
+        4 -> colorResource(id = R.color.material_teal_300)
+        5 -> colorResource(id = R.color.material_green_300)
+        6 -> colorResource(id = R.color.material_yellow_300)
+        7 -> colorResource(id = R.color.material_orange_300)
+        8 -> colorResource(id = R.color.material_pink_300)
+        9 -> colorResource(id = R.color.material_indigo_300)
+        0 -> colorResource(id = R.color.material_deep_orange_300)
+        else -> MaterialTheme.colorScheme.primary
+    }
+}
+
+@Composable
+private fun colorDark(num: Int): Color {
+    return when (num) {
+        1 -> colorResource(id = R.color.material_red_900)
+        2 -> colorResource(id = R.color.material_purple_900)
+        3 -> colorResource(id = R.color.material_blue_900)
+        4 -> colorResource(id = R.color.material_teal_900)
+        5 -> colorResource(id = R.color.material_green_900)
+        6 -> colorResource(id = R.color.material_yellow_900)
+        7 -> colorResource(id = R.color.material_orange_900)
+        8 -> colorResource(id = R.color.material_pink_900)
+        9 -> colorResource(id = R.color.material_indigo_900)
+        0 -> colorResource(id = R.color.material_deep_orange_900)
+        else -> MaterialTheme.colorScheme.primary
+    }
 }

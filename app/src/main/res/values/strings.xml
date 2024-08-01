@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="untrusted">Untrusted</string>
-
     <!-- Crypto -->
     <string name="crypto_skip">Skip</string>
     <string name="crypto_encrypt">Encrypt</string>
@@ -31,18 +29,21 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+    <string name="settings_token">Token</string>
+    <string name="settings_token_desc">Add new token</string>
+    <string name="settings_import_export">Import &amp; Export</string>
+    <string name="settings_import_export_desc">Import and export database</string>
+    <string name="settings_tools">Tools</string>
+    <string name="settings_tools_desc">Decrypt, encode and decode</string>
     <string name="settings_enter">Enter Manually</string>
     <string name="settings_scan">Scan QR Code</string>
     <string name="settings_import">Import from JSON</string>
     <string name="settings_export">Export to JSON</string>
     <string name="settings_decrypt">Decrypt a JSON</string>
-    <string name="settings_trash">Trash</string>
-    <string name="settings_clear_all">Move All to Trash</string>
-    <string name="settings_restore_all">Restore All in Trash</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
-    <string name="settings_source_code">Source Code</string>
 
     <!-- Trash -->
+    <string name="trash_title">Trash</string>
     <string name="trash_empty">Empty trash</string>
 
     <!-- Search -->

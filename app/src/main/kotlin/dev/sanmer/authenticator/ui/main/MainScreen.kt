@@ -26,6 +26,7 @@ import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
+import dev.sanmer.authenticator.ui.screens.settings.SettingsScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
 
 @Composable
@@ -42,6 +43,7 @@ fun MainScreen() {
             startDestination = Screen.Home()
         ) {
             Screen.Home(navController).addTo(this)
+            Screen.Settings(navController).addTo(this)
             Screen.Edit(navController).addTo(this)
             Screen.Scan(navController).addTo(this)
             Screen.Trash(navController).addTo(this)
@@ -68,12 +70,9 @@ sealed class Screen(
     @Suppress("FunctionName")
     companion object Routes {
         fun Home() = "Home"
-
-        fun Edit(
-            secret: String = " ",
-            encode: Boolean = true
-        ) = if (encode) "Edit/${Uri.encode(secret)}" else "Edit/${secret}"
-
+        fun Settings() = "Settings"
+        fun Edit(secret: String = " ", encode: Boolean = true) =
+            if (encode) "Edit/${Uri.encode(secret)}" else "Edit/${secret}"
         fun Scan() = "Scan"
         fun Trash() = "Trash"
         fun Encode() = "Encode"
@@ -84,10 +83,17 @@ sealed class Screen(
         content = { HomeScreen(navController = navController) }
     )
 
+    class Settings(navController: NavController) : Screen(
+        route = Settings(),
+        content = { SettingsScreen(navController = navController) }
+    )
+
     class Edit(navController: NavController) : Screen(
         route = Edit("{secret}", false),
         content = { EditScreen(navController = navController) },
-        arguments = listOf(navArgument("secret") { type = NavType.StringType })
+        arguments = listOf(
+            navArgument("secret") { type = NavType.StringType }
+        )
     )
 
     class Scan(navController: NavController) : Screen(

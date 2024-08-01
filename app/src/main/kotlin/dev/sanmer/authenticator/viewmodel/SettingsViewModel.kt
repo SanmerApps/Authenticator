@@ -106,30 +106,17 @@ class SettingsViewModel @Inject constructor(
             auths = encrypted
         )
 
-    fun encryptFromJson(context: Context, uri: Uri, callback: () -> Unit) =
+    fun decryptFromJson(context: Context, uri: Uri, callback: () -> Unit) =
         importFromJson(
             context = context,
             uri = uri,
             callback = callback
         )
 
-    fun decryptToJson(context: Context, uri: Uri) =
+    fun decryptedToJson(context: Context, uri: Uri) =
         exportToJson(
             context = context,
             uri = uri,
             auths = decrypted
         )
-
-    fun recycleAuthAll() {
-        viewModelScope.launch {
-            val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
-            dbRepository.insertTrash(auths.map { it.secret })
-        }
-    }
-
-    fun restoreAuthAll() {
-        viewModelScope.launch {
-            dbRepository.deleteTrashAll()
-        }
-    }
 }

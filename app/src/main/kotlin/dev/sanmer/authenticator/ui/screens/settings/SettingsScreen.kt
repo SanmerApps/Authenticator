@@ -1,34 +1,26 @@
 package dev.sanmer.authenticator.ui.screens.settings
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.DrawableRes
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,54 +29,55 @@ import androidx.navigation.NavController
 import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.viewUrl
-import dev.sanmer.authenticator.model.serializer.AuthJson
+import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
+import dev.sanmer.authenticator.ui.screens.settings.component.DatabaseItem
+import dev.sanmer.authenticator.ui.screens.settings.component.SettingIcon
+import dev.sanmer.authenticator.ui.screens.settings.component.SettingItem
+import dev.sanmer.authenticator.ui.screens.settings.component.TokenItem
+import dev.sanmer.authenticator.ui.screens.settings.component.ToolItem
 import dev.sanmer.authenticator.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
-    navController: NavController,
-    onBack: () -> Unit
+    navController: NavController
 ) {
-    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val jsonImport = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) viewModel.importFromJson(context, uri)
-    }
+    var token by rememberSaveable { mutableStateOf(false) }
+    if (token) TokenItem(
+        onDismiss = { token = false },
+        navController = navController
+    )
 
-    val jsonExport = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE)
-    ) { uri ->
-        if (uri != null) viewModel.exportToJson(context, uri)
-    }
+    var database by rememberSaveable { mutableStateOf(false) }
+    if (database) DatabaseItem(
+        onDismiss = { database = false },
+        encrypt = viewModel::encrypt,
+        importFromJson = viewModel::importFromJson,
+        exportToJson = viewModel::exportToJson
+    )
 
-    val jsonDecrypt = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE)
-    ) { uri ->
-        if (uri != null) viewModel.decryptToJson(context, uri)
-    }
-
-    val jsonEncrypt = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) viewModel.encryptFromJson(context, uri) {
-            jsonDecrypt.launch(AuthJson.FILE_NAME)
-        }
-    }
+    var tool by rememberSaveable { mutableStateOf(false) }
+    if (tool) ToolItem(
+        onDismiss = { tool = false },
+        navController = navController,
+        decryptedToJson = viewModel::decryptedToJson,
+        decryptFromJson = viewModel::decryptFromJson
+    )
 
     Scaffold(
         topBar = {
             TopBar(
-                onBack = onBack,
+                navController = navController,
                 scrollBehavior = scrollBehavior
             )
         },
-        contentWindowInsets = WindowInsets(0.dp)
+        floatingActionButton = {
+            ActionButton(navController = navController)
+        }
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -92,129 +85,91 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(contentPadding)
                 .padding(all = 15.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             SettingItem(
-                icon = R.drawable.pencil_plus,
-                title = stringResource(id = R.string.settings_enter),
-                onClick = { navController.navigateSingleTopTo(Screen.Edit()) }
+                icon = {
+                    SettingIcon(
+                        icon = R.drawable.key,
+                        color = if (isSystemInDarkTheme()) {
+                            colorResource(id = R.color.material_blue_900)
+                        } else {
+                            colorResource(id = R.color.material_blue_300)
+                        }
+                    )
+                },
+                title = stringResource(id = R.string.settings_token),
+                text = stringResource(id = R.string.settings_token_desc),
+                onClick = { token = true }
             )
 
             SettingItem(
-                icon = R.drawable.scan,
-                title = stringResource(id = R.string.settings_scan),
-                onClick = { navController.navigateSingleTopTo(Screen.Scan()) }
+                icon = {
+                    SettingIcon(
+                        icon = R.drawable.database,
+                        color = if (isSystemInDarkTheme()) {
+                            colorResource(id = R.color.material_green_900)
+                        } else {
+                            colorResource(id = R.color.material_green_300)
+                        }
+                    )
+                },
+                title = stringResource(id = R.string.settings_import_export),
+                text = stringResource(id = R.string.settings_import_export_desc),
+                onClick = { database = true }
             )
 
             SettingItem(
-                icon = R.drawable.database_import,
-                title = stringResource(id = R.string.settings_import),
-                onClick = { jsonImport.launch(AuthJson.MIME_TYPE) }
-            )
-
-            SettingItem(
-                icon = R.drawable.database_export,
-                title = stringResource(id = R.string.settings_export),
-                onClick = {
-                    viewModel.encrypt(context) {
-                        jsonExport.launch(AuthJson.FILE_NAME)
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            SettingItem(
-                icon = R.drawable.trash,
-                title = stringResource(id = R.string.settings_trash),
-                onClick = { navController.navigateSingleTopTo(Screen.Trash()) }
-            )
-
-            SettingItem(
-                icon = R.drawable.clear_all,
-                title = stringResource(id = R.string.settings_clear_all),
-                onClick = viewModel::recycleAuthAll
-            )
-
-            SettingItem(
-                icon = R.drawable.arrow_back_up,
-                title = stringResource(id = R.string.settings_restore_all),
-                onClick = viewModel::restoreAuthAll
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            SettingItem(
-                icon = R.drawable.lock_open,
-                title = stringResource(id = R.string.settings_decrypt),
-                onClick = { jsonEncrypt.launch(AuthJson.MIME_TYPE) }
-            )
-
-            SettingItem(
-                icon = R.drawable.a_b,
-                title = stringResource(id = R.string.settings_encode_decode),
-                onClick = { navController.navigateSingleTopTo(Screen.Encode()) }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            SettingItem(
-                icon = R.drawable.brand_github,
-                title = stringResource(id = R.string.settings_source_code),
-                onClick = { context.viewUrl(Const.GITHUB_URL) }
+                icon = {
+                    SettingIcon(
+                        icon = R.drawable.tool,
+                        color = if (isSystemInDarkTheme()) {
+                            colorResource(id = R.color.material_orange_900)
+                        } else {
+                            colorResource(id = R.color.material_orange_300)
+                        }
+                    )
+                },
+                title = stringResource(id = R.string.settings_tools),
+                text = stringResource(id = R.string.settings_tools_desc),
+                onClick = { tool = true }
             )
         }
     }
 }
 
 @Composable
-private fun SettingItem(
-    @DrawableRes icon: Int,
-    title: String,
-    onClick: () -> Unit,
-    enabled: Boolean = true
-) = Card(
-    shape = MaterialTheme.shapes.medium,
-    colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
-    ),
-    onClick = onClick,
-    enabled = enabled
+private fun ActionButton(
+    navController: NavController
 ) {
-    Row(
-        modifier = Modifier
-            .padding(all = 15.dp)
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    FloatingActionButton(
+        onClick = { navController.navigateSingleTopTo(Screen.Trash()) }
     ) {
         Icon(
-            painter = painterResource(id = icon),
+            painter = painterResource(id = R.drawable.trash),
             contentDescription = null
-        )
-
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall
         )
     }
 }
 
 @Composable
-fun TopBar(
-    onBack: () -> Unit,
+private fun TopBar(
+    navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
-) = CenterAlignedTopAppBar(
-    title = { Text(text = stringResource(id = R.string.settings_title)) },
-    navigationIcon = {
+) = NavigateUpTopBar(
+    title = stringResource(id = R.string.settings_title),
+    actions = {
+        val context = LocalContext.current
+
         IconButton(
-            onClick = onBack
+            onClick = { context.viewUrl(Const.GITHUB_URL) }
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.arrow_left),
+                painter = painterResource(id = R.drawable.brand_github),
                 contentDescription = null
             )
         }
     },
+    navController = navController,
     scrollBehavior = scrollBehavior
 )
