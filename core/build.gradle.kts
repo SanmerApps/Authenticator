@@ -11,4 +11,5 @@ dependencies {
     implementation(libs.encoding.base32)
     implementation(libs.encoding.base64)
     implementation(libs.google.zxing)
+    implementation(libs.kotlinx.coroutines.android)
 }
