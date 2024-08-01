@@ -11,18 +11,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 object Timer {
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val epochSecondsFlow = MutableStateFlow(Clock.System.now().epochSeconds)
+    private val epochSecondsFlow = MutableStateFlow(System.currentTimeMillis())
     val epochSeconds get() = epochSecondsFlow.asStateFlow()
 
     fun start() = coroutineScope.launch {
-        val offset = offset()
+        val offset = runCatching { NtpServer.Apple.sync() }.getOrElse { 0L }
         Timber.d("Time offset: $offset")
 
         while (currentCoroutineContext().isActive) {
@@ -32,7 +31,4 @@ object Timer {
     }
 
     fun stop() = coroutineScope.cancel()
-
-    private suspend fun offset() =
-        runCatching { NtpServer.Apple.sync() }.getOrElse { 0L }
 }
