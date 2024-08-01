@@ -1,7 +1,6 @@
 package dev.sanmer.authenticator.viewmodel
 
 import android.net.Uri
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +29,9 @@ class EditViewModel @Inject constructor(
     private val dbRepository: DbRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private var secret by mutableStateOf(savedStateHandle.secret)
-    val secretReadOnly by derivedStateOf { secret.isOtpUri() }
-    val addAccount by derivedStateOf { secret.isBlank() || secretReadOnly }
+    private val secret = savedStateHandle.secret
+    val isOtpUri = secret.isOtpUri()
+    val edit = secret.isNotBlank() && !isOtpUri
 
     var input by mutableStateOf(Input())
         private set

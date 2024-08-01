@@ -57,11 +57,11 @@ fun EditScreen(
     Scaffold(
         topBar = {
             TopBar(
-                addAccount = viewModel.addAccount,
+                edit = viewModel.edit,
                 uri = viewModel.uriString,
                 fromUri = viewModel::updateFromUri,
                 onSave = {
-                    viewModel.save { if (viewModel.addAccount) navController.navigateUp() }
+                    viewModel.save { if (!viewModel.edit) navController.navigateUp() }
                 },
                 navController = navController,
                 scrollBehavior = scrollBehavior
@@ -104,24 +104,24 @@ fun EditScreen(
                 },
                 leadingIcon = R.drawable.key,
                 label = stringResource(id = R.string.edit_secret),
-                hidden = !viewModel.addAccount,
+                hidden = viewModel.edit,
                 isError = viewModel.isFailed(EditViewModel.Check.Secret),
                 trailingIcon = {
-                    if (viewModel.addAccount) {
+                    if (viewModel.edit) {
+                        ToggleQRCode(
+                            show = viewModel.showQr,
+                            onClick = { viewModel.updateShowQr { !it } }
+                        )
+                    } else {
                         IconButton(
                             onClick = viewModel::randomSecret,
-                            enabled = !viewModel.secretReadOnly
+                            enabled = !viewModel.isOtpUri
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.arrows_shuffle),
                                 contentDescription = null
                             )
                         }
-                    } else {
-                        ToggleQRCode(
-                            show = viewModel.showQr,
-                            onClick = { viewModel.updateShowQr { !it } }
-                        )
                     }
                 },
                 keyboardOptions = KeyboardOptions(
@@ -139,7 +139,7 @@ fun EditScreen(
                 onHashChange = { hash ->
                     viewModel.update { it.copy(hash = hash) }
                 },
-                readOnly = !viewModel.addAccount
+                readOnly = viewModel.edit
             )
 
             DigitsItem(
@@ -156,7 +156,7 @@ fun EditScreen(
                 onPeriodChange = { period ->
                     viewModel.update { it.copy(period = period) }
                 },
-                readOnly = !viewModel.addAccount
+                readOnly = viewModel.edit
             )
 
             if (viewModel.showQr && viewModel.uriString.isNotEmpty()) {
@@ -230,7 +230,7 @@ private fun ToggleQRCode(
 
 @Composable
 private fun TopBar(
-    addAccount: Boolean,
+    edit: Boolean,
     uri: String,
     fromUri: (String) -> Unit,
     onSave: () -> Unit,
@@ -238,10 +238,10 @@ private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior
 ) = NavigateUpTopBar(
     title = stringResource(
-        id = if (addAccount) {
-            R.string.edit_add_tile
-        } else {
+        id = if (edit) {
             R.string.edit_edit_tile
+        } else {
+            R.string.edit_add_tile
         }
     ),
     actions = {
@@ -249,20 +249,20 @@ private fun TopBar(
 
         IconButton(
             onClick = {
-                if (addAccount) {
-                    clipboardManager.getText()?.let { fromUri(it.text) }
-                } else {
+                if (edit) {
                     clipboardManager.setSensitiveText(uri)
+                } else {
+                    clipboardManager.getText()?.let { fromUri(it.text) }
                 }
             },
             enabled = uri.isNotBlank() || clipboardManager.hasText()
         ) {
             Icon(
                 painter = painterResource(
-                    id = if (addAccount) {
-                        R.drawable.clipboard_text
-                    } else {
+                    id = if (edit) {
                         R.drawable.clipboard_copy
+                    } else {
+                        R.drawable.clipboard_text
                     }
                 ),
                 contentDescription = null
