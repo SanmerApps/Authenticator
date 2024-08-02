@@ -8,7 +8,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -33,22 +32,19 @@ import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
 fun MainScreen() {
     val navController = rememberNavController()
 
-    Box(
+    NavHost(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
-            .fillMaxSize()
+            .fillMaxSize(),
+        navController = navController,
+        startDestination = Screen.Home()
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Home()
-        ) {
-            Screen.Home(navController).addTo(this)
-            Screen.Settings(navController).addTo(this)
-            Screen.Edit(navController).addTo(this)
-            Screen.Scan(navController).addTo(this)
-            Screen.Trash(navController).addTo(this)
-            Screen.Encode(navController).addTo(this)
-        }
+        Screen.Home(navController).addTo(this)
+        Screen.Settings(navController).addTo(this)
+        Screen.Edit(navController).addTo(this)
+        Screen.Scan(navController).addTo(this)
+        Screen.Trash(navController).addTo(this)
+        Screen.Encode(navController).addTo(this)
     }
 }
 
