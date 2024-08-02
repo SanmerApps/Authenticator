@@ -9,6 +9,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -20,15 +21,37 @@ object Timer {
     private val epochSecondsFlow = MutableStateFlow(System.currentTimeMillis())
     val epochSeconds get() = epochSecondsFlow.asStateFlow()
 
-    fun start() = coroutineScope.launch {
-        val offset = runCatching { NtpServer.Apple.sync() }.getOrElse { 0L }
-        Timber.d("Time offset: $offset")
+    private var offset = 0L
 
-        while (currentCoroutineContext().isActive) {
-            epochSecondsFlow.value = (System.currentTimeMillis() + offset) / 1000
-            delay(1.seconds)
+    init {
+        sync()
+    }
+
+    fun start() {
+        coroutineScope.launch {
+            epochSeconds().collect(epochSecondsFlow)
         }
     }
 
-    fun stop() = coroutineScope.cancel()
+    fun stop() {
+        coroutineScope.cancel()
+    }
+
+    private fun sync() {
+        coroutineScope.launch {
+            runCatching {
+                offset = NtpServer.Apple.sync()
+                Timber.d("Time offset: $offset")
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun epochSeconds() = flow {
+        while (currentCoroutineContext().isActive) {
+            emit((System.currentTimeMillis() + offset) / 1000)
+            delay(1.seconds)
+        }
+    }
 }
