@@ -16,6 +16,7 @@ fun PieProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     color: Color = ProgressIndicatorDefaults.circularColor,
+    trackColor: Color = ProgressIndicatorDefaults.circularTrackColor
 ) {
     val coercedProgress = { progress().coerceIn(0f, 1f) }
 
@@ -26,10 +27,20 @@ fun PieProgressIndicator(
             }
             .size(40.dp)
     ) {
+        val startAngle = 270f
+        val sweep = coercedProgress() * 360f
+
+        drawArc(
+            color = trackColor,
+            startAngle = startAngle,
+            sweepAngle = 360f,
+            useCenter = true
+        )
+
         drawArc(
             color = color,
-            startAngle = 270f,
-            sweepAngle = coercedProgress() * 360f,
+            startAngle = startAngle,
+            sweepAngle = sweep,
             useCenter = true
         )
     }

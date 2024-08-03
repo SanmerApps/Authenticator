@@ -20,7 +20,9 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -93,6 +95,7 @@ private fun <T> AuthItemContent(
 ) {
     val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.now())
     val progress by auth.progress.collectAsStateWithLifecycle(initialValue = 1f)
+    val num by remember { derivedStateOf { otp[0].toString().toInt() } }
 
     Box(
         modifier = Modifier.size(40.dp),
@@ -100,10 +103,9 @@ private fun <T> AuthItemContent(
     ) {
         PieProgressIndicator(
             progress = { progress },
-            color = if (isSystemInDarkTheme()) {
-                colorDark(num = otp[0].toString().toInt())
-            } else {
-                colorLight(num = otp[0].toString().toInt())
+            color = when {
+                isSystemInDarkTheme() -> colorDark(num = num)
+                else -> colorLight(num = num)
             },
             modifier = Modifier.fillMaxSize(),
         )
