@@ -10,6 +10,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -29,7 +31,6 @@ import androidx.navigation.NavController
 import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.viewUrl
-import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.ui.screens.settings.component.DatabaseItem
@@ -156,8 +157,18 @@ private fun ActionButton(
 private fun TopBar(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
-) = NavigateUpTopBar(
-    title = stringResource(id = R.string.settings_title),
+) = TopAppBar(
+    title = { Text(text = stringResource(id = R.string.settings_title)) },
+    navigationIcon = {
+        IconButton(
+            onClick = { navController.navigateUp() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
     actions = {
         val context = LocalContext.current
 
@@ -170,6 +181,5 @@ private fun TopBar(
             )
         }
     },
-    navController = navController,
     scrollBehavior = scrollBehavior
 )

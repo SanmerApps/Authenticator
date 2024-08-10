@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -20,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.screens.trash.component.AuthList
 import dev.sanmer.authenticator.viewmodel.TrashViewModel
@@ -73,8 +74,18 @@ private fun TopBar(
     onRestore: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
-) = NavigateUpTopBar(
-    title = stringResource(id = R.string.trash_title),
+) = TopAppBar(
+    title = { Text(text = stringResource(id = R.string.trash_title)) },
+    navigationIcon = {
+        IconButton(
+            onClick = { navController.navigateUp() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
     actions = {
         IconButton(
             onClick = onRestore
@@ -85,6 +96,5 @@ private fun TopBar(
             )
         }
     },
-    navController = navController,
     scrollBehavior = scrollBehavior
 )

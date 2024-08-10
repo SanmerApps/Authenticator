@@ -15,6 +15,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -38,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
 import dev.sanmer.authenticator.ui.ktx.setSensitiveText
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.authenticator.ui.screens.edit.component.DigitsItem
@@ -74,7 +75,7 @@ fun EditScreen(
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(contentPadding)
-                .padding(vertical = 15.dp),
+                .padding(vertical = 15.dp, horizontal = 5.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -236,14 +237,24 @@ private fun TopBar(
     onSave: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
-) = NavigateUpTopBar(
-    title = stringResource(
-        id = if (edit) {
-            R.string.edit_edit_tile
-        } else {
-            R.string.edit_add_tile
+) = TopAppBar(
+    title = {
+        Text(
+            text = stringResource(
+                id = if (edit) R.string.edit_edit_tile else R.string.edit_add_tile
+            )
+        )
+    },
+    navigationIcon = {
+        IconButton(
+            onClick = { navController.navigateUp() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.x),
+                contentDescription = null
+            )
         }
-    ),
+    },
     actions = {
         val clipboardManager = LocalClipboardManager.current
 
@@ -278,6 +289,5 @@ private fun TopBar(
             )
         }
     },
-    navController = navController,
     scrollBehavior = scrollBehavior
 )

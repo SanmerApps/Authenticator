@@ -21,6 +21,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -41,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.component.NavigateUpTopBar
 import dev.sanmer.authenticator.viewmodel.EncodeViewModel
 
 @Composable
@@ -185,8 +185,17 @@ private fun ButtonItem(
 private fun TopBar(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
-) = NavigateUpTopBar(
-    title = stringResource(id = R.string.settings_encode_decode),
-    navController = navController,
+) = TopAppBar(
+    title = { Text(text = stringResource(id = R.string.settings_encode_decode)) },
+    navigationIcon = {
+        IconButton(
+            onClick = { navController.navigateUp() }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
     scrollBehavior = scrollBehavior
 )
