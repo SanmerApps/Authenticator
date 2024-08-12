@@ -9,16 +9,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ktx.decodeOtpAuth
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.model.auth.TotpAuth
+import dev.sanmer.authenticator.model.serializer.HotpSerializable
+import dev.sanmer.authenticator.model.serializer.TotpSerializable
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
+import dev.sanmer.otp.OtpUri.Default.toOtpUri
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.security.SecureRandom
@@ -82,11 +84,33 @@ class EditViewModel @Inject constructor(
 
     fun isFailed(value: Check) = !checks.getOrDefault(value, true)
 
-    fun updateFromUri(uri: String) {
-        if (!uri.isOtpUri()) return
+    fun updateFromUri(uriString: String) {
+        if (!uriString.isOtpUri()) return
 
         runCatching {
-            uri.decodeOtpAuth()
+            val uri = uriString.toOtpUri()
+            val type = uri.type.let(Auth.Type::valueOf)
+            val hash = uri.algorithm.let(HOTP.Hash::valueOf)
+
+            when (type) {
+                Auth.Type.HOTP -> HotpSerializable(
+                    issuer = uri.issuer,
+                    name = uri.name,
+                    secret = uri.secret,
+                    hash = hash,
+                    digits = uri.digits,
+                    counter = uri.counter ?: 0L,
+                )
+
+                Auth.Type.TOTP -> TotpSerializable(
+                    issuer = uri.issuer,
+                    name = uri.name,
+                    secret = uri.secret,
+                    hash = hash,
+                    digits = uri.digits,
+                    period = uri.period ?: 30L,
+                )
+            }
         }.onSuccess {
             updateFromAuth(it.auth)
         }
