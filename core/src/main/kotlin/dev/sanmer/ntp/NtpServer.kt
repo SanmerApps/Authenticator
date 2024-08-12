@@ -12,50 +12,70 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 interface NtpServer {
-    val name: String
-    val address: InetAddress
+    val address: String
     val port: Int get() = NTP_PORT
     val timeout: Duration get() = 15.seconds
 
+    suspend fun address() = address.toInetAddress()
     suspend fun sync() = sync(this)
 
     object Apple : NtpServer {
-        override val name = "Apple"
-        override val address = "time.apple.com".toInetAddress()
+        override val address = "time.apple.com"
     }
 
     object Cloudflare : NtpServer {
-        override val name = "Cloudflare"
-        override val address = "time.cloudflare.com".toInetAddress()
+        override val address = "time.cloudflare.com"
     }
 
     object Google : NtpServer {
-        override val name = "Google"
-        override val address = "time.google.com".toInetAddress()
+        override val address = "time.google.com"
     }
 
     object Microsoft : NtpServer {
-        override val name = "Microsoft"
-        override val address = "time.windows.com".toInetAddress()
-    }
-
-    object NTPPool : NtpServer {
-        override val name = "NTPPool"
-        override val address = "pool.ntp.org".toInetAddress()
+        override val address = "time.windows.com"
     }
 
     private companion object Impl {
-        private const val NTP_PORT = 123
-        private const val NTP_MODE = 3
-        private const val NTP_VERSION = 3
-        private const val NTP_PACKET_SIZE = 48
-        private const val NTP_OFFSET = 2208988800L
+        const val NTP_PORT = 123
+        const val NTP_MODE = 3
+        const val NTP_VERSION = 3
+        const val NTP_PACKET_SIZE = 48
+        const val NTP_OFFSET = 2208988800L
 
-        private const val INDEX_VERSION = 0
-        private const val INDEX_RECEIVE_TIME = 32
-        private const val INDEX_TRANSMIT_TIME = 40
+        const val INDEX_VERSION = 0
+        const val INDEX_RECEIVE_TIME = 32
+        const val INDEX_TRANSMIT_TIME = 40
 
-        private class NtpData(
+        suspend fun sync(server: NtpServer) = withContext(Dispatchers.IO) {
+            val data = NtpData(NTP_PACKET_SIZE)
+            data.writeNtpVersion(NTP_VERSION)
+
+            val socket = DatagramSocket()
+            socket.soTimeout = server.timeout.toInt(DurationUnit.MILLISECONDS)
+
+            val request = DatagramPacket(data.bytes, data.size, server.address(), server.port)
+            val t1 = System.currentTimeMillis()
+            data.writeTransmitTimestamp(t1)
+            socket.send(request)
+
+            val response = DatagramPacket(data.bytes, data.size)
+            socket.receive(response)
+            val t4 = System.currentTimeMillis()
+
+            val t2 = data.readTimestamp(INDEX_RECEIVE_TIME)
+            val t3 = data.readTimestamp(INDEX_TRANSMIT_TIME)
+
+            val offset = ((t2 - t1) + (t3 - t4)) / 2
+            socket.close()
+
+            offset
+        }
+
+        suspend fun String.toInetAddress(): InetAddress = withContext(Dispatchers.IO) {
+            InetAddress.getByName(this@toInetAddress)
+        }
+
+        class NtpData(
             val bytes: ByteArray
         ) {
             constructor(size: Int) : this(
@@ -83,35 +103,6 @@ interface NtpServer {
                 val fraction = buffer.getInt(index + 4).toLong() and 0xFFFFFFFFL
                 return ((seconds - NTP_OFFSET) * 1000) + (fraction * 1000) / 0x100000000L
             }
-        }
-
-        suspend fun sync(server: NtpServer) = withContext(Dispatchers.IO) {
-            val data = NtpData(NTP_PACKET_SIZE)
-            data.writeNtpVersion(NTP_VERSION)
-
-            val socket = DatagramSocket()
-            socket.soTimeout = server.timeout.toInt(DurationUnit.MILLISECONDS)
-
-            val request = DatagramPacket(data.bytes, data.size, server.address, server.port)
-            val t1 = System.currentTimeMillis()
-            data.writeTransmitTimestamp(t1)
-            socket.send(request)
-
-            val response = DatagramPacket(data.bytes, data.size)
-            socket.receive(response)
-            val t4 = System.currentTimeMillis()
-
-            val t2 = data.readTimestamp(INDEX_RECEIVE_TIME)
-            val t3 = data.readTimestamp(INDEX_TRANSMIT_TIME)
-
-            val offset = ((t2 - t1) + (t3 - t4)) / 2
-            socket.close()
-
-            offset
-        }
-
-        fun String.toInetAddress(): InetAddress {
-            return InetAddress.getByName(this)
         }
     }
 }

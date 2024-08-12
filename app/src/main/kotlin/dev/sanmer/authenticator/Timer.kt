@@ -7,9 +7,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,35 +24,43 @@ interface Timer {
     companion object Default : Timer {
         private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         private var job: Job? = null
-        private var offset = 0L
 
         override val epochSeconds = MutableStateFlow(System.currentTimeMillis())
 
         override fun start() {
-            sync()
             job = coroutineScope.launch {
-                epochSeconds().collect(epochSeconds)
+                EpochSecond(
+                    server = NtpServer.Apple,
+                    coroutineScope = this
+                ).collect(epochSeconds)
             }
         }
 
         override fun stop() {
             job?.cancel()
         }
+    }
 
-        private fun sync() {
+    private class EpochSecond(
+        private val server: NtpServer,
+        coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    ) : Flow<Long> {
+        private var offset = 0L
+
+        init {
             coroutineScope.launch {
                 runCatching {
-                    offset = NtpServer.Apple.sync()
-                    Timber.d("Time offset: $offset")
+                    offset = server.sync()
+                    Timber.d("Time offset(${server.address}): ${offset}ms")
                 }.onFailure {
                     Timber.e(it)
                 }
             }
         }
 
-        private fun epochSeconds() = flow {
+        override suspend fun collect(collector: FlowCollector<Long>) {
             while (currentCoroutineContext().isActive) {
-                emit((System.currentTimeMillis() + offset) / 1000)
+                collector.emit((System.currentTimeMillis() + offset) / 1000)
                 delay(1.seconds)
             }
         }
