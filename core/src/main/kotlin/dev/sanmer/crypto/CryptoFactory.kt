@@ -6,22 +6,20 @@ import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 class CryptoFactory(
     private val password: CharArray
 ) {
-    constructor(password: String) : this(
-        password = password.toCharArray()
-    )
+    constructor(password: String) : this(password.toCharArray())
 
     private val salt by lazy { randomSalt }
-    private val secrets = hashMapOf<String, SecretKey>()
+    private val secrets = hashMapOf<Int, SecretKey>()
 
     private fun generateSecret(salt: ByteArray): SecretKey {
-        return secrets.getOrPut(salt.encodeBase64()) {
+        return secrets.getOrPut(salt.contentHashCode()) {
             password.generateSecret(salt)
         }
     }
@@ -30,7 +28,7 @@ class CryptoFactory(
         val iv = randomIv
         val key = generateSecret(salt)
         val cipher = Cipher.getInstance(ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(iv))
+        cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(TAG_LENGTH, iv))
         return salt + iv + cipher.doFinal(input)
     }
 
@@ -44,21 +42,22 @@ class CryptoFactory(
 
         val key = generateSecret(salt)
         val cipher = Cipher.getInstance(ALGORITHM)
-        cipher.init(Cipher.DECRYPT_MODE, key, IvParameterSpec(iv))
+        cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(TAG_LENGTH, iv))
         return cipher.doFinal(data)
     }
 
     fun decrypt(input: String) =
         decrypt(input.decodeBase64()).toString(Charsets.UTF_8)
 
-    internal companion object Default {
+    private companion object Default {
         const val FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256"
-        const val ALGORITHM = "AES/CBC/PKCS5Padding"
+        const val ALGORITHM = "AES/GCM/NoPadding"
         const val KEY_ALGORITHM = "AES"
         const val ITERATION_COUNT = 102400
-        const val KEY_LENGTH = 128
+        const val KEY_LENGTH = 256
         const val SALT_LENGTH = 16
-        const val IV_LENGTH = 16
+        const val IV_LENGTH = 12
+        const val TAG_LENGTH = 128
 
         val randomSalt: ByteArray
             inline get() = ByteArray(SALT_LENGTH).apply {
