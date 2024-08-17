@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.encoding.decodeBase32
@@ -17,10 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EncodeViewModel @Inject constructor() : ViewModel() {
-    var encoded by mutableStateOf("")
+    var encoded by mutableStateOf(TextFieldValue())
         private set
 
-    var decoded by mutableStateOf("")
+    var decoded by mutableStateOf(TextFieldValue())
         private set
 
     var type by mutableStateOf(Type.Base64)
@@ -32,12 +34,12 @@ class EncodeViewModel @Inject constructor() : ViewModel() {
         Timber.d("EncodeViewModel init")
     }
 
-    fun updateEncoded(value: String) {
-        if (value != encoded) encoded = value
+    fun updateEncoded(value: TextFieldValue) {
+        encoded = value
     }
 
-    fun updateDecoded(value: String) {
-        if (value != decoded) decoded = value
+    fun updateDecoded(value: TextFieldValue) {
+        decoded = value
     }
 
     fun updateType(value: Type) {
@@ -50,16 +52,22 @@ class EncodeViewModel @Inject constructor() : ViewModel() {
     fun encode() {
         errors[Error.Decode] = false
         errors[Error.Encode] = runCatching {
-            encoded = type.encode(decoded)
+            encoded = type.encode(decoded.text).asTextFieldValue()
         }.isFailure
     }
 
     fun decode() {
         errors[Error.Encode] = false
         errors[Error.Decode] = runCatching {
-            decoded = type.decode(encoded)
+            decoded = type.decode(encoded.text).asTextFieldValue()
         }.isFailure
     }
+
+    private fun String.asTextFieldValue() =
+        TextFieldValue(
+            text = this,
+            selection = TextRange(length)
+        )
 
     enum class Type(
         val ok: (String) -> Boolean,

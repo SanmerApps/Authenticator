@@ -27,17 +27,13 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -93,20 +89,9 @@ fun EncodeScreen(
                 }
             }
 
-            var decoded by remember(viewModel.decoded) {
-                mutableStateOf(
-                    TextFieldValue(
-                        text = viewModel.decoded,
-                        selection = TextRange(viewModel.decoded.length)
-                    )
-                )
-            }
             OutlinedTextField(
-                value = decoded,
-                onValueChange = {
-                    decoded = it
-                    viewModel.updateDecoded(it.text)
-                },
+                value = viewModel.decoded,
+                onValueChange = { viewModel.updateDecoded(it) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Encode),
@@ -131,20 +116,9 @@ fun EncodeScreen(
                 )
             }
 
-            var encoded by remember(viewModel.encoded) {
-                mutableStateOf(
-                    TextFieldValue(
-                        text = viewModel.encoded,
-                        selection = TextRange(viewModel.encoded.length)
-                    )
-                )
-            }
             OutlinedTextField(
-                value = encoded,
-                onValueChange = {
-                    encoded = it
-                    viewModel.updateEncoded(it.text)
-                },
+                value = viewModel.encoded,
+                onValueChange = { viewModel.updateEncoded(it) },
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Decode),
