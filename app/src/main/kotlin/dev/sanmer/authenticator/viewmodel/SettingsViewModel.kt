@@ -10,7 +10,10 @@ import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
+import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,8 +26,15 @@ class SettingsViewModel @Inject constructor(
     private var encrypted = emptyList<Auth>()
     private var decrypted = emptyList<Auth>()
 
+    private val uriFlow = MutableStateFlow("")
+    val uri get() = uriFlow.asStateFlow()
+
     init {
         Timber.d("SettingsViewModel init")
+    }
+
+    fun rewind() {
+        uriFlow.value = ""
     }
 
     private fun decrypt(
@@ -119,4 +129,15 @@ class SettingsViewModel @Inject constructor(
             uri = uri,
             auths = decrypted
         )
+
+    fun scanImage(context: Context, uri: Uri) {
+        runCatching {
+            val cr = context.contentResolver
+            cr.openInputStream(uri).let(::requireNotNull).use(QRCode::decodeFromStream)
+        }.onSuccess {
+            uriFlow.value = it
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
 }
