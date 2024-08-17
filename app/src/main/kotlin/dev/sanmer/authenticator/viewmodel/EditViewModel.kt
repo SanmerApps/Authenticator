@@ -178,7 +178,7 @@ class EditViewModel @Inject constructor(
         val hotp get() = HotpAuth(
             name = name.trim(),
             issuer = issuer.trim(),
-            secret = secret.trim(),
+            secret = secret.replace("\\s+".toRegex(), ""),
             hash = hash,
             digits = digits.toIntOrNull() ?: 6,
             count = counter.toLongOrNull() ?: 0L
@@ -187,7 +187,7 @@ class EditViewModel @Inject constructor(
         val totp get() = TotpAuth(
             name = name.trim(),
             issuer = issuer.trim(),
-            secret = secret.trim(),
+            secret = secret.replace("\\s+".toRegex(), ""),
             hash = hash,
             digits = digits.toIntOrNull() ?: 6,
             period = period.toLongOrNull() ?: 30L
