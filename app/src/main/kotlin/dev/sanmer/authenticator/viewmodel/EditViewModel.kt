@@ -89,10 +89,9 @@ class EditViewModel @Inject constructor(
 
         runCatching {
             val uri = uriString.toOtpUri()
-            val type = uri.type.let(Auth.Type::valueOf)
-            val hash = uri.algorithm.let(HOTP.Hash::valueOf)
+            val hash = HOTP.Hash.valueOf(uri.algorithm)
 
-            when (type) {
+            when (Auth.Type.valueOf(uri.type)) {
                 Auth.Type.HOTP -> HotpSerializable(
                     issuer = uri.issuer,
                     name = uri.name,
@@ -113,6 +112,8 @@ class EditViewModel @Inject constructor(
             }
         }.onSuccess {
             updateFromAuth(it.auth)
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
