@@ -89,31 +89,32 @@ class EditViewModel @Inject constructor(
 
         runCatching {
             val uri = uriString.toOtpUri()
-            val hash = HOTP.Hash.valueOf(uri.algorithm)
+            val type = Auth.Type.valueOf(uri.type)
+            val hash = uri.algorithm?.let(HOTP.Hash::valueOf)
 
-            when (Auth.Type.valueOf(uri.type)) {
+            when (type) {
                 Auth.Type.HOTP -> HotpSerializable(
                     issuer = uri.issuer,
                     name = uri.name,
                     secret = uri.secret,
-                    hash = hash,
-                    digits = uri.digits,
-                    counter = uri.counter ?: 0L,
+                    hash = hash ?: HOTP.Hash.SHA1,
+                    digits = uri.digits ?: 6,
+                    counter = uri.counter ?: 0,
                 )
 
                 Auth.Type.TOTP -> TotpSerializable(
                     issuer = uri.issuer,
                     name = uri.name,
                     secret = uri.secret,
-                    hash = hash,
-                    digits = uri.digits,
-                    period = uri.period ?: 30L,
+                    hash = hash ?: HOTP.Hash.SHA1,
+                    digits = uri.digits ?: 6,
+                    period = uri.period ?: 30,
                 )
             }
         }.onSuccess {
             updateFromAuth(it.auth)
         }.onFailure {
-            Timber.e(it)
+            Timber.e(it, "uri = $uriString")
         }
     }
 
