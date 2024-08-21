@@ -23,7 +23,7 @@ android {
         versionCode = commitCount
 
         ndk.abiFilters += listOf("arm64-v8a", "x86_64")
-        resourceConfigurations += arrayOf("en")
+        resourceConfigurations += arrayOf("en", "zh-rCN")
     }
 
     val releaseSigning = if (project.hasReleaseKeyStore) {
