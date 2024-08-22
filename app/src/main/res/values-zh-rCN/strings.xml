@@ -34,8 +34,10 @@
     <string name="settings_enter">手动输入</string>
     <string name="settings_scan">扫描二维码</string>
     <string name="settings_scan_image">扫描图片</string>
-    <string name="settings_import">从 JSON 导入</string>
-    <string name="settings_export">导出为 JSON</string>
+    <string name="settings_import_json">从 JSON 导入</string>
+    <string name="settings_export_json">导出为 JSON</string>
+    <string name="settings_import_txt">从 URI 导入</string>
+    <string name="settings_export_txt">导出为 URI</string>
     <string name="settings_decrypt">解密 JSON</string>
     <string name="settings_encode_decode">编码与解码</string>
 

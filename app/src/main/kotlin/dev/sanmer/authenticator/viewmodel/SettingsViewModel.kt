@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.serializer.AuthJson
+import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
@@ -17,14 +18,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.InputStream
+import java.io.OutputStream
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private var encrypted = emptyList<Auth>()
-    private var decrypted = emptyList<Auth>()
+    private var output = emptyList<Auth>()
+    private var input = emptyList<Auth>()
 
     private val uriFlow = MutableStateFlow("")
     val uri get() = uriFlow.asStateFlow()
@@ -37,107 +40,137 @@ class SettingsViewModel @Inject constructor(
         uriFlow.value = ""
     }
 
-    private fun decrypt(
-        context: Context,
-        auths: List<Auth>,
-        callback: () -> Unit
-    ) = CryptoActivity.decrypt(
-        context = context,
-        input = auths.map { it.secret }
-    ) { decryptedSecrets ->
-        decrypted = auths.mapIndexed { index, auth ->
-            auth.copy(secret = decryptedSecrets[index])
-        }
-
-        callback()
-    }
-
-    fun encrypt(context: Context, callback: () -> Unit) {
+    fun prepare(fileType: FileType, context: Context, callback: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
-
-            CryptoActivity.encrypt(
-                context = context,
-                input = auths.map { it.secret }
-            ) { encryptedSecrets ->
-                encrypted = auths.mapIndexed { index, auth ->
-                    auth.copy(secret = encryptedSecrets[index])
-                }
-
+            if (fileType.skip) {
+                output = auths
                 callback()
+            } else {
+                CryptoActivity.encrypt(
+                    context = context,
+                    input = auths.map { it.secret }
+                ) { encryptedSecrets ->
+                    output = auths.mapIndexed { index, auth ->
+                        auth.copy(secret = encryptedSecrets[index])
+                    }
+                    callback()
+                }
             }
         }
     }
 
-    private fun importFromJson(context: Context, uri: Uri, callback: () -> Unit) {
+    private fun importFrom(fileType: FileType, context: Context, uri: Uri, callback: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
-                checkNotNull(cr.openInputStream(uri)).use(AuthJson::decodeFrom)
-            }.onSuccess { json ->
-                decrypt(
-                    context = context,
-                    auths = json.auths.map { it.auth },
-                    callback = callback
-                )
-
+                checkNotNull(cr.openInputStream(uri)).use(fileType::decodeFrom)
+            }.onSuccess { auths ->
+                if (fileType.skip) {
+                    input = auths
+                    callback()
+                } else {
+                    CryptoActivity.decrypt(
+                        context = context,
+                        input = auths.map { it.secret }
+                    ) { decryptedSecrets ->
+                        input = auths.mapIndexed { index, auth ->
+                            auth.copy(secret = decryptedSecrets[index])
+                        }
+                        callback()
+                    }
+                }
             }.onFailure {
                 Timber.e(it)
             }
         }
     }
 
-    fun importFromJson(context: Context, uri: Uri) =
-        importFromJson(
+    fun importFrom(fileType: FileType, context: Context, uri: Uri) =
+        importFrom(
+            fileType = fileType,
             context = context,
             uri = uri
         ) {
-            val ok = decrypted.all { it.secret.isBase32() }
+            val ok = input.all { it.secret.isBase32() }
             if (ok) viewModelScope.launch {
-                dbRepository.insertAuth(decrypted)
+                dbRepository.insertAuth(input)
             }
         }
 
-    private fun exportToJson(context: Context, uri: Uri, auths: List<Auth>) {
+    private fun exportTo(fileType: FileType, context: Context, uri: Uri, auths: List<Auth>) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
-                checkNotNull(cr.openOutputStream(uri)).use(AuthJson(auths)::encodeTo)
+                checkNotNull(cr.openOutputStream(uri)).use { fileType.decodeTo(auths, it) }
             }.onFailure {
                 Timber.e(it)
             }
         }
     }
 
-    fun exportToJson(context: Context, uri: Uri) =
-        exportToJson(
+    fun exportTo(fileType: FileType, context: Context, uri: Uri) =
+        exportTo(
+            fileType = fileType,
             context = context,
             uri = uri,
-            auths = encrypted
+            auths = output
         )
 
     fun decryptFromJson(context: Context, uri: Uri, callback: () -> Unit) =
-        importFromJson(
+        importFrom(
+            fileType = FileType.Json,
             context = context,
             uri = uri,
             callback = callback
         )
 
     fun decryptedToJson(context: Context, uri: Uri) =
-        exportToJson(
+        exportTo(
+            fileType = FileType.Json,
             context = context,
             uri = uri,
-            auths = decrypted
+            auths = input
         )
 
     fun scanImage(context: Context, uri: Uri) {
         runCatching {
             val cr = context.contentResolver
-            cr.openInputStream(uri).let(::requireNotNull).use(QRCode::decodeFromStream)
+            checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
         }.onSuccess {
             uriFlow.value = it
         }.onFailure {
             Timber.e(it)
+        }
+    }
+
+    sealed class FileType {
+        abstract val skip: Boolean
+        abstract fun decodeFrom(input: InputStream): List<Auth>
+        abstract fun decodeTo(auths: List<Auth>, output: OutputStream)
+
+        data object Txt : FileType() {
+            override val skip = true
+
+            override fun decodeFrom(input: InputStream): List<Auth> {
+                return AuthTxt.decodeFrom(input).auths.map { it.auth }
+            }
+
+            override fun decodeTo(auths: List<Auth>, output: OutputStream) {
+                AuthTxt(auths).encodeTo(output)
+            }
+        }
+
+        data object Json : FileType() {
+            override val skip = false
+
+            override fun decodeFrom(input: InputStream): List<Auth> {
+                return AuthJson.decodeFrom(input).auths.map { it.auth }
+            }
+
+            override fun decodeTo(auths: List<Auth>, output: OutputStream) {
+                AuthJson(auths).encodeTo(output)
+            }
         }
     }
 }

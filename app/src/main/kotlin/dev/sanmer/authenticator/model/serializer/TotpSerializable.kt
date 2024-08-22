@@ -1,7 +1,9 @@
 package dev.sanmer.authenticator.model.serializer
 
+import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.otp.HOTP
+import dev.sanmer.otp.OtpUri
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -29,6 +31,16 @@ data class TotpSerializable(
         name = name,
         secret = secret,
         hash = hash,
+        digits = digits,
+        period = period
+    )
+
+    override val uri get() = OtpUri(
+        type = Auth.Type.TOTP.name,
+        name = name,
+        issuer = issuer,
+        secret = secret,
+        algorithm = hash.name,
         digits = digits,
         period = period
     )

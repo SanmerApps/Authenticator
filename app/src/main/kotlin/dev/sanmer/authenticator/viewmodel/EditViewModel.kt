@@ -13,14 +13,12 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.HotpAuth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.model.auth.TotpAuth
-import dev.sanmer.authenticator.model.serializer.HotpSerializable
-import dev.sanmer.authenticator.model.serializer.TotpSerializable
+import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
-import dev.sanmer.otp.OtpUri.Default.toOtpUri
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.security.SecureRandom
@@ -88,29 +86,7 @@ class EditViewModel @Inject constructor(
         if (!uriString.isOtpUri()) return
 
         runCatching {
-            val uri = uriString.toOtpUri()
-            val type = Auth.Type.valueOf(uri.type)
-            val hash = uri.algorithm?.let(HOTP.Hash::valueOf)
-
-            when (type) {
-                Auth.Type.HOTP -> HotpSerializable(
-                    issuer = uri.issuer,
-                    name = uri.name,
-                    secret = uri.secret,
-                    hash = hash ?: HOTP.Hash.SHA1,
-                    digits = uri.digits ?: 6,
-                    counter = uri.counter ?: 0,
-                )
-
-                Auth.Type.TOTP -> TotpSerializable(
-                    issuer = uri.issuer,
-                    name = uri.name,
-                    secret = uri.secret,
-                    hash = hash ?: HOTP.Hash.SHA1,
-                    digits = uri.digits ?: 6,
-                    period = uri.period ?: 30,
-                )
-            }
+            AuthTxt.parse(uriString)
         }.onSuccess {
             updateFromAuth(it.auth)
         }.onFailure {
@@ -177,27 +153,23 @@ class EditViewModel @Inject constructor(
             period = totp.period.toString()
         )
 
-        val hotp get() = HotpAuth(
-            name = name.trim(),
-            issuer = issuer.trim(),
-            secret = secret.replace("\\s+".toRegex(), ""),
-            hash = hash,
-            digits = digits.toIntOrNull() ?: 6,
-            count = counter.toLongOrNull() ?: 0L
-        )
-
-        val totp get() = TotpAuth(
-            name = name.trim(),
-            issuer = issuer.trim(),
-            secret = secret.replace("\\s+".toRegex(), ""),
-            hash = hash,
-            digits = digits.toIntOrNull() ?: 6,
-            period = period.toLongOrNull() ?: 30L
-        )
-
         val auth: Auth get() = when (type) {
-            Auth.Type.HOTP -> hotp
-            Auth.Type.TOTP -> totp
+            Auth.Type.HOTP -> HotpAuth(
+                name = name.trim(),
+                issuer = issuer.trim(),
+                secret = secret.replace("\\s+".toRegex(), ""),
+                hash = hash,
+                digits = digits.toIntOrNull() ?: 6,
+                count = counter.toLongOrNull() ?: 0
+            )
+            Auth.Type.TOTP -> TotpAuth(
+                name = name.trim(),
+                issuer = issuer.trim(),
+                secret = secret.replace("\\s+".toRegex(), ""),
+                hash = hash,
+                digits = digits.toIntOrNull() ?: 6,
+                period = period.toLongOrNull() ?: 30
+            )
         }
     }
 

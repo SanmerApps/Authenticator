@@ -34,8 +34,10 @@
     <string name="settings_enter">Enter Manually</string>
     <string name="settings_scan">Scan QR Code</string>
     <string name="settings_scan_image">Scan Image</string>
-    <string name="settings_import">Import from JSON</string>
-    <string name="settings_export">Export to JSON</string>
+    <string name="settings_import_json">Import from JSON</string>
+    <string name="settings_export_json">Export to JSON</string>
+    <string name="settings_import_txt">Import from URI</string>
+    <string name="settings_export_txt">Export to URI</string>
     <string name="settings_decrypt">Decrypt a JSON</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
 

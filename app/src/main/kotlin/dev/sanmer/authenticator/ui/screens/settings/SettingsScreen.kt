@@ -66,9 +66,9 @@ fun SettingsScreen(
     var database by rememberSaveable { mutableStateOf(false) }
     if (database) DatabaseItem(
         onDismiss = { database = false },
-        encrypt = viewModel::encrypt,
-        importFromJson = viewModel::importFromJson,
-        exportToJson = viewModel::exportToJson
+        prepare = viewModel::prepare,
+        importFrom = viewModel::importFrom,
+        exportTo = viewModel::exportTo
     )
 
     var tool by rememberSaveable { mutableStateOf(false) }

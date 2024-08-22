@@ -14,7 +14,7 @@ import java.io.OutputStream
 data class AuthJson(
     val hotp: List<HotpSerializable> = emptyList(),
     val totp: List<TotpSerializable> = emptyList()
-) {
+) : AuthSerializable<OtpSerializable> {
     constructor(
         auths: List<Auth>
     ) : this(
@@ -22,16 +22,16 @@ data class AuthJson(
         totp = auths.filterIsInstance<TotpAuth>().map(::TotpSerializable)
     )
 
-    val auths: List<OtpSerializable>
+    override val auths: List<OtpSerializable>
         get() = hotp.toMutableList<OtpSerializable>()
             .apply { addAll(totp) }
             .toList()
 
-    fun encodeTo(output: OutputStream) {
+    override fun encodeTo(output: OutputStream) {
         endpointJson.encodeToStream(this, output)
     }
 
-    companion object Util {
+    companion object Default {
         private val endpointJson = Json {
             prettyPrint = true
         }
