@@ -49,8 +49,8 @@ class OtpUri private constructor() {
 
     private fun fromUri(uri: Uri): OtpUri {
         require(uri.isOtpUri()) { "Expected scheme = $SCHEME" }
-        type = checkNotNull(uri.host) { "Unknown type" }.uppercase()
-        secret = checkNotNull(uri.getQueryParameter(Query.SECRET)) { "Unknown secret" }.uppercase()
+        type = requireNotNull(uri.host) { "Unknown type" }.uppercase()
+        secret = requireNotNull(uri.getQueryParameter(Query.SECRET)) { "Unknown secret" }.uppercase()
         algorithm = uri.getQueryParameter(Query.ALGORITHM)?.uppercase()
         digits = uri.getQueryParameter(Query.DIGITS)?.let(String::toInt)
         counter = uri.getQueryParameter(Query.COUNTER)?.let(String::toLong)
@@ -79,7 +79,7 @@ class OtpUri private constructor() {
         builder.scheme(SCHEME)
         builder.authority(type.lowercase())
         builder.appendQueryParameter(Query.SECRET, secret)
-        algorithm?.let { builder.appendQueryParameter(Query.ALGORITHM, it.lowercase()) }
+        algorithm?.let { builder.appendQueryParameter(Query.ALGORITHM, it) }
         digits?.let { builder.appendQueryParameter(Query.DIGITS, it.toString()) }
         period?.let { builder.appendQueryParameter(Query.PERIOD, it.toString()) }
         counter?.let { builder.appendQueryParameter(Query.COUNTER, it.toString()) }

@@ -179,7 +179,7 @@ class EditViewModel @Inject constructor(
         Secret(String::isBase32)
     }
 
-    companion object Util {
+    companion object Default {
         private val SavedStateHandle.secret: String
             inline get() = checkNotNull(Uri.decode(get("secret")))
     }
