@@ -42,7 +42,7 @@ class EditViewModel @Inject constructor(
     var showQr by mutableStateOf(false)
         private set
 
-    private val checks = mutableStateMapOf<Check, Boolean>()
+    private val result = mutableStateMapOf<Value, Boolean>()
 
     init {
         Timber.d("EditViewModel init")
@@ -73,14 +73,14 @@ class EditViewModel @Inject constructor(
         }
     }
 
-    private fun check(): Boolean {
-        Check.Name.check(input.name, checks::put)
-        Check.Issuer.check(input.issuer, checks::put)
-        Check.Secret.check(input.secret, checks::put)
-        return checks.all { it.value }
+    private fun isAllOk(): Boolean {
+        Value.Name.ok(input.name, result::put)
+        Value.Issuer.ok(input.issuer, result::put)
+        Value.Secret.ok(input.secret, result::put)
+        return result.all { it.value }
     }
 
-    fun isFailed(value: Check) = !checks.getOrDefault(value, true)
+    fun isError(value: Value) = !(result[value] ?: true)
 
     fun updateFromUri(uriString: String) {
         if (!uriString.isOtpUri()) return
@@ -99,7 +99,7 @@ class EditViewModel @Inject constructor(
     }
 
     fun save(block: () -> Unit = {}) {
-        if (!check()) return
+        if (!isAllOk()) return
 
         viewModelScope.launch {
             dbRepository.updateAuth(input.auth)
@@ -117,10 +117,6 @@ class EditViewModel @Inject constructor(
         }.encodeBase32Default()
 
         update { it.copy(secret = secret) }
-    }
-
-    private inline fun Check.check(value: String, block: (Check, Boolean) -> Unit) {
-        block(this, ok(value))
     }
 
     data class Input(
@@ -173,10 +169,14 @@ class EditViewModel @Inject constructor(
         }
     }
 
-    enum class Check(val ok: (String) -> Boolean) {
+    enum class Value(val ok: (String) -> Boolean) {
         Issuer(String::isNotBlank),
         Name(String::isNotBlank),
         Secret(String::isBase32)
+    }
+
+    private inline fun Value.ok(value: String, block: (Value, Boolean) -> Unit) {
+        block(this, ok(value))
     }
 
     companion object Default {

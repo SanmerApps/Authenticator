@@ -46,6 +46,7 @@ import dev.sanmer.authenticator.ui.screens.edit.component.DigitsItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeItem
 import dev.sanmer.authenticator.viewmodel.EditViewModel
+import dev.sanmer.authenticator.viewmodel.EditViewModel.Value
 import dev.sanmer.qrcode.QRCode
 
 @Composable
@@ -86,7 +87,7 @@ fun EditScreen(
                 },
                 leadingIcon = R.drawable.user,
                 label = stringResource(id = R.string.edit_name),
-                isError = viewModel.isFailed(EditViewModel.Check.Name)
+                isError = viewModel.isError(Value.Name)
             )
 
             TextFieldItem(
@@ -95,7 +96,7 @@ fun EditScreen(
                     viewModel.update { it.copy(issuer = issuer) }
                 },
                 label = stringResource(id = R.string.edit_issuer),
-                isError = viewModel.isFailed(EditViewModel.Check.Issuer)
+                isError = viewModel.isError(Value.Issuer)
             )
 
             TextFieldItem(
@@ -106,7 +107,7 @@ fun EditScreen(
                 leadingIcon = R.drawable.key,
                 label = stringResource(id = R.string.edit_secret),
                 hidden = viewModel.edit,
-                isError = viewModel.isFailed(EditViewModel.Check.Secret),
+                isError = viewModel.isError(Value.Secret),
                 trailingIcon = {
                     if (viewModel.edit) {
                         ToggleQRCode(
