@@ -173,11 +173,11 @@ fun EditScreen(
 private fun QRCodeItem(
     uri: String,
     modifier: Modifier = Modifier,
-    size: Dp = 230.dp,
+    size: Dp = 240.dp,
     shape: Shape = MaterialTheme.shapes.small
 ) = Box(
     modifier = modifier
-        .size(size = 240.dp)
+        .size(size = size)
         .surface(
             shape = shape,
             backgroundColor = MaterialTheme.colorScheme.surface,
@@ -186,7 +186,7 @@ private fun QRCodeItem(
     contentAlignment = Alignment.Center
 ) {
     val sizePx = with(LocalDensity.current) {
-        size.roundToPx()
+        (size - 5.dp).roundToPx()
     }
 
     val foregroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
