@@ -9,7 +9,7 @@
     <string name="password_placeholder">Password</string>
 
     <!-- Home -->
-    <string name="home_empty">Empty token</string>
+    <string name="home_empty">No tokens</string>
 
     <!-- Edit -->
     <string name="edit_add_tile">Add Token</string>
@@ -43,7 +43,7 @@
 
     <!-- Trash -->
     <string name="trash_title">Trash</string>
-    <string name="trash_empty">Empty trash</string>
+    <string name="trash_empty">No items</string>
 
     <!-- Encode -->
     <string name="encode_encoded">Encoded</string>

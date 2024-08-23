@@ -9,13 +9,13 @@
     <string name="password_placeholder">密码</string>
 
     <!-- Home -->
-    <string name="home_empty">空令牌</string>
+    <string name="home_empty">没有令牌</string>
 
     <!-- Edit -->
     <string name="edit_add_tile">添加令牌</string>
     <string name="edit_edit_tile">编辑令牌</string>
     <string name="edit_name">名称</string>
-    <string name="edit_issuer">发行者</string>
+    <string name="edit_issuer">发行方</string>
     <string name="edit_secret">密钥</string>
     <string name="edit_type">类型</string>
     <string name="edit_hash">哈希算法</string>
@@ -43,7 +43,7 @@
 
     <!-- Trash -->
     <string name="trash_title">回收站</string>
-    <string name="trash_empty">空回收站</string>
+    <string name="trash_empty">没有项目</string>
 
     <!-- Encode -->
     <string name="encode_encoded">已编码</string>
@@ -51,7 +51,7 @@
 
     <!-- Search -->
     <string name="search_placeholder">搜索…</string>
-    <string name="empty_list">列表为空</string>
+    <string name="empty_list">空列表</string>
 
     <!-- Message -->
     <string name="loading">加载中…</string>
