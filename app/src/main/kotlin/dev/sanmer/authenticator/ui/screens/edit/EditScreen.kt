@@ -61,7 +61,6 @@ fun EditScreen(
             TopBar(
                 edit = viewModel.edit,
                 uri = viewModel.uriString,
-                fromUri = viewModel::updateFromUri,
                 onSave = {
                     viewModel.save { if (!viewModel.edit) navController.navigateUp() }
                 },
@@ -234,7 +233,6 @@ private fun ToggleQRCode(
 private fun TopBar(
     edit: Boolean,
     uri: String,
-    fromUri: (String) -> Unit,
     onSave: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
@@ -259,26 +257,15 @@ private fun TopBar(
     actions = {
         val clipboardManager = LocalClipboardManager.current
 
-        IconButton(
-            onClick = {
-                if (edit) {
-                    clipboardManager.setSensitiveText(uri)
-                } else {
-                    clipboardManager.getText()?.let { fromUri(it.text) }
-                }
-            },
-            enabled = uri.isNotBlank() || clipboardManager.hasText()
-        ) {
-            Icon(
-                painter = painterResource(
-                    id = if (edit) {
-                        R.drawable.clipboard_copy
-                    } else {
-                        R.drawable.clipboard_text
-                    }
-                ),
-                contentDescription = null
-            )
+        if (uri.isNotBlank()) {
+            IconButton(
+                onClick = { clipboardManager.setSensitiveText(uri) },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.clipboard_text),
+                    contentDescription = null
+                )
+            }
         }
 
         IconButton(

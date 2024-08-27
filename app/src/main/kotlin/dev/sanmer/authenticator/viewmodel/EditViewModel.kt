@@ -82,7 +82,7 @@ class EditViewModel @Inject constructor(
 
     fun isError(value: Value) = !(result[value] ?: true)
 
-    fun updateFromUri(uriString: String) {
+   private fun updateFromUri(uriString: String) {
         if (!uriString.isOtpUri()) return
 
         runCatching {
