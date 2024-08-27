@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.viewmodel
 import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraState
 import androidx.camera.core.ImageAnalysis
@@ -115,6 +116,17 @@ class ScanViewModel @Inject constructor(
 
         } finally {
             image.close()
+        }
+    }
+
+    fun scanImage(context: Context, uri: Uri) {
+        runCatching {
+            val cr = context.contentResolver
+            checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
+        }.onSuccess {
+            uriFlow.updateDistinct { it }
+        }.onFailure {
+            Timber.e(it)
         }
     }
 

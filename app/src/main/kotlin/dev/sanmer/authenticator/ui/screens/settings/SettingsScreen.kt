@@ -15,7 +15,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
@@ -41,26 +39,18 @@ import dev.sanmer.authenticator.ui.screens.settings.component.SettingItem
 import dev.sanmer.authenticator.ui.screens.settings.component.TokenItem
 import dev.sanmer.authenticator.ui.screens.settings.component.ToolItem
 import dev.sanmer.authenticator.viewmodel.SettingsViewModel
-import dev.sanmer.otp.OtpUri.Default.isOtpUri
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val uri by viewModel.uri.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    DisposableEffect(uri) {
-        if (uri.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(uri))
-        onDispose(viewModel::rewind)
-    }
 
     var token by rememberSaveable { mutableStateOf(false) }
     if (token) TokenItem(
         onDismiss = { token = false },
         navController = navController,
-        scanImage = viewModel::scanImage,
     )
 
     var database by rememberSaveable { mutableStateOf(false) }

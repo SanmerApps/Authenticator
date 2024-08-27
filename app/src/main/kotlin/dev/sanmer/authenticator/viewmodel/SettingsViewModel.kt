@@ -11,7 +11,6 @@ import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
-import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -132,17 +131,6 @@ class SettingsViewModel @Inject constructor(
             uri = uri,
             auths = input
         )
-
-    fun scanImage(context: Context, uri: Uri) {
-        runCatching {
-            val cr = context.contentResolver
-            checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
-        }.onSuccess {
-            uriFlow.value = it
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
 
     sealed class FileType {
         abstract val skip: Boolean
