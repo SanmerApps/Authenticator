@@ -50,7 +50,7 @@ fun ToolItem(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.large.bottom(0.dp),
-        windowInsets = WindowInsets(0.dp)
+        contentWindowInsets =  { WindowInsets(0.dp) }
     ) {
         val contentPadding = WindowInsets.navigationBars.asPaddingValues()
 
