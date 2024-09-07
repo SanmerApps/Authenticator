@@ -39,6 +39,7 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
+import dev.sanmer.authenticator.ui.theme.JetBrainsMono
 
 @Composable
 fun <T> AuthItem(
@@ -114,7 +115,7 @@ private fun <T> AuthItemContent(
             text = auth.issuer,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.titleLarge.copy(
-                fontFamily = FontFamily.Monospace,
+                fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.Bold
             )
         )
