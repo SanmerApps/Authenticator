@@ -16,6 +16,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +29,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.sanmer.authenticator.R
@@ -35,7 +39,6 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
-import dev.sanmer.icons.Letter
 
 @Composable
 fun <T> AuthItem(
@@ -107,10 +110,13 @@ private fun <T> AuthItemContent(
             modifier = Modifier.fillMaxSize(),
         )
 
-        Icon(
-            painter = painterResource(id = Letter.get(auth.issuer)),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        Logo(
+            text = auth.issuer,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 
@@ -161,6 +167,21 @@ private fun AuthItemButtons(
             contentDescription = null
         )
     }
+}
+
+@Composable
+private fun Logo(
+    text: String,
+    color: Color = LocalContentColor.current,
+    style: TextStyle = LocalTextStyle.current
+) {
+    if (text.isEmpty()) return
+
+    Text(
+        text = text[0].uppercase(),
+        color = color,
+        style = style
+    )
 }
 
 @Composable

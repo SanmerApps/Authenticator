@@ -80,7 +80,6 @@ android {
 
 dependencies {
     implementation(projects.core)
-    implementation(projects.icons)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)

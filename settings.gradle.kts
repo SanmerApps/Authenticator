@@ -19,4 +19,4 @@ pluginManagement {
 }
 
 rootProject.name = "Authenticator"
-include(":core", ":icons", ":app")
+include(":core", ":app")
