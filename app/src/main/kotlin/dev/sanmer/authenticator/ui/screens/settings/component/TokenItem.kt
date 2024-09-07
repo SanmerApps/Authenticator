@@ -2,9 +2,6 @@ package dev.sanmer.authenticator.ui.screens.settings.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -27,11 +24,8 @@ fun TokenItem(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        shape = MaterialTheme.shapes.large.bottom(0.dp),
-        contentWindowInsets =  { WindowInsets(0.dp) }
+        shape = MaterialTheme.shapes.large.bottom(0.dp)
     ) {
-        val contentPadding = WindowInsets.navigationBars.asPaddingValues()
-
         Text(
             text = stringResource(id = R.string.settings_token),
             style = MaterialTheme.typography.headlineSmall,
@@ -39,9 +33,7 @@ fun TokenItem(
         )
 
         Column(
-            modifier = Modifier
-                .padding(all = 15.dp)
-                .padding(contentPadding),
+            modifier = Modifier.padding(all = 15.dp),
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             SettingItem(
