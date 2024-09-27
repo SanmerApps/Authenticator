@@ -1,12 +1,14 @@
 package dev.sanmer.authenticator.ui.screens.trash.component
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
@@ -89,27 +91,19 @@ private fun AuthItemContent(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            verticalAlignment = Alignment.Top
         ) {
             Text(
                 text = hiddenSecret,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontFamily = FontFamily.Monospace
-                )
+                ),
+                modifier = Modifier.weight(1f)
             )
 
-            Text(
-                text = lifetimeString,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier
-                    .border(
-                        border = CardDefaults.outlinedCardBorder(),
-                        shape = CircleShape
-                    )
-                    .padding(horizontal = 10.dp)
-            )
+            Spacer(modifier = Modifier.width(10.dp))
+
+            LabelText(text = lifetimeString)
         }
 
         Text(
@@ -150,3 +144,18 @@ private fun AuthItemButtons(
         )
     }
 }
+
+@Composable
+private fun LabelText(
+    text: String
+) = Text(
+    text = text,
+    style = MaterialTheme.typography.titleSmall,
+    color = MaterialTheme.colorScheme.onSecondaryContainer,
+    modifier = Modifier
+        .background(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            shape = CircleShape
+        )
+        .padding(horizontal = 10.dp)
+)
