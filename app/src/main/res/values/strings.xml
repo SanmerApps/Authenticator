@@ -22,6 +22,7 @@
     <string name="edit_digits">Digits</string>
     <string name="edit_counter">Counter</string>
     <string name="edit_period">Period</string>
+    <string name="edit_qrcode">QR Code</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

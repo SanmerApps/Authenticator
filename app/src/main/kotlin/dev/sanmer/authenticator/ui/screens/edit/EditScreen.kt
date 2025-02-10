@@ -6,14 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,23 +24,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.ktx.bottom
 import dev.sanmer.authenticator.ui.ktx.setSensitiveText
-import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.authenticator.ui.screens.edit.component.DigitsItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeItem
@@ -109,10 +107,14 @@ fun EditScreen(
                 isError = viewModel.isError(Value.Secret),
                 trailingIcon = {
                     if (viewModel.edit) {
-                        ToggleQRCode(
-                            show = viewModel.showQr,
-                            onClick = { viewModel.updateShowQr { !it } }
-                        )
+                        IconButton(
+                            onClick = { viewModel.updateShowQr { true } }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.qrcode),
+                                contentDescription = null
+                            )
+                        }
                     } else {
                         IconButton(
                             onClick = viewModel::randomSecret,
@@ -161,8 +163,9 @@ fun EditScreen(
             )
 
             if (viewModel.showQr && viewModel.uriString.isNotEmpty()) {
-                QRCodeItem(
-                    uri = viewModel.uriString
+                QRCodeBottomSheet(
+                    uri = viewModel.uriString,
+                    onDismiss = { viewModel.updateShowQr { false } }
                 )
             }
         }
@@ -170,63 +173,50 @@ fun EditScreen(
 }
 
 @Composable
-private fun QRCodeItem(
+private fun QRCodeBottomSheet(
     uri: String,
-    modifier: Modifier = Modifier,
-    size: Dp = 240.dp,
-    shape: Shape = MaterialTheme.shapes.small
-) = Box(
-    modifier = modifier
-        .size(size = size)
-        .surface(
-            shape = shape,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            border = CardDefaults.outlinedCardBorder()
-        ),
-    contentAlignment = Alignment.Center
+    onDismiss: () -> Unit,
+) = ModalBottomSheet(
+    onDismissRequest = onDismiss,
+    shape = MaterialTheme.shapes.large.bottom(0.dp)
 ) {
-    val sizePx = with(LocalDensity.current) {
-        (size - 5.dp).roundToPx()
-    }
+    Text(
+        text = stringResource(id = R.string.edit_qrcode),
+        style = MaterialTheme.typography.headlineSmall,
+        modifier = Modifier.align(Alignment.CenterHorizontally)
+    )
 
-    val foregroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
-
-    val bitmap by remember {
-        derivedStateOf {
-            QRCode.encodeToBitmap(
-                contents = uri,
-                width = sizePx,
-                height = sizePx,
-                foregroundColor = foregroundColor,
-                backgroundColor = backgroundColor
-            )
+    Box(
+        modifier = Modifier
+            .padding(all = 15.dp)
+            .align(Alignment.CenterHorizontally),
+        contentAlignment = Alignment.Center
+    ) {
+        val size = (LocalConfiguration.current.screenWidthDp * 0.75).dp
+        val sizePx = with(LocalDensity.current) {
+            size.roundToPx()
         }
-    }
 
-    Image(
-        bitmap = bitmap.asImageBitmap(),
-        contentDescription = null
-    )
-}
+        val foregroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
+        val backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow.toArgb()
 
-@Composable
-private fun ToggleQRCode(
-    show: Boolean,
-    onClick: () -> Unit
-) = IconButton(
-    onClick = onClick
-) {
-    Icon(
-        painter = painterResource(
-            id = if (show) {
-                R.drawable.qrcode
-            } else {
-                R.drawable.qrcode_off
+        val bitmap by remember {
+            derivedStateOf {
+                QRCode.encodeToBitmap(
+                    contents = uri,
+                    width = sizePx,
+                    height = sizePx,
+                    foregroundColor = foregroundColor,
+                    backgroundColor = backgroundColor
+                )
             }
-        ),
-        contentDescription = null
-    )
+        }
+
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null
+        )
+    }
 }
 
 @Composable
