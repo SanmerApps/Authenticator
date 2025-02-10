@@ -6,20 +6,26 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,10 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.Timer
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.component.SearchTopBar
 import dev.sanmer.authenticator.ui.ktx.isScrollingUp
@@ -40,6 +48,7 @@ import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.ui.screens.home.component.AuthList
 import dev.sanmer.authenticator.viewmodel.HomeViewModel
+import kotlin.time.DurationUnit
 
 @Composable
 fun HomeScreen(
@@ -142,6 +151,11 @@ private fun TopBar(
     onCloseSearch: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) {
+    val time by Timer.time.collectAsStateWithLifecycle()
+    val offsetString by remember {
+        derivedStateOf { time.offset.toString(unit = DurationUnit.MILLISECONDS) }
+    }
+
     var query by remember { mutableStateOf("") }
     DisposableEffect(isSearch) {
         onDispose { query = "" }
@@ -155,7 +169,15 @@ private fun TopBar(
             query = it
         },
         onClose = onCloseSearch,
-        title = { Text(text = stringResource(id = R.string.app_name)) },
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(text = stringResource(id = R.string.app_name))
+                LabelText(text = offsetString)
+            }
+        },
         actions = {
             if (!isSearch) IconButton(
                 onClick = onOpenSearch,
@@ -170,3 +192,19 @@ private fun TopBar(
         scrollBehavior = scrollBehavior
     )
 }
+
+@Composable
+private fun LabelText(
+    text: String
+) = Text(
+    text = text,
+    style = MaterialTheme.typography.titleSmall,
+    color = MaterialTheme.colorScheme.onSecondaryContainer,
+    modifier = Modifier
+        .border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline,
+            shape = CircleShape
+        )
+        .padding(horizontal = 10.dp)
+)

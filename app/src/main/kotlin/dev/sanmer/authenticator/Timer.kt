@@ -15,8 +15,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 interface Timer {
+    val time: StateFlow<NtpServer.NtpTime>
     val epochSeconds: StateFlow<Long>
     fun start()
     fun stop()
@@ -25,12 +27,14 @@ interface Timer {
         private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         private var job: Job? = null
 
+        override val time = MutableStateFlow(NtpServer.NtpTime())
         override val epochSeconds = MutableStateFlow(System.currentTimeMillis())
 
         override fun start() {
             job = coroutineScope.launch {
                 EpochSecond(
                     server = NtpServer.Apple,
+                    time = time,
                     coroutineScope = this
                 ).collect(epochSeconds)
             }
@@ -38,20 +42,22 @@ interface Timer {
 
         override fun stop() {
             job?.cancel()
+            job = null
         }
     }
 
     private class EpochSecond(
         private val server: NtpServer,
+        private val time: MutableStateFlow<NtpServer.NtpTime>,
         coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     ) : Flow<Long> {
-        private var offset = 0L
+        val offset get() = time.value.offset.toLong(DurationUnit.MILLISECONDS)
 
         init {
             coroutineScope.launch {
                 runCatching {
-                    offset = server.sync()
-                    Timber.d("Time offset(${server.address}): ${offset}ms")
+                    time.value = server.sync()
+                    Timber.d("Time offset(${server.address}): ${time.value}")
                 }.onFailure {
                     Timber.e(it)
                 }

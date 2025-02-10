@@ -8,6 +8,7 @@ import java.net.InetAddress
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -35,6 +36,11 @@ interface NtpServer {
         override val address = "time.windows.com"
     }
 
+    data class NtpTime(
+        val delay: Duration = 0.milliseconds,
+        val offset: Duration = 0.milliseconds
+    )
+
     private companion object Impl {
         const val NTP_PORT = 123
         const val NTP_MODE = 3
@@ -50,25 +56,26 @@ interface NtpServer {
             val data = NtpData(NTP_PACKET_SIZE)
             data.writeNtpVersion(NTP_VERSION)
 
-            val socket = DatagramSocket()
-            socket.soTimeout = server.timeout.toInt(DurationUnit.MILLISECONDS)
+            DatagramSocket().use { socket ->
+                socket.soTimeout = server.timeout.toInt(DurationUnit.MILLISECONDS)
 
-            val request = DatagramPacket(data.bytes, data.size, server.address(), server.port)
-            val t1 = System.currentTimeMillis()
-            data.writeTransmitTimestamp(t1)
-            socket.send(request)
+                val request = DatagramPacket(data.bytes, data.size, server.address(), server.port)
+                val t1 = System.currentTimeMillis()
+                data.writeTransmitTimestamp(t1)
+                socket.send(request)
 
-            val response = DatagramPacket(data.bytes, data.size)
-            socket.receive(response)
-            val t4 = System.currentTimeMillis()
+                val response = DatagramPacket(data.bytes, data.size)
+                socket.receive(response)
+                val t4 = System.currentTimeMillis()
 
-            val t2 = data.readTimestamp(INDEX_RECEIVE_TIME)
-            val t3 = data.readTimestamp(INDEX_TRANSMIT_TIME)
+                val t2 = data.readTimestamp(INDEX_RECEIVE_TIME)
+                val t3 = data.readTimestamp(INDEX_TRANSMIT_TIME)
 
-            val offset = ((t2 - t1) + (t3 - t4)) / 2
-            socket.close()
-
-            offset
+                NtpTime(
+                    delay = ((t4 - t1) - (t3 - t2)).milliseconds,
+                    offset = (((t2 - t1) + (t3 - t4)) / 2.0).milliseconds
+                )
+            }
         }
 
         suspend fun String.toInetAddress(): InetAddress = withContext(Dispatchers.IO) {
@@ -88,7 +95,7 @@ interface NtpServer {
             val size inline get() = bytes.size
 
             fun writeNtpVersion(value: Int) {
-                bytes[INDEX_VERSION] = (NTP_MODE or (value shl 3)).toByte()
+                buffer.put(INDEX_VERSION, (NTP_MODE or (value shl 3)).toByte())
             }
 
             fun writeTransmitTimestamp(value: Long) {
