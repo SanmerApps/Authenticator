@@ -7,28 +7,37 @@ import androidx.annotation.ColorInt
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
+import com.google.zxing.EncodeHintType
 import com.google.zxing.LuminanceSource
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.MultiFormatWriter
 import com.google.zxing.NotFoundException
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeReader
+import com.google.zxing.qrcode.QRCodeWriter
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import java.io.InputStream
 
-@Suppress("NOTHING_TO_INLINE")
 object QRCode {
-    private val hints by lazy {
+    private val decodeHint by lazy {
         hashMapOf<DecodeHintType, Any>().apply {
             put(DecodeHintType.POSSIBLE_FORMATS, listOf(BarcodeFormat.QR_CODE))
             put(DecodeHintType.ALSO_INVERTED, true)
         }
     }
 
-    private inline fun decode(source: LuminanceSource): String {
+    private val encodeHint by lazy {
+        hashMapOf<EncodeHintType, Any>().apply {
+            put(EncodeHintType.CHARACTER_SET, "UTF-8")
+            put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q)
+            put(EncodeHintType.MARGIN, 0)
+        }
+    }
+
+    private fun decode(source: LuminanceSource): String {
         val bitmap = BinaryBitmap(HybridBinarizer(source))
-        return MultiFormatReader().decode(bitmap, hints).text.trim()
+        return QRCodeReader().decode(bitmap, decodeHint).text.trim()
     }
 
     fun decodeFromYuv(
@@ -50,7 +59,7 @@ object QRCode {
         )
     )
 
-    private inline fun Bitmap.resize(maxWidth: Int, maxHeight: Int): Bitmap {
+    private fun Bitmap.resize(maxWidth: Int, maxHeight: Int): Bitmap {
         if (maxHeight <= 0 || maxWidth <= 0) {
             return this
         }
@@ -94,18 +103,18 @@ object QRCode {
         throw IllegalArgumentException(stream.toString())
     }
 
-    private inline fun createBitmap(
-        matrix: BitMatrix,
+    private fun createBitmap(
+        bitMatrix: BitMatrix,
         @ColorInt foregroundColor: Int,
-        @ColorInt backgroundColor: Int,
+        @ColorInt backgroundColor: Int
     ): Bitmap {
-        val width = matrix.width
-        val height = matrix.height
+        val width = bitMatrix.width
+        val height = bitMatrix.height
         val pixels = IntArray(width * height)
         for (y in 0 until height) {
             val offset = y * width
             for (x in 0 until width) {
-                pixels[offset + x] = if (matrix[x, y]) foregroundColor else backgroundColor
+                pixels[offset + x] = if (bitMatrix[x, y]) foregroundColor else backgroundColor
             }
         }
 
@@ -116,12 +125,11 @@ object QRCode {
 
     fun encodeToBitmap(
         contents: String,
-        width: Int,
-        height: Int,
+        size: Int,
         @ColorInt foregroundColor: Int = Color.WHITE,
         @ColorInt backgroundColor: Int = Color.BLACK,
     ) = createBitmap(
-        matrix = MultiFormatWriter().encode(contents, BarcodeFormat.QR_CODE, width, height),
+        bitMatrix = QRCodeWriter().encode(contents, BarcodeFormat.QR_CODE, size, size, encodeHint),
         foregroundColor = foregroundColor,
         backgroundColor = backgroundColor
     )

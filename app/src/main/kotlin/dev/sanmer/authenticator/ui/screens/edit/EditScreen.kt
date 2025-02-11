@@ -204,8 +204,7 @@ private fun QRCodeBottomSheet(
             derivedStateOf {
                 QRCode.encodeToBitmap(
                     contents = uri,
-                    width = sizePx,
-                    height = sizePx,
+                    size = sizePx,
                     foregroundColor = foregroundColor,
                     backgroundColor = backgroundColor
                 )
