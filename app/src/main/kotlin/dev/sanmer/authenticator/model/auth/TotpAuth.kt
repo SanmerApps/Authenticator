@@ -7,7 +7,6 @@ import dev.sanmer.otp.OtpUri
 import dev.sanmer.otp.TOTP
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 
 data class TotpAuth(
     override val issuer: String,
@@ -31,7 +30,7 @@ data class TotpAuth(
     )
 
     override val progress = Timer.epochSeconds.map { t ->
-        counter.update { it / period }
+        counter.value = t / period
         (period - t % period) / period.toFloat()
     }
 
