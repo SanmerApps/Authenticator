@@ -6,7 +6,6 @@ import dev.sanmer.otp.OtpUri
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.update
 
 data class HotpAuth(
     override val issuer: String,
@@ -48,5 +47,5 @@ data class HotpAuth(
         secret = secret
     )
 
-    fun new() = counterFlow.update { it + 1 }
+    fun new() { counterFlow.value += 1 }
 }
