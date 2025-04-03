@@ -12,8 +12,6 @@ import dev.sanmer.encoding.decodeBase32
 import dev.sanmer.encoding.decodeBase64
 import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.encodeBase64
-import dev.sanmer.encoding.isBase32
-import dev.sanmer.encoding.isBase64
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -70,17 +68,14 @@ class EncodeViewModel @Inject constructor() : ViewModel() {
         )
 
     enum class Type(
-        val ok: (String) -> Boolean,
         val encode: (String) -> String,
         val decode: (String) -> String
     ) {
         Base32(
-            ok = String::isBase32,
             encode = String::encodeBase32Default,
             decode = String::decodeBase32
         ),
         Base64(
-            ok = String::isBase64,
             encode = String::encodeBase64,
             decode = String::decodeBase64
         )

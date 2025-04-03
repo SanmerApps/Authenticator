@@ -1,13 +1,13 @@
 package dev.sanmer.authenticator.model.auth
 
 import dev.sanmer.authenticator.Timer
-import dev.sanmer.authenticator.ktx.updateDistinct
 import dev.sanmer.encoding.decodeBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri
 import dev.sanmer.otp.TOTP
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 data class TotpAuth(
     override val issuer: String,
@@ -30,9 +30,9 @@ data class TotpAuth(
         period = period
     )
 
-    override val progress = Timer.epochSeconds.map {
-        counter.updateDistinct { it / period }
-        (period - it % period) / period.toFloat()
+    override val progress = Timer.epochSeconds.map { t ->
+        counter.update { it / period }
+        (period - t % period) / period.toFloat()
     }
 
     override val otp = counter.map { new(it) }

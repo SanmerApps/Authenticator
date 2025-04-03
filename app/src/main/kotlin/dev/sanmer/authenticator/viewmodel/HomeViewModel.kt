@@ -62,7 +62,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun search(key: String) {
-        queryFlow.update { key }
+        queryFlow.value = key
     }
 
     fun openSearch() {

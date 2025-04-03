@@ -1,7 +1,6 @@
 package dev.sanmer.authenticator.viewmodel
 
 import android.Manifest
-import android.app.Application
 import android.content.Context
 import android.net.Uri
 import androidx.camera.core.ImageAnalysis
@@ -12,11 +11,11 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.sanmer.authenticator.compat.PermissionCompat
-import dev.sanmer.authenticator.ktx.updateDistinct
 import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,9 +27,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
-    application: Application
-) : AndroidViewModel(application), ImageAnalysis.Analyzer {
-    private val context: Context by lazy { getApplication() }
+    @ApplicationContext private val context: Context
+) : ViewModel(), ImageAnalysis.Analyzer {
     private val _isAllowed: Boolean
         get() = PermissionCompat.checkPermission(
             context, Manifest.permission.CAMERA
@@ -89,7 +87,7 @@ class ScanViewModel @Inject constructor(
                 height = image.height,
             )
 
-            uriFlow.updateDistinct { content }
+            uriFlow.update { content }
 
         } catch (_: Throwable) {
 
@@ -103,7 +101,7 @@ class ScanViewModel @Inject constructor(
             val cr = context.contentResolver
             checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
         }.onSuccess {
-            uriFlow.updateDistinct { it }
+            uriFlow.update { it }
         }.onFailure {
             Timber.e(it)
         }

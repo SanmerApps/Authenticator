@@ -22,21 +22,21 @@ import dev.sanmer.otp.HOTP
 import javax.inject.Singleton
 
 @Database(version = 1, entities = [TrashEntity::class, HotpEntity::class, TotpEntity::class])
-@TypeConverters(AppDatabase.Converters::class)
+@TypeConverters(AppDatabase.Converter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun trash(): TrashDao
     abstract fun hotp(): HotpDao
     abstract fun totp(): TotpDao
 
-    companion object Default {
-        fun build(context: Context) =
+    companion object Build {
+        operator fun invoke(context: Context) =
             Room.databaseBuilder(
                 context, AppDatabase::class.java, "auth"
             ).build()
     }
 
     @Suppress("FunctionName")
-    object Converters {
+    object Converter {
         @TypeConverter
         fun StringToHash(value: String) = HOTP.Hash.valueOf(value)
 
@@ -46,12 +46,12 @@ abstract class AppDatabase : RoomDatabase() {
 
     @Module
     @InstallIn(SingletonComponent::class)
-    object Provider {
+    object Impl {
         @Provides
         @Singleton
         fun AppDatabase(
             @ApplicationContext context: Context
-        ) = build(context.deviceProtectedContext)
+        ) = Build(context.deviceProtectedContext)
 
         @Provides
         @Singleton

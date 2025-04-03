@@ -47,10 +47,10 @@ class EditViewModel @Inject constructor(
     init {
         Timber.d("EditViewModel init")
         updateFromUri(secret)
-        authObserver()
+        dataObserver()
     }
 
-    private fun authObserver() {
+    private fun dataObserver() {
         viewModelScope.launch {
             dbRepository.getAuthBySecretAsFlow(secret)
                 .collect { auth ->

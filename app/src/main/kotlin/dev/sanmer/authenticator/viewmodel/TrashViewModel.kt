@@ -8,8 +8,6 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -29,15 +27,16 @@ class TrashViewModel @Inject constructor(
     }
 
     private fun dataObserver() {
-        dbRepository.getAuthInTrashAllAsFlow()
-            .onEach { source ->
-                authsFlow.update {
-                    source.map(::AuthWrapper).sortedBy {
-                        it.auth.issuer.lowercase()
+        viewModelScope.launch {
+            dbRepository.getAuthInTrashAllAsFlow()
+                .collect { source ->
+                    authsFlow.update {
+                        source.map(::AuthWrapper).sortedBy {
+                            it.auth.issuer.lowercase()
+                        }
                     }
                 }
-
-            }.launchIn(viewModelScope)
+        }
     }
 
     fun restoreAuth(auth: Auth) {

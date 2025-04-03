@@ -12,8 +12,6 @@ import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -28,15 +26,8 @@ class SettingsViewModel @Inject constructor(
     private var output = emptyList<Auth>()
     private var input = emptyList<Auth>()
 
-    private val uriFlow = MutableStateFlow("")
-    val uri get() = uriFlow.asStateFlow()
-
     init {
         Timber.d("SettingsViewModel init")
-    }
-
-    fun rewind() {
-        uriFlow.value = ""
     }
 
     fun prepare(fileType: FileType, context: Context, callback: () -> Unit) {
