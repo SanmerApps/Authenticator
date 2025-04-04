@@ -13,10 +13,25 @@ data class HotpAuth(
     override val secret: String,
     val hash: HOTP.Hash,
     val digits: Int,
-    private val count: Long = 0
+    private val counterFlow: MutableStateFlow<Long>
 ) : Auth, Otp {
+    constructor(
+        issuer: String,
+        name: String,
+        secret: String,
+        hash: HOTP.Hash,
+        digits: Int,
+        counter: Long
+    ) : this(
+        issuer = issuer,
+        name = name,
+        secret = secret,
+        hash = hash,
+        digits = digits,
+        counterFlow = MutableStateFlow(counter)
+    )
+
     private val secretBytes by lazy { secret.decodeBase32() }
-    private val counterFlow = MutableStateFlow(count)
 
     val counter get() = counterFlow.value
 

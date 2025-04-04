@@ -23,21 +23,22 @@ import javax.inject.Singleton
 class DbRepository @Inject constructor(
     private val trash: TrashDao,
     private val hotp: HotpDao,
-    private val totp: TotpDao
+    private val totp: TotpDao,
+    private val timeRepository: TimeRepository
 ) {
     fun getHotpAllAsFlow(enable: Boolean = true) = hotp.getMapToTrashAsFlow()
         .map { entries ->
             entries.mapNotNull { (hotp, trash) ->
                 when {
-                    enable -> if (trash == null) hotp.auth else null
-                    else -> if (trash != null) hotp.auth else null
+                    enable -> if (trash == null) hotp.auth() else null
+                    else -> if (trash != null) hotp.auth() else null
                 }
             }
         }
 
     fun getHotpBySecretAsFlow(secret: String) = hotp.getBySecretAsFlow(secret)
         .filterNotNull()
-        .map { it.auth }
+        .map { it.auth() }
 
     suspend fun existsHotp(secret: String) = withContext(Dispatchers.IO) {
         hotp.exists(secret)
@@ -97,7 +98,7 @@ class DbRepository @Inject constructor(
     }
 
     fun getAuthInTrashAllAsFlow() = combine(
-        hotp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth }.toList() },
+        hotp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth() }.toList() },
         totp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth }.toList() }
     ) { hotp, totp ->
         hotp.toMutableList<Pair<Auth, TrashEntity>>().apply { addAll(totp) }

@@ -156,7 +156,7 @@ class EditViewModel @Inject constructor(
                 secret = secret.replace("\\s+".toRegex(), ""),
                 hash = hash,
                 digits = digits.toIntOrNull() ?: 6,
-                count = counter.toLongOrNull() ?: 0
+                counter = counter.toLongOrNull() ?: 0
             )
             Auth.Type.TOTP -> TotpAuth(
                 name = name.trim(),

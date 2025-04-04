@@ -32,7 +32,7 @@ data class HotpSerializable(
         secret = secret,
         hash = hash,
         digits = digits,
-        count = counter
+        counter = counter
     )
 
     override val uri get() = OtpUri(

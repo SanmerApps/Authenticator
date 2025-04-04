@@ -24,12 +24,12 @@ data class HotpEntity(
         counter = original.counter
     )
 
-    val auth get() = HotpAuth(
+    fun auth() = HotpAuth(
         issuer = issuer,
         name = name,
         secret = secret,
         hash = hash,
         digits = digits,
-        count = counter
+        counter = counter
     )
 }
