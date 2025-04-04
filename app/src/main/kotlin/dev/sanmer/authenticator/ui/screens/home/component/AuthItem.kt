@@ -188,16 +188,16 @@ private fun Logo(
 @Composable
 private fun colorLight(num: Int): Color {
     return when (num) {
-        1 -> colorResource(id = R.color.material_red_300)
-        2 -> colorResource(id = R.color.material_purple_300)
-        3 -> colorResource(id = R.color.material_blue_300)
+        0 -> colorResource(id = R.color.material_red_300)
+        1 -> colorResource(id = R.color.material_orange_300)
+        2 -> colorResource(id = R.color.material_yellow_300)
+        3 -> colorResource(id = R.color.material_green_300)
         4 -> colorResource(id = R.color.material_teal_300)
-        5 -> colorResource(id = R.color.material_green_300)
-        6 -> colorResource(id = R.color.material_yellow_300)
-        7 -> colorResource(id = R.color.material_orange_300)
+        5 -> colorResource(id = R.color.material_blue_300)
+        6 -> colorResource(id = R.color.material_indigo_300)
+        7 -> colorResource(id = R.color.material_purple_300)
         8 -> colorResource(id = R.color.material_pink_300)
-        9 -> colorResource(id = R.color.material_indigo_300)
-        0 -> colorResource(id = R.color.material_deep_orange_300)
+        9 -> colorResource(id = R.color.material_deep_orange_300)
         else -> MaterialTheme.colorScheme.primary
     }
 }
@@ -205,16 +205,16 @@ private fun colorLight(num: Int): Color {
 @Composable
 private fun colorDark(num: Int): Color {
     return when (num) {
-        1 -> colorResource(id = R.color.material_red_900)
-        2 -> colorResource(id = R.color.material_purple_900)
-        3 -> colorResource(id = R.color.material_blue_900)
+        0 -> colorResource(id = R.color.material_red_900)
+        1 -> colorResource(id = R.color.material_orange_900)
+        2 -> colorResource(id = R.color.material_yellow_900)
+        3 -> colorResource(id = R.color.material_green_900)
         4 -> colorResource(id = R.color.material_teal_900)
-        5 -> colorResource(id = R.color.material_green_900)
-        6 -> colorResource(id = R.color.material_yellow_900)
-        7 -> colorResource(id = R.color.material_orange_900)
+        5 -> colorResource(id = R.color.material_blue_900)
+        6 -> colorResource(id = R.color.material_indigo_900)
+        7 -> colorResource(id = R.color.material_purple_900)
         8 -> colorResource(id = R.color.material_pink_900)
-        9 -> colorResource(id = R.color.material_indigo_900)
-        0 -> colorResource(id = R.color.material_deep_orange_900)
+        9 -> colorResource(id = R.color.material_deep_orange_900)
         else -> MaterialTheme.colorScheme.primary
     }
 }
