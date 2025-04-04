@@ -48,15 +48,15 @@ class DbRepository @Inject constructor(
         .map { entries ->
             entries.mapNotNull { (totp, trash) ->
                 when {
-                    enable -> if (trash == null) totp.auth else null
-                    else -> if (trash != null) totp.auth else null
+                    enable -> if (trash == null) totp.auth(timeRepository.epochSeconds) else null
+                    else -> if (trash != null) totp.auth(timeRepository.epochSeconds) else null
                 }
             }
         }
 
     fun getTotpBySecretAsFlow(secret: String) = totp.getBySecretAsFlow(secret)
         .filterNotNull()
-        .map { it.auth }
+        .map { it.auth(timeRepository.epochSeconds) }
 
     suspend fun existsTotp(secret: String) = withContext(Dispatchers.IO) {
         totp.exists(secret)
@@ -99,7 +99,9 @@ class DbRepository @Inject constructor(
 
     fun getAuthInTrashAllAsFlow() = combine(
         hotp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth() }.toList() },
-        totp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.auth }.toList() }
+        totp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys {
+            it.key.auth(timeRepository.epochSeconds)
+        }.toList() }
     ) { hotp, totp ->
         hotp.toMutableList<Pair<Auth, TrashEntity>>().apply { addAll(totp) }
     }

@@ -37,9 +37,12 @@ interface NtpServer {
     }
 
     data class NtpTime(
-        val delay: Duration = 0.milliseconds,
+        val rtt: Duration = 0.milliseconds,
         val offset: Duration = 0.milliseconds
-    )
+    ) {
+        val offsetValue by lazy { offset.toLong(DurationUnit.MILLISECONDS) }
+        val currentTimeMillis inline get() = System.currentTimeMillis() + offsetValue
+    }
 
     private companion object Impl {
         const val NTP_PORT = 123
@@ -72,7 +75,7 @@ interface NtpServer {
                 val t3 = data.readTimestamp(INDEX_TRANSMIT_TIME)
 
                 NtpTime(
-                    delay = ((t4 - t1) - (t3 - t2)).milliseconds,
+                    rtt = ((t4 - t1) - (t3 - t2)).milliseconds,
                     offset = (((t2 - t1) + (t3 - t4)) / 2.0).milliseconds
                 )
             }

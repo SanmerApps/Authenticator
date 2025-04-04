@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.database.entity
 import androidx.room.Entity
 import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.otp.HOTP
+import kotlinx.coroutines.flow.StateFlow
 
 @Entity(tableName = "totp", primaryKeys = ["secret"])
 data class TotpEntity(
@@ -24,12 +25,15 @@ data class TotpEntity(
         period = original.period
     )
 
-    val auth get() = TotpAuth(
+    fun auth(
+        epochSeconds: StateFlow<Long>
+    ) = TotpAuth(
         issuer = issuer,
         name = name,
         secret = secret,
         hash = hash,
         digits = digits,
-        period = period
+        period = period,
+        epochSecondsFlow = epochSeconds
     )
 }
