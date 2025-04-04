@@ -18,8 +18,8 @@ import kotlin.time.Duration
 class TrashViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private val authsFlow = MutableStateFlow(emptyList<AuthWrapper>())
-    val auths get() = authsFlow.asStateFlow()
+    private val _auths = MutableStateFlow(emptyList<AuthCompat>())
+    val auths get() = _auths.asStateFlow()
 
     init {
         Timber.d("TrashViewModel init")
@@ -30,8 +30,8 @@ class TrashViewModel @Inject constructor(
         viewModelScope.launch {
             dbRepository.getAuthInTrashAllAsFlow()
                 .collect { source ->
-                    authsFlow.update {
-                        source.map(::AuthWrapper).sortedBy {
+                    _auths.update {
+                        source.map(::AuthCompat).sortedBy {
                             it.auth.issuer.lowercase()
                         }
                     }
@@ -58,7 +58,7 @@ class TrashViewModel @Inject constructor(
         }
     }
 
-    class AuthWrapper(
+    data class AuthCompat(
         val auth: Auth,
         val lifetime: Duration
     ) {

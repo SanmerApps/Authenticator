@@ -18,7 +18,7 @@ import dev.sanmer.authenticator.viewmodel.TrashViewModel
 @Composable
 fun AuthList(
     state: LazyListState,
-    auths: List<TrashViewModel.AuthWrapper>,
+    auths: List<TrashViewModel.AuthCompat>,
     restoreAuth: (Auth) -> Unit,
     deleteAuth: (Auth) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
