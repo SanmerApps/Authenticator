@@ -20,19 +20,23 @@ interface NtpServer {
     suspend fun address() = address.toInetAddress()
     suspend fun sync() = sync(this)
 
-    object Apple : NtpServer {
+    data class Custom(
+        override val address: String
+    ) : NtpServer
+
+    data object Apple : NtpServer {
         override val address = "time.apple.com"
     }
 
-    object Cloudflare : NtpServer {
+    data object Cloudflare : NtpServer {
         override val address = "time.cloudflare.com"
     }
 
-    object Google : NtpServer {
+    data object Google : NtpServer {
         override val address = "time.google.com"
     }
 
-    object Microsoft : NtpServer {
+    data object Microsoft : NtpServer {
         override val address = "time.windows.com"
     }
 
