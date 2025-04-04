@@ -20,8 +20,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private val authsFlow = MutableStateFlow(emptyList<Auth>())
-    val auths get() = authsFlow.asStateFlow()
+    private val _auths = MutableStateFlow(emptyList<Auth>())
+    val auths get() = _auths.asStateFlow()
 
     var isSearch by mutableStateOf(false)
         private set
@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             dbRepository.getAuthAllAsFlow(enable = true)
                 .combineToLatest(queryFlow) { source, key ->
-                    authsFlow.update {
+                    _auths.update {
                         source.filter {
                             if (key.isNotBlank()) {
                                 it.name.contains(key, ignoreCase = true)

@@ -39,8 +39,8 @@ class ScanViewModel @Inject constructor(
 
     val cameraController by lazy { LifecycleCameraController(context) }
 
-    private val uriFlow = MutableStateFlow("")
-    val uri get() = uriFlow.asStateFlow()
+    private val _uri = MutableStateFlow("")
+    val uri get() = _uri.asStateFlow()
 
     init {
         Timber.d("ScanViewModel init")
@@ -72,7 +72,7 @@ class ScanViewModel @Inject constructor(
     }
 
     fun rewind() {
-        uriFlow.update { "" }
+        _uri.update { "" }
     }
 
     override fun analyze(image: ImageProxy) {
@@ -87,7 +87,7 @@ class ScanViewModel @Inject constructor(
                 height = image.height,
             )
 
-            uriFlow.update { content }
+            _uri.update { content }
 
         } catch (_: Throwable) {
 
@@ -101,7 +101,7 @@ class ScanViewModel @Inject constructor(
             val cr = context.contentResolver
             checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
         }.onSuccess {
-            uriFlow.update { it }
+            _uri.update { it }
         }.onFailure {
             Timber.e(it)
         }

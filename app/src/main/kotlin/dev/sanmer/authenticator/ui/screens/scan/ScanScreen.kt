@@ -74,8 +74,7 @@ fun ScanScreen(
 
         Crossfade(
             targetState = !viewModel.isAllowed,
-            animationSpec = tween(800),
-            label = "CameraOff"
+            animationSpec = tween(800)
         ) { show ->
             if (show) {
                 CameraOff(
