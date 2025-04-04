@@ -69,7 +69,7 @@ private fun AuthItemContent(
         .sizeIn(maxWidth = 450.dp)
         .fillMaxWidth()
         .surface(
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.large,
             backgroundColor = MaterialTheme.colorScheme.surface,
             border = CardDefaults.outlinedCardBorder()
         )
@@ -150,7 +150,7 @@ private fun LabelText(
     text: String
 ) = Text(
     text = text,
-    style = MaterialTheme.typography.titleSmall,
+    style = MaterialTheme.typography.labelLarge,
     color = MaterialTheme.colorScheme.onSecondaryContainer,
     modifier = Modifier
         .background(

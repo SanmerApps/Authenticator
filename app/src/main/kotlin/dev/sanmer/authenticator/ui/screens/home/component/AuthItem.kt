@@ -82,7 +82,7 @@ private fun <T> AuthItemContent(
         .sizeIn(maxWidth = 450.dp)
         .fillMaxWidth()
         .surface(
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.large,
             backgroundColor = MaterialTheme.colorScheme.surface,
             border = CardDefaults.outlinedCardBorder()
         )
