@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Google" transform="matrix(2.29062,0,0,2.29062,-661.352,-659.952)">
+        <g transform="matrix(1,0,0,1,256,256)">
+            <path d="M153,292C183,374 271,387 324,352L386,352L386,400C351.232,429.737 306.954,446.09 261.203,446.09C189.011,446.09 122.678,405.373 90,341" style="fill:rgb(52,168,83);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,256,256)">
+            <path d="M386,400C430.351,358.764 451.187,288.393 439,221L260,221L260,295L362,295C357.333,319.667 344.667,338.667 324,352" style="fill:rgb(66,133,244);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,256,256)">
+            <path d="M90,341C63.397,286.907 63.397,224.093 90,170L153,219C145,243.667 145,268 153,292" style="fill:rgb(251,188,2);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(1,0,0,1,256,256)">
+            <path d="M153,219C175,150 269,110 332,169L387,115C309,40 157,43 90,170" style="fill:rgb(234,67,53);fill-rule:nonzero;"/>
+        </g>
+    </g>
+</svg>
