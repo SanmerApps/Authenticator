@@ -15,7 +15,7 @@ import kotlin.time.DurationUnit
 interface NtpServer {
     val address: String
     val port: Int get() = NTP_PORT
-    val timeout: Duration get() = 15.seconds
+    val timeout: Duration get() = 5.seconds
 
     suspend fun address() = address.toInetAddress()
     suspend fun sync() = sync(this)
@@ -24,8 +24,16 @@ interface NtpServer {
         override val address: String
     ) : NtpServer
 
+    data object Alibaba : NtpServer {
+        override val address = "ntp.aliyun.com"
+    }
+
     data object Apple : NtpServer {
         override val address = "time.apple.com"
+    }
+
+    data object Amazon : NtpServer {
+        override val address = "time.aws.com"
     }
 
     data object Cloudflare : NtpServer {
@@ -36,13 +44,21 @@ interface NtpServer {
         override val address = "time.google.com"
     }
 
+    data object Meta : NtpServer {
+        override val address = "time.facebook.com"
+    }
+
     data object Microsoft : NtpServer {
         override val address = "time.windows.com"
     }
 
+    data object Tencent : NtpServer {
+        override val address = "ntp.tencent.com"
+    }
+
     data class NtpTime(
-        val rtt: Duration = 0.milliseconds,
-        val offset: Duration = 0.milliseconds
+        val rtt: Duration = Duration.ZERO,
+        val offset: Duration = Duration.ZERO
     ) {
         val offsetValue by lazy { offset.toLong(DurationUnit.MILLISECONDS) }
         val currentTimeMillis inline get() = System.currentTimeMillis() + offsetValue

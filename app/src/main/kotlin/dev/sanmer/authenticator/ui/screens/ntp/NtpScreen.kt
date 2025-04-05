@@ -42,7 +42,7 @@ fun NtpScreen(
     viewModel: NtpViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val ntps by viewModel.ntps.collectAsStateWithLifecycle()
+    val ntps by viewModel.ntps.collectAsStateWithLifecycle(initialValue = emptyList())
     val syncState by viewModel.syncState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()

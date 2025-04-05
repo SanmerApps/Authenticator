@@ -14,6 +14,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -26,7 +27,9 @@ class NtpViewModel @Inject constructor(
     private val timeRepository: TimeRepository
 ) : ViewModel() {
     private val _ntps = MutableStateFlow(defaultNtps)
-    val ntps get() = _ntps.asStateFlow()
+    val ntps get() = _ntps.map { list ->
+        list.sortedBy { it.ntpTime.rtt }
+    }
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Pending)
     val syncState get() = _syncState.asStateFlow()
@@ -129,9 +132,21 @@ class NtpViewModel @Inject constructor(
     companion object Default {
         private val defaultNtps = listOf(
             NtpCompat(
+                icon = R.drawable.brand_aliyun,
+                ntp = Ntp.Alibaba,
+                server = NtpServer.Alibaba,
+                ntpTime = NtpServer.NtpTime()
+            ),
+            NtpCompat(
                 icon = R.drawable.brand_apple,
                 ntp = Ntp.Apple,
                 server = NtpServer.Apple,
+                ntpTime = NtpServer.NtpTime()
+            ),
+            NtpCompat(
+                icon = R.drawable.brand_aws,
+                ntp = Ntp.Amazon,
+                server = NtpServer.Amazon,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
@@ -147,9 +162,21 @@ class NtpViewModel @Inject constructor(
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
+                icon = R.drawable.brand_meta,
+                ntp = Ntp.Meta,
+                server = NtpServer.Meta,
+                ntpTime = NtpServer.NtpTime()
+            ),
+            NtpCompat(
                 icon = R.drawable.brand_microsoft,
                 ntp = Ntp.Microsoft,
                 server = NtpServer.Microsoft,
+                ntpTime = NtpServer.NtpTime()
+            ),
+            NtpCompat(
+                icon = R.drawable.brand_tencent_cloud,
+                ntp = Ntp.Tencent,
+                server = NtpServer.Tencent,
                 ntpTime = NtpServer.NtpTime()
             )
         )

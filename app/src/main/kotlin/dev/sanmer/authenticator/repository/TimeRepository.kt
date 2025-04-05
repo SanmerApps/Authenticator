@@ -72,10 +72,14 @@ class TimeRepository @Inject constructor(
     suspend fun sync(preference: Preference): Result<NtpServer.NtpTime> {
         val server = when (preference.ntp) {
             Ntp.Custom -> NtpServer.Custom(preference.ntpAddress)
+            Ntp.Alibaba -> NtpServer.Alibaba
             Ntp.Apple -> NtpServer.Apple
+            Ntp.Amazon -> NtpServer.Amazon
             Ntp.Cloudflare -> NtpServer.Cloudflare
             Ntp.Google -> NtpServer.Google
+            Ntp.Meta -> NtpServer.Meta
             Ntp.Microsoft -> NtpServer.Microsoft
+            Ntp.Tencent -> NtpServer.Tencent
         }
 
         return runCatching {
