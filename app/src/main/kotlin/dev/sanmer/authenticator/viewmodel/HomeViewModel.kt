@@ -1,31 +1,41 @@
 package dev.sanmer.authenticator.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ktx.combineToLatest
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
+import dev.sanmer.authenticator.repository.TimeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dbRepository: DbRepository
+    private val dbRepository: DbRepository,
+    private val timeRepository: TimeRepository
 ) : ViewModel() {
     private val _auths = MutableStateFlow(emptyList<Auth>())
     val auths get() = _auths.asStateFlow()
 
-    var isSearch by mutableStateOf(false)
-        private set
-    private val queryFlow = MutableStateFlow("")
+    val time = timeRepository.epochSeconds.map { epochSecond ->
+        Instant.ofEpochSecond(epochSecond)
+            .atZone(ZoneId.systemDefault())
+            .toLocalTime()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = LocalTime.now()
+    )
 
     init {
         Timber.d("HomeViewModel init")
@@ -36,18 +46,9 @@ class HomeViewModel @Inject constructor(
     private fun dataObserver() {
         viewModelScope.launch {
             dbRepository.getAuthAllAsFlow(enable = true)
-                .combineToLatest(queryFlow) { source, key ->
+                .collect { auths ->
                     _auths.update {
-                        source.filter {
-                            if (key.isNotBlank()) {
-                                it.name.contains(key, ignoreCase = true)
-                                        || it.issuer.contains(key, ignoreCase = true)
-                            } else {
-                                true
-                            }
-                        }.sortedBy {
-                            it.issuer.lowercase()
-                        }
+                        auths.sortedBy { it.issuer.lowercase() }
                     }
                 }
         }
@@ -59,19 +60,6 @@ class HomeViewModel @Inject constructor(
             dbRepository.deleteAuth(secrets)
             dbRepository.deleteTrash(secrets)
         }
-    }
-
-    fun search(key: String) {
-        queryFlow.value = key
-    }
-
-    fun openSearch() {
-        isSearch = true
-    }
-
-    fun closeSearch() {
-        isSearch = false
-        queryFlow.value = ""
     }
 
     fun updateAuth(auth: Auth) {
