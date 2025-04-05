@@ -28,18 +28,21 @@
     <string name="settings_title">Settings</string>
     <string name="settings_token">Token</string>
     <string name="settings_token_desc">Add new token</string>
-    <string name="settings_import_export">Import &amp; Export</string>
-    <string name="settings_import_export_desc">Import and export database</string>
-    <string name="settings_tools">Tools</string>
-    <string name="settings_tools_desc">Decrypt, encode and decode</string>
     <string name="settings_enter">Enter Manually</string>
     <string name="settings_scan">Scan QR Code</string>
+    <string name="settings_import_export">Import &amp; Export</string>
+    <string name="settings_import_export_desc">Import and export database</string>
     <string name="settings_import_json">Import from JSON</string>
     <string name="settings_export_json">Export to JSON</string>
     <string name="settings_import_txt">Import from URI</string>
     <string name="settings_export_txt">Export to URI</string>
+    <string name="settings_tools">Tools</string>
+    <string name="settings_tools_desc">Decrypt, encode and decode</string>
     <string name="settings_decrypt">Decrypt a JSON</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
+    <string name="settings_preference">Preference</string>
+    <string name="settings_preference_desc">Do what you want</string>
+    <string name="settings_ntp_server">Time server</string>
 
     <!-- Trash -->
     <string name="trash_title">Trash</string>
@@ -48,6 +51,11 @@
     <!-- Encode -->
     <string name="encode_encoded">Encoded</string>
     <string name="encode_decoded">Decoded</string>
+
+    <!-- Ntp -->
+    <string name="ntp_rtt">RTT: %1$s</string>
+    <string name="ntp_offset">Offset: %1$s</string>
+    <string name="ntp_timeout">Timeout</string>
 
     <!-- Search -->
     <string name="search_placeholder">Search…</string>

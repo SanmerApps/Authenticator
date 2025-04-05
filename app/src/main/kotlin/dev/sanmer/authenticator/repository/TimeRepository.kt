@@ -25,9 +25,11 @@ class TimeRepository @Inject constructor(
     private val preferenceRepository: PreferenceRepository
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    val ntpTime = MutableStateFlow(NtpServer.NtpTime())
+    private var clockJob: Job? = null
 
-    private var job: Job? = null
+    private val _ntpTime = MutableStateFlow(NtpServer.NtpTime())
+    val ntpTime get() = _ntpTime.asStateFlow()
+
     private val _epochSeconds = MutableStateFlow(TOTP.epochSeconds)
     val epochSeconds get() = _epochSeconds.asStateFlow()
 
@@ -50,15 +52,15 @@ class TimeRepository @Inject constructor(
 
     private fun ntpObserver() {
         coroutineScope.launch {
-            ntpTime.collectLatest {
+            _ntpTime.collect {
                 start(it)
             }
         }
     }
 
     private fun start(ntpTime: NtpServer.NtpTime) {
-        job?.cancel()
-        job = coroutineScope.launch {
+        clockJob?.cancel()
+        clockJob = coroutineScope.launch {
             delay(1000 - (ntpTime.currentTimeMillis % 1000))
             while (currentCoroutineContext().isActive) {
                 _epochSeconds.value = ntpTime.currentTimeMillis / 1000
@@ -67,7 +69,7 @@ class TimeRepository @Inject constructor(
         }
     }
 
-    fun sync(preference: Preference) {
+    suspend fun sync(preference: Preference): Result<NtpServer.NtpTime> {
         val server = when (preference.ntp) {
             Ntp.Custom -> NtpServer.Custom(preference.ntpAddress)
             Ntp.Apple -> NtpServer.Apple
@@ -76,14 +78,12 @@ class TimeRepository @Inject constructor(
             Ntp.Microsoft -> NtpServer.Microsoft
         }
 
-        coroutineScope.launch {
-            runCatching {
-                ntpTime.updateAndGet { server.sync() }
-            }.onSuccess {
-                Timber.i("ntp(${server.address}): $it")
-            }.onFailure {
-                Timber.w(it)
-            }
+        return runCatching {
+            _ntpTime.updateAndGet { server.sync() }
+        }.onSuccess {
+            Timber.i("ntp(${server.address}): $it")
+        }.onFailure {
+            Timber.e(it, "address = ${server.address}")
         }
     }
 }

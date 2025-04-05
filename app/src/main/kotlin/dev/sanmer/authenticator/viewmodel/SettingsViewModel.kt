@@ -2,6 +2,9 @@ package dev.sanmer.authenticator.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,8 +29,19 @@ class SettingsViewModel @Inject constructor(
     private var output = emptyList<Auth>()
     private var input = emptyList<Auth>()
 
+    var bottomSheet by mutableStateOf(BottomSheet.Closed)
+        private set
+
     init {
         Timber.d("SettingsViewModel init")
+    }
+
+    fun updateBottomSheet(block: (BottomSheet) -> BottomSheet) {
+        bottomSheet = block(bottomSheet)
+    }
+
+    fun closeBottomSheet() {
+        bottomSheet = BottomSheet.Closed
     }
 
     fun prepare(fileType: FileType, context: Context, callback: () -> Unit) {
@@ -151,5 +165,15 @@ class SettingsViewModel @Inject constructor(
                 AuthJson(auths).encodeTo(output)
             }
         }
+    }
+
+    enum class BottomSheet {
+        Closed,
+        Token,
+        Database,
+        Tool,
+        Preference;
+
+        val isClosed inline get() = this == Closed
     }
 }

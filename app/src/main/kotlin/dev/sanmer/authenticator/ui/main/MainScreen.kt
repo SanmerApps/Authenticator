@@ -24,6 +24,7 @@ import androidx.navigation.navArgument
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
+import dev.sanmer.authenticator.ui.screens.ntp.NtpScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screens.settings.SettingsScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
@@ -45,6 +46,7 @@ fun MainScreen() {
         Screen.Scan(navController).addTo(this)
         Screen.Trash(navController).addTo(this)
         Screen.Encode(navController).addTo(this)
+        Screen.Ntp(navController).addTo(this)
     }
 }
 
@@ -72,6 +74,7 @@ sealed class Screen(
         fun Scan() = "Scan"
         fun Trash() = "Trash"
         fun Encode() = "Encode"
+        fun Ntp() = "Ntp"
     }
 
     class Home(navController: NavController) : Screen(
@@ -105,5 +108,10 @@ sealed class Screen(
     class Encode(navController: NavController) : Screen(
         route = Encode(),
         content = { EncodeScreen(navController = navController) }
+    )
+
+    class Ntp(navController: NavController) : Screen(
+        route = Ntp(),
+        content = { NtpScreen(navController = navController) }
     )
 }

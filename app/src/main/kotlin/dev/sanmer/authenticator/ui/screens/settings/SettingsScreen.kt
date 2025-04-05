@@ -1,5 +1,10 @@
 package dev.sanmer.authenticator.ui.screens.settings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,10 +20,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -34,11 +35,13 @@ import dev.sanmer.authenticator.ktx.viewUrl
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.ui.screens.settings.component.DatabaseItem
+import dev.sanmer.authenticator.ui.screens.settings.component.PreferenceItem
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingIcon
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingItem
 import dev.sanmer.authenticator.ui.screens.settings.component.TokenItem
 import dev.sanmer.authenticator.ui.screens.settings.component.ToolItem
 import dev.sanmer.authenticator.viewmodel.SettingsViewModel
+import dev.sanmer.authenticator.viewmodel.SettingsViewModel.BottomSheet
 
 @Composable
 fun SettingsScreen(
@@ -47,27 +50,29 @@ fun SettingsScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    var token by rememberSaveable { mutableStateOf(false) }
-    if (token) TokenItem(
-        onDismiss = { token = false },
-        navController = navController,
-    )
-
-    var database by rememberSaveable { mutableStateOf(false) }
-    if (database) DatabaseItem(
-        onDismiss = { database = false },
-        prepare = viewModel::prepare,
-        importFrom = viewModel::importFrom,
-        exportTo = viewModel::exportTo
-    )
-
-    var tool by rememberSaveable { mutableStateOf(false) }
-    if (tool) ToolItem(
-        onDismiss = { tool = false },
-        navController = navController,
-        decryptedToJson = viewModel::decryptedToJson,
-        decryptFromJson = viewModel::decryptFromJson
-    )
+    when (viewModel.bottomSheet) {
+        BottomSheet.Closed -> Unit
+        BottomSheet.Token -> TokenItem(
+            onDismiss = viewModel::closeBottomSheet,
+            navController = navController,
+        )
+        BottomSheet.Database -> DatabaseItem(
+            onDismiss = viewModel::closeBottomSheet,
+            prepare = viewModel::prepare,
+            importFrom = viewModel::importFrom,
+            exportTo = viewModel::exportTo
+        )
+        BottomSheet.Tool -> ToolItem(
+            onDismiss = viewModel::closeBottomSheet,
+            navController = navController,
+            decryptedToJson = viewModel::decryptedToJson,
+            decryptFromJson = viewModel::decryptFromJson
+        )
+        BottomSheet.Preference -> PreferenceItem(
+            onDismiss = viewModel::closeBottomSheet,
+            navController = navController,
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -77,7 +82,13 @@ fun SettingsScreen(
             )
         },
         floatingActionButton = {
-            ActionButton(navController = navController)
+            AnimatedVisibility(
+                visible = viewModel.bottomSheet.isClosed,
+                enter = fadeIn() + scaleIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
+                ActionButton(navController = navController)
+            }
         }
     ) { contentPadding ->
         Column(
@@ -93,15 +104,15 @@ fun SettingsScreen(
                     SettingIcon(
                         icon = R.drawable.key,
                         color = if (isSystemInDarkTheme()) {
-                            colorResource(id = R.color.material_blue_900)
+                            colorResource(id = R.color.material_orange_900)
                         } else {
-                            colorResource(id = R.color.material_blue_300)
+                            colorResource(id = R.color.material_orange_300)
                         }
                     )
                 },
                 title = stringResource(id = R.string.settings_token),
                 text = stringResource(id = R.string.settings_token_desc),
-                onClick = { token = true }
+                onClick = { viewModel.updateBottomSheet { BottomSheet.Token } }
             )
 
             SettingItem(
@@ -117,7 +128,7 @@ fun SettingsScreen(
                 },
                 title = stringResource(id = R.string.settings_import_export),
                 text = stringResource(id = R.string.settings_import_export_desc),
-                onClick = { database = true }
+                onClick = { viewModel.updateBottomSheet { BottomSheet.Database } }
             )
 
             SettingItem(
@@ -125,15 +136,31 @@ fun SettingsScreen(
                     SettingIcon(
                         icon = R.drawable.tool,
                         color = if (isSystemInDarkTheme()) {
-                            colorResource(id = R.color.material_orange_900)
+                            colorResource(id = R.color.material_blue_900)
                         } else {
-                            colorResource(id = R.color.material_orange_300)
+                            colorResource(id = R.color.material_blue_300)
                         }
                     )
                 },
                 title = stringResource(id = R.string.settings_tools),
                 text = stringResource(id = R.string.settings_tools_desc),
-                onClick = { tool = true }
+                onClick = { viewModel.updateBottomSheet { BottomSheet.Tool } }
+            )
+
+            SettingItem(
+                icon = {
+                    SettingIcon(
+                        icon = R.drawable.mood_heart,
+                        color = if (isSystemInDarkTheme()) {
+                            colorResource(id = R.color.material_deep_orange_900)
+                        } else {
+                            colorResource(id = R.color.material_deep_orange_300)
+                        }
+                    )
+                },
+                title = stringResource(id = R.string.settings_preference),
+                text = stringResource(id = R.string.settings_preference_desc),
+                onClick = { viewModel.updateBottomSheet { BottomSheet.Preference } }
             )
         }
     }
