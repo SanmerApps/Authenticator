@@ -1,13 +1,12 @@
 package dev.sanmer.authenticator.viewmodel
 
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.repository.PreferenceRepository
 import dev.sanmer.authenticator.repository.TimeRepository
+import dev.sanmer.logo.Brand
 import dev.sanmer.ntp.NtpServer
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -94,8 +93,7 @@ class NtpViewModel @Inject constructor(
         }
 
     data class NtpCompat(
-        @DrawableRes
-        val icon: Int,
+        val brand: Brand,
         val ntp: Ntp,
         val server: NtpServer,
         val ntpTime: NtpServer.NtpTime
@@ -132,49 +130,49 @@ class NtpViewModel @Inject constructor(
     companion object Default {
         private val defaultNtps = listOf(
             NtpCompat(
-                icon = R.drawable.brand_aliyun,
+                brand = Brand.Aliyun,
                 ntp = Ntp.Alibaba,
                 server = NtpServer.Alibaba,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_apple,
+                brand = Brand.Apple,
                 ntp = Ntp.Apple,
                 server = NtpServer.Apple,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_aws,
+                brand = Brand.AWS,
                 ntp = Ntp.Amazon,
                 server = NtpServer.Amazon,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_cloudflare,
+                brand = Brand.Cloudflare,
                 ntp = Ntp.Cloudflare,
                 server = NtpServer.Cloudflare,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_google,
+                brand = Brand.Google,
                 ntp = Ntp.Google,
                 server = NtpServer.Google,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_meta,
+                brand = Brand.Meta,
                 ntp = Ntp.Meta,
                 server = NtpServer.Meta,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_microsoft,
+                brand = Brand.Microsoft,
                 ntp = Ntp.Microsoft,
                 server = NtpServer.Microsoft,
                 ntpTime = NtpServer.NtpTime()
             ),
             NtpCompat(
-                icon = R.drawable.brand_tencent_cloud,
+                brand = Brand.TencentCloud,
                 ntp = Ntp.Tencent,
                 server = NtpServer.Tencent,
                 ntpTime = NtpServer.NtpTime()

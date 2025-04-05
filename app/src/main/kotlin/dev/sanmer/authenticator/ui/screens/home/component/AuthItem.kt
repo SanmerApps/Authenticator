@@ -1,23 +1,18 @@
 package dev.sanmer.authenticator.ui.screens.home.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,12 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.sanmer.authenticator.R
@@ -39,7 +31,7 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.auth.Otp
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
-import dev.sanmer.authenticator.ui.theme.JetBrainsMono
+import dev.sanmer.logo.Logo
 
 @Composable
 fun <T> AuthItem(
@@ -92,34 +84,19 @@ private fun <T> AuthItemContent(
         )
         .padding(all = 15.dp),
     verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(10.dp)
+    horizontalArrangement = Arrangement.spacedBy(12.dp)
 ) {
+    val logo by remember(auth.issuer) { derivedStateOf { Logo.getOrDefault(auth.issuer) } }
     val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.now())
-    val progress by auth.progress.collectAsStateWithLifecycle(initialValue = 1f)
 
-    Box(
+    Image(
+        painter = painterResource(id = logo.res),
+        contentDescription = null,
         modifier = Modifier.size(40.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        val num by remember { derivedStateOf { otp.first().toString().toInt() } }
-        CircularProgressIndicator(
-            progress = { progress },
-            color = when {
-                isSystemInDarkTheme() -> colorDark(num = num)
-                else -> colorLight(num = num)
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-
-        Logo(
-            text = auth.issuer,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontFamily = JetBrainsMono,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
+        colorFilter = if (logo.refillable) {
+            ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        } else null
+    )
 
     Column(
         horizontalAlignment = Alignment.Start
@@ -167,54 +144,5 @@ private fun AuthItemButtons(
             painter = painterResource(id = R.drawable.trash_x),
             contentDescription = null
         )
-    }
-}
-
-@Composable
-private fun Logo(
-    text: String,
-    color: Color = LocalContentColor.current,
-    style: TextStyle = LocalTextStyle.current
-) {
-    if (text.isEmpty()) return
-
-    Text(
-        text = text[0].uppercase(),
-        color = color,
-        style = style
-    )
-}
-
-@Composable
-private fun colorLight(num: Int): Color {
-    return when (num) {
-        0 -> colorResource(id = R.color.material_red_300)
-        1 -> colorResource(id = R.color.material_orange_300)
-        2 -> colorResource(id = R.color.material_yellow_300)
-        3 -> colorResource(id = R.color.material_green_300)
-        4 -> colorResource(id = R.color.material_teal_300)
-        5 -> colorResource(id = R.color.material_blue_300)
-        6 -> colorResource(id = R.color.material_indigo_300)
-        7 -> colorResource(id = R.color.material_purple_300)
-        8 -> colorResource(id = R.color.material_pink_300)
-        9 -> colorResource(id = R.color.material_deep_orange_300)
-        else -> MaterialTheme.colorScheme.primary
-    }
-}
-
-@Composable
-private fun colorDark(num: Int): Color {
-    return when (num) {
-        0 -> colorResource(id = R.color.material_red_900)
-        1 -> colorResource(id = R.color.material_orange_900)
-        2 -> colorResource(id = R.color.material_yellow_900)
-        3 -> colorResource(id = R.color.material_green_900)
-        4 -> colorResource(id = R.color.material_teal_900)
-        5 -> colorResource(id = R.color.material_blue_900)
-        6 -> colorResource(id = R.color.material_indigo_900)
-        7 -> colorResource(id = R.color.material_purple_900)
-        8 -> colorResource(id = R.color.material_pink_900)
-        9 -> colorResource(id = R.color.material_deep_orange_900)
-        else -> MaterialTheme.colorScheme.primary
     }
 }

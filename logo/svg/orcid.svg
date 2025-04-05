@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="ORCID" transform="matrix(53.3125,0,0,53.3125,85.5,85.5)">
+        <path d="M16,8C16,12.419 12.419,16 8,16C3.581,16 0,12.419 0,8C0,3.581 3.581,0 8,0C12.419,0 16,3.581 16,8Z" style="fill:rgb(166,206,57);fill-rule:nonzero;"/>
+        <g>
+            <path d="M5.394,11.637L4.431,11.637L4.431,4.944L5.394,4.944L5.394,11.637Z" style="fill:white;fill-rule:nonzero;"/>
+            <path d="M6.806,4.944L9.406,4.944C11.881,4.944 12.969,6.712 12.969,8.294C12.969,10.012 11.625,11.644 9.419,11.644L6.806,11.644L6.806,4.944ZM7.769,10.775L9.3,10.775C11.481,10.775 11.981,9.119 11.981,8.294C11.981,6.95 11.125,5.812 9.25,5.812L7.769,5.812L7.769,10.775Z" style="fill:white;fill-rule:nonzero;"/>
+            <path d="M5.544,3.55C5.544,3.894 5.263,4.181 4.913,4.181C4.563,4.181 4.281,3.894 4.281,3.55C4.281,3.2 4.563,2.919 4.913,2.919C5.263,2.919 5.544,3.206 5.544,3.55Z" style="fill:white;fill-rule:nonzero;"/>
+        </g>
+    </g>
+</svg>

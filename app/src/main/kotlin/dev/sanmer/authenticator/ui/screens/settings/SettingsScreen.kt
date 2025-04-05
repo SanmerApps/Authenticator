@@ -203,7 +203,7 @@ private fun TopBar(
             onClick = { context.viewUrl(Const.GITHUB_URL) }
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.brand_github),
+                painter = painterResource(id = R.drawable.brand_github_2),
                 contentDescription = null
             )
         }

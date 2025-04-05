@@ -84,6 +84,7 @@ android {
 
 dependencies {
     implementation(projects.core)
+    implementation(projects.logo)
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)

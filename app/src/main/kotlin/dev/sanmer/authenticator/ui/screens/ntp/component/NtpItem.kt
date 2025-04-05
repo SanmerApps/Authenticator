@@ -56,9 +56,9 @@ fun NtpItem(
     horizontalArrangement = Arrangement.spacedBy(10.dp)
 ) {
     Image(
-        painter = painterResource(id = ntp.icon),
+        painter = painterResource(id = ntp.brand.res),
         contentDescription = null,
-        modifier = Modifier.size(35.dp)
+        modifier = Modifier.size(40.dp)
     )
 
     Column(

@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.trash.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -30,6 +33,7 @@ import dev.sanmer.authenticator.ktx.hidden
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
+import dev.sanmer.logo.Logo
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -75,17 +79,22 @@ private fun AuthItemContent(
         )
         .padding(all = 15.dp),
     verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(10.dp)
+    horizontalArrangement = Arrangement.spacedBy(12.dp)
 ) {
-    val hiddenSecret by remember {
-        derivedStateOf { auth.secret.hidden() }
+    val logo by remember(auth.issuer) { derivedStateOf { Logo.getOrDefault(auth.issuer) } }
+    val hiddenSecret by remember { derivedStateOf { auth.secret.hidden() } }
+    val lifetimeString by remember {
+        derivedStateOf { lifetime.toString(unit = DurationUnit.HOURS, decimals = 2) }
     }
 
-    val lifetimeString by remember {
-        derivedStateOf {
-            lifetime.toString(unit = DurationUnit.HOURS, decimals = 2)
-        }
-    }
+    Image(
+        painter = painterResource(id = logo.res),
+        contentDescription = null,
+        modifier = Modifier.size(40.dp),
+        colorFilter = if (logo.refillable) {
+            ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        } else null
+    )
 
     Column(
         modifier = Modifier.fillMaxWidth()

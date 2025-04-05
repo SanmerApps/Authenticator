@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Jetbrains" transform="matrix(13.3281,0,0,13.3281,85.5,85.5)">
+        <path d="M20.34,3.66L3.66,20.34C1.317,22.684 -0,25.866 0,29.18L0,59C0,61.76 2.24,64 5,64L34.82,64C38.14,64 41.31,62.68 43.66,60.34L60.34,43.66C62.68,41.32 64,38.14 64,34.82L64,5C64,2.24 61.76,0 59,0L29.18,0C25.86,0 22.69,1.32 20.34,3.66Z" style="fill:url(#_Linear1);fill-rule:nonzero;"/>
+        <rect x="8" y="16" width="40" height="40" style="fill-rule:nonzero;"/>
+        <rect x="13" y="47" width="17" height="4" style="fill:white;fill-rule:nonzero;"/>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(61.77,-60.91,60.91,61.77,0.85,62.72)"><stop offset="0" style="stop-color:rgb(255,148,25);stop-opacity:1"/><stop offset="0.43" style="stop-color:rgb(255,2,29);stop-opacity:1"/><stop offset="0.99" style="stop-color:rgb(230,0,255);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(230,0,255);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>
