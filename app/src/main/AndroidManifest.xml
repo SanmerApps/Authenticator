@@ -39,7 +39,7 @@
         </activity>
 
         <activity
-            android:name=".ui.CryptoActivity"
+            android:name=".ui.TextCryptoActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="${applicationId}.action.ENCRYPT" />

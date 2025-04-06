@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.finishActivity
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel
+import dev.sanmer.authenticator.viewmodel.TextCryptoViewModel
 
 @Composable
-fun CryptoScreen(
-    viewModel: CryptoViewModel = hiltViewModel()
+fun TextCryptoScreen(
+    viewModel: TextCryptoViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -107,7 +107,7 @@ fun CryptoScreen(
         ) {
             Icon(
                 painter = when {
-                    viewModel.state.isRunning -> viewModel.runningIcon()
+                    viewModel.state.isRunning -> runningIcon()
                     else -> viewModel.waitIcon()
                 },
                 contentDescription = null,
@@ -127,7 +127,7 @@ fun CryptoScreen(
 }
 
 @Composable
-private fun CryptoViewModel.waitIcon() =
+private fun TextCryptoViewModel.waitIcon() =
     painterResource(
         id = when {
             isSkip -> R.drawable.lock_off
@@ -137,15 +137,14 @@ private fun CryptoViewModel.waitIcon() =
         }
     )
 
-@Suppress("UnusedReceiverParameter")
 @Composable
-private fun CryptoViewModel.runningIcon() =
+private fun runningIcon() =
     painterResource(
         id = R.drawable.lock
     )
 
 @Composable
-private fun CryptoViewModel.waitString() =
+private fun TextCryptoViewModel.waitString() =
     stringResource(
         id = when {
             isSkip -> R.string.crypto_skip
@@ -156,7 +155,7 @@ private fun CryptoViewModel.waitString() =
     )
 
 @Composable
-private fun CryptoViewModel.runningString() =
+private fun TextCryptoViewModel.runningString() =
     stringResource(
         id = when {
             isEncrypt -> R.string.crypto_encrypting

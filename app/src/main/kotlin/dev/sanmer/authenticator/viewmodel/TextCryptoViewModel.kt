@@ -8,17 +8,22 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ui.CryptoActivity.Action
-import dev.sanmer.authenticator.ui.CryptoActivity.Default.input
-import dev.sanmer.crypto.CryptoFactory
+import dev.sanmer.authenticator.ui.TextCryptoActivity.Action
+import dev.sanmer.authenticator.ui.TextCryptoActivity.Default.allowSkip
+import dev.sanmer.authenticator.ui.TextCryptoActivity.Default.input
+import dev.sanmer.crypto.PasswordKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class CryptoViewModel @Inject constructor() : ViewModel() {
+class TextCryptoViewModel @Inject constructor() : ViewModel() {
     private var action by mutableStateOf(Action.Encrypt)
+    private var allowSkip = true
+
+    var state by mutableStateOf(State.Wait)
+        private set
 
     var hidden by mutableStateOf(true)
         private set
@@ -27,24 +32,21 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
     var password by mutableStateOf("")
         private set
 
-    val isSkip by derivedStateOf { password.isBlank() }
+    val isSkip by derivedStateOf { password.isEmpty() && allowSkip }
     val isEncrypt by lazy { action == Action.Encrypt }
     val isDecrypt by lazy { action == Action.Decrypt }
 
-    var state by mutableStateOf(State.Wait)
-        private set
-
     init {
-        Timber.d("CryptoViewModel init")
+        Timber.d("TextCryptoViewModel init")
     }
 
     private fun run() = viewModelScope.launch(Dispatchers.Default) {
         runCatching {
-            val factory = CryptoFactory(password)
+            val key = PasswordKey.new(password)
             state = State.Running
             data = when (action) {
-                Action.Encrypt -> data.map(factory::encrypt)
-                Action.Decrypt -> data.map(factory::decrypt)
+                Action.Encrypt -> data.map { key.encrypt(it) }
+                Action.Decrypt -> data.map { key.decrypt(it) }
             }
         }.onSuccess {
             state = State.Ok
@@ -59,10 +61,11 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
         else -> run().isCompleted
     }
 
-    fun updateFromIntent(block: () -> Intent) {
-        val intent = block()
+    fun updateFromIntent(getIntent: () -> Intent) {
+        val intent = getIntent()
+        allowSkip = intent.allowSkip
         data = intent.input.toList()
-        action = checkNotNull(Action.fromStr(intent.action))
+        action = Action(intent.action)
     }
 
     fun updateHidden(block: (Boolean) -> Boolean) {
