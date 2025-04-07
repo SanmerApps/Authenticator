@@ -14,6 +14,22 @@ class PreferenceRepository @Inject constructor(
 ) {
     val data get() = dataStore.data
 
+    suspend fun setKeyEncryptedByPassword(value: String) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.copy(keyEncryptedByPassword = value)
+            }
+        }
+    }
+
+    suspend fun setKeyEncryptedByBiometric(value: String) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.copy(keyEncryptedByBiometric = value)
+            }
+        }
+    }
+
     suspend fun setNtpAddress(value: String) {
         withContext(Dispatchers.IO) {
             dataStore.updateData {
