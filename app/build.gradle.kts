@@ -53,6 +53,10 @@ android {
             )
         }
 
+        debug {
+            applicationIdSuffix = ".debug"
+        }
+
         all {
             signingConfig = releaseSigning
             buildConfigField("boolean", "DEV_VERSION", devVersion.toString())
