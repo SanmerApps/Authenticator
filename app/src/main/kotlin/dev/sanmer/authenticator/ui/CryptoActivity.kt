@@ -10,15 +10,14 @@ import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import dev.sanmer.authenticator.BuildConfig
-import dev.sanmer.authenticator.ui.main.TextCryptoScreen
+import dev.sanmer.authenticator.ui.screens.crypto.CryptoScreen
 import dev.sanmer.authenticator.ui.theme.AppTheme
-import dev.sanmer.authenticator.viewmodel.TextCryptoViewModel
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel
 import java.util.UUID
 
 @AndroidEntryPoint
-class TextCryptoActivity : ComponentActivity() {
-    private val viewModel: TextCryptoViewModel by viewModels()
+class CryptoActivity : ComponentActivity() {
+    private val viewModel: CryptoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +27,7 @@ class TextCryptoActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                TextCryptoScreen()
+                CryptoScreen()
             }
         }
     }
@@ -41,30 +40,28 @@ class TextCryptoActivity : ComponentActivity() {
         super.finish()
     }
 
-    enum class Action {
-        Encrypt,
-        Decrypt;
+    enum class Action(
+        val original: String,
+    ) {
+        Encrypt(ACTION_ENCRYPT),
+        Decrypt(ACTION_DECRYPT);
 
         companion object Default {
             operator fun invoke(action: String?): Action {
-                return when (action) {
-                    ACTION_ENCRYPT -> Encrypt
-                    ACTION_DECRYPT -> Decrypt
-                    else -> throw IllegalArgumentException("Unsupported($action)")
-                }
+                return entries.first { it.original == action }
             }
         }
     }
 
     companion object Default {
-        private const val ACTION_ENCRYPT = "${BuildConfig.APPLICATION_ID}.action.ENCRYPT"
-        private const val ACTION_DECRYPT = "${BuildConfig.APPLICATION_ID}.action.DECRYPT"
-        const val EXTRA_ALLOW_SKIP = "${BuildConfig.APPLICATION_ID}.extra.ALLOW_SKIP"
-        const val EXTRA_INPUT = "${BuildConfig.APPLICATION_ID}.extra.INPUT"
-        const val EXTRA_OUTPUT = "${BuildConfig.APPLICATION_ID}.extra.OUTPUT"
+        private const val ACTION_ENCRYPT = "dev.sanmer.authenticator.action.ENCRYPT"
+        private const val ACTION_DECRYPT = "dev.sanmer.authenticator.action.DECRYPT"
+        const val EXTRA_BYPASS = "dev.sanmer.authenticator.extra.BYPASS"
+        const val EXTRA_INPUT = "dev.sanmer.authenticator.extra.INPUT"
+        const val EXTRA_OUTPUT = "dev.sanmer.authenticator.extra.OUTPUT"
 
-        val Intent.allowSkip: Boolean
-            inline get() = getBooleanExtra(EXTRA_ALLOW_SKIP, true)
+        val Intent.bypass: Boolean
+            inline get() = getBooleanExtra(EXTRA_BYPASS, true)
 
         val Intent.input: Array<String>
             inline get() = checkNotNull(getStringArrayExtra(EXTRA_INPUT))
@@ -72,10 +69,11 @@ class TextCryptoActivity : ComponentActivity() {
         val Intent.output: Array<String>
             inline get() = checkNotNull(getStringArrayExtra(EXTRA_OUTPUT))
 
-        fun encrypt(
+        private fun start(
             context: Context,
             input: List<String>,
-            allowSkip: Boolean = true,
+            action: Action,
+            bypass: Boolean,
             callback: (List<String>) -> Unit
         ) {
             if (context !is ActivityResultRegistryOwner) return
@@ -83,7 +81,7 @@ class TextCryptoActivity : ComponentActivity() {
             val activityResultRegistry = context.activityResultRegistry
             val launcher = activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
-                contract = Crypto(Action.Encrypt, allowSkip),
+                contract = Crypto(action, bypass),
                 callback = {
                     if (it.isNotEmpty()) callback(it)
                 }
@@ -91,38 +89,42 @@ class TextCryptoActivity : ComponentActivity() {
 
             launcher.launch(input)
         }
+
+        fun encrypt(
+            context: Context,
+            input: List<String>,
+            bypass: Boolean = true,
+            callback: (List<String>) -> Unit
+        ) = start(
+            context = context,
+            input = input,
+            action = Action.Encrypt,
+            bypass = bypass,
+            callback = callback
+        )
 
         fun decrypt(
             context: Context,
             input: List<String>,
-            allowSkip: Boolean = true,
+            bypass: Boolean = true,
             callback: (List<String>) -> Unit
-        ) {
-            if (context !is ActivityResultRegistryOwner) return
-
-            val activityResultRegistry = context.activityResultRegistry
-            val launcher = activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
-                contract = Crypto(Action.Decrypt, allowSkip),
-                callback = {
-                    if (it.isNotEmpty()) callback(it)
-                }
-            )
-
-            launcher.launch(input)
-        }
+        ) = start(
+            context = context,
+            input = input,
+            action = Action.Decrypt,
+            bypass = bypass,
+            callback = callback
+        )
     }
 
     private class Crypto(
         private val action: Action,
-        private val allowSkip: Boolean
+        private val bypass: Boolean
     ) : ActivityResultContract<List<String>, List<String>>() {
         override fun createIntent(context: Context, input: List<String>): Intent {
-            return when (action) {
-                Action.Encrypt -> Intent(ACTION_ENCRYPT)
-                Action.Decrypt -> Intent(ACTION_DECRYPT)
-            }.also {
-                it.putExtra(EXTRA_ALLOW_SKIP, allowSkip)
+            return Intent(context, CryptoActivity::class.java).also {
+                it.action = action.original
+                it.putExtra(EXTRA_BYPASS, bypass)
                 it.putExtra(EXTRA_INPUT, input.toTypedArray())
             }
         }

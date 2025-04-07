@@ -12,7 +12,7 @@ import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.repository.DbRepository
-import dev.sanmer.authenticator.ui.TextCryptoActivity
+import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -55,7 +55,7 @@ class SettingsViewModel @Inject constructor(
                 output = auths
                 callback()
             } else {
-                TextCryptoActivity.encrypt(
+                CryptoActivity.encrypt(
                     context = context,
                     input = auths.map { it.secret }
                 ) { encryptedSecrets ->
@@ -72,7 +72,7 @@ class SettingsViewModel @Inject constructor(
         fileType: FileType,
         context: Context,
         uri: Uri,
-        allowSkip: Boolean = true,
+        bypass: Boolean = true,
         callback: () -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -84,10 +84,10 @@ class SettingsViewModel @Inject constructor(
                     input = auths
                     callback()
                 } else {
-                    TextCryptoActivity.decrypt(
+                    CryptoActivity.decrypt(
                         context = context,
                         input = auths.map { it.secret },
-                        allowSkip = allowSkip
+                        bypass = bypass
                     ) { decryptedSecrets ->
                         input = auths.mapIndexed { index, auth ->
                             auth.copy(secret = decryptedSecrets[index])
@@ -151,7 +151,7 @@ class SettingsViewModel @Inject constructor(
         fileType = FileType.Json,
         context = context,
         uri = uri,
-        allowSkip = false,
+        bypass = false,
         callback = callback
     )
 

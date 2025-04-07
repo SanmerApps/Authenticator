@@ -26,6 +26,7 @@ import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
 import dev.sanmer.authenticator.ui.screens.ntp.NtpScreen
 import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
+import dev.sanmer.authenticator.ui.screens.security.SecurityScreen
 import dev.sanmer.authenticator.ui.screens.settings.SettingsScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
 
@@ -47,6 +48,7 @@ fun MainScreen() {
         Screen.Trash(navController).addTo(this)
         Screen.Encode(navController).addTo(this)
         Screen.Ntp(navController).addTo(this)
+        Screen.Security(navController).addTo(this)
     }
 }
 
@@ -75,6 +77,7 @@ sealed class Screen(
         fun Trash() = "Trash"
         fun Encode() = "Encode"
         fun Ntp() = "Ntp"
+        fun Security() = "Security"
     }
 
     class Home(navController: NavController) : Screen(
@@ -113,5 +116,10 @@ sealed class Screen(
     class Ntp(navController: NavController) : Screen(
         route = Ntp(),
         content = { NtpScreen(navController = navController) }
+    )
+
+    class Security(navController: NavController) : Screen(
+        route = Security(),
+        content = { SecurityScreen(navController = navController) }
     )
 }

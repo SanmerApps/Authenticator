@@ -6,14 +6,13 @@
     <string name="crypto_encrypting">Encrypting</string>
     <string name="crypto_decrypt">Decrypt</string>
     <string name="crypto_decrypting">Decrypting</string>
-    <string name="password_placeholder">Password</string>
 
     <!-- Home -->
     <string name="home_empty">No tokens</string>
 
     <!-- Edit -->
-    <string name="edit_add_tile">Add Token</string>
-    <string name="edit_edit_tile">Edit Token</string>
+    <string name="edit_add_title">Add token</string>
+    <string name="edit_edit_title">Edit token</string>
     <string name="edit_name">Name</string>
     <string name="edit_issuer">Issuer</string>
     <string name="edit_secret">Secret</string>
@@ -28,7 +27,7 @@
     <string name="settings_title">Settings</string>
     <string name="settings_token">Token</string>
     <string name="settings_token_desc">Add new token</string>
-    <string name="settings_enter">Enter Manually</string>
+    <string name="settings_enter">Enter manually</string>
     <string name="settings_scan">Scan QR Code</string>
     <string name="settings_import_export">Import &amp; Export</string>
     <string name="settings_import_export_desc">Import and export database</string>
@@ -41,7 +40,8 @@
     <string name="settings_decrypt">Decrypt a JSON</string>
     <string name="settings_encode_decode">Encode &amp; Decode</string>
     <string name="settings_preference">Preference</string>
-    <string name="settings_preference_desc">Do what you want</string>
+    <string name="settings_preference_desc">Security, time server</string>
+    <string name="settings_security">Security</string>
     <string name="settings_ntp_server">Time server</string>
 
     <!-- Trash -->
@@ -51,6 +51,22 @@
     <!-- Encode -->
     <string name="encode_encoded">Encoded</string>
     <string name="encode_decoded">Decoded</string>
+
+    <!-- Security -->
+    <string name="biometric_title">Verify identity</string>
+    <string name="biometric_desc">Biometrics required to continue</string>
+    <string name="biometric_cancel">Cancel</string>
+    <string name="security_password">Password</string>
+    <string name="security_password_empty">No password set</string>
+    <string name="security_biometric">Biometric</string>
+    <string name="security_biometric_desc">Use biometric authentication to unlock app</string>
+    <string name="security_remove_password">Remove password</string>
+    <string name="security_remove_password_desc">Delete the current password and biometric authentication will be disabled</string>
+    <string name="security_set_password">Set password</string>
+    <string name="security_change_password">Change password</string>
+    <string name="security_enter_password">Enter password</string>
+    <string name="security_new_password">New password</string>
+    <string name="security_current_password">Current password</string>
 
     <!-- Ntp -->
     <string name="ntp_rtt">RTT: %1$s</string>

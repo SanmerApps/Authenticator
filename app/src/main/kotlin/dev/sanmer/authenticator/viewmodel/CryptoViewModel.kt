@@ -8,9 +8,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ui.TextCryptoActivity.Action
-import dev.sanmer.authenticator.ui.TextCryptoActivity.Default.allowSkip
-import dev.sanmer.authenticator.ui.TextCryptoActivity.Default.input
+import dev.sanmer.authenticator.ui.CryptoActivity.Action
+import dev.sanmer.authenticator.ui.CryptoActivity.Default.bypass
+import dev.sanmer.authenticator.ui.CryptoActivity.Default.input
 import dev.sanmer.crypto.PasswordKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,21 +18,18 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class TextCryptoViewModel @Inject constructor() : ViewModel() {
+class CryptoViewModel @Inject constructor() : ViewModel() {
     private var action by mutableStateOf(Action.Encrypt)
-    private var allowSkip = true
+    private var bypass = true
 
     var state by mutableStateOf(State.Wait)
-        private set
-
-    var hidden by mutableStateOf(true)
         private set
 
     var data by mutableStateOf(emptyList<String>())
     var password by mutableStateOf("")
         private set
 
-    val isSkip by derivedStateOf { password.isEmpty() && allowSkip }
+    val isSkip by derivedStateOf { password.isEmpty() && bypass }
     val isEncrypt by lazy { action == Action.Encrypt }
     val isDecrypt by lazy { action == Action.Decrypt }
 
@@ -40,36 +37,30 @@ class TextCryptoViewModel @Inject constructor() : ViewModel() {
         Timber.d("TextCryptoViewModel init")
     }
 
-    private fun run() = viewModelScope.launch(Dispatchers.Default) {
-        runCatching {
-            val key = PasswordKey.new(password)
-            state = State.Running
-            data = when (action) {
-                Action.Encrypt -> data.map { key.encrypt(it) }
-                Action.Decrypt -> data.map { key.decrypt(it) }
-            }
-        }.onSuccess {
-            state = State.Ok
-        }.onFailure {
-            state = State.Failed
-        }
-    }
-
-    operator fun invoke() = when {
+    fun crypto() = when {
         state.isRunning -> false
         isSkip -> true
-        else -> run().isCompleted
+        else -> viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val key = PasswordKey.new(password)
+                state = State.Running
+                data = when (action) {
+                    Action.Encrypt -> data.map { key.encrypt(it) }
+                    Action.Decrypt -> data.map { key.decrypt(it) }
+                }
+            }.onSuccess {
+                state = State.Ok
+            }.onFailure {
+                state = State.Failed
+            }
+        }.isCompleted
     }
 
     fun updateFromIntent(getIntent: () -> Intent) {
         val intent = getIntent()
-        allowSkip = intent.allowSkip
-        data = intent.input.toList()
         action = Action(intent.action)
-    }
-
-    fun updateHidden(block: (Boolean) -> Boolean) {
-        hidden = block(hidden)
+        bypass = intent.bypass
+        data = intent.input.toList()
     }
 
     fun updatePassword(value: String) {

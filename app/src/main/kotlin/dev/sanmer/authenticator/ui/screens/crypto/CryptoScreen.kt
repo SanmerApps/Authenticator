@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.ui.main
+package dev.sanmer.authenticator.ui.screens.crypto
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -9,41 +9,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.finishActivity
-import dev.sanmer.authenticator.viewmodel.TextCryptoViewModel
+import dev.sanmer.authenticator.ui.screens.authorize.component.PasswordTextField
+import dev.sanmer.authenticator.viewmodel.CryptoViewModel
 
 @Composable
-fun TextCryptoScreen(
-    viewModel: TextCryptoViewModel = hiltViewModel()
+fun CryptoScreen(
+    viewModel: CryptoViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    val passwordVisualTransformation = remember { PasswordVisualTransformation() }
 
     BackHandler {
         viewModel.rewind()
@@ -62,46 +54,21 @@ fun TextCryptoScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(
-            shape = MaterialTheme.shapes.medium,
-            value = viewModel.password,
-            onValueChange = viewModel::updatePassword,
+        PasswordTextField(
+            password = viewModel.password,
+            onPasswordChange = viewModel::updatePassword,
             isError = viewModel.state.isFailed,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            visualTransformation = if (viewModel.hidden) {
-                passwordVisualTransformation
-            } else {
-                VisualTransformation.None
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        viewModel.updateHidden { !it }
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            id = if (viewModel.hidden) {
-                                R.drawable.eye_closed
-                            } else {
-                                R.drawable.eye
-                            }
-                        ),
-                        contentDescription = null
-                    )
-                }
-            },
-            placeholder = { Text(text = stringResource(id = R.string.password_placeholder)) }
+            placeholder = { Text(text = stringResource(id = R.string.security_password)) },
+            modifier = Modifier.width(TextFieldDefaults.MinWidth)
         )
 
         Spacer(modifier = Modifier.height(45.dp))
 
         FilledTonalButton(
             onClick = {
-                if (viewModel()) context.finishActivity()
+                if (viewModel.crypto()) {
+                    context.finishActivity()
+                }
                 keyboardController?.hide()
             }
         ) {
@@ -127,7 +94,7 @@ fun TextCryptoScreen(
 }
 
 @Composable
-private fun TextCryptoViewModel.waitIcon() =
+private fun CryptoViewModel.waitIcon() =
     painterResource(
         id = when {
             isSkip -> R.drawable.lock_off
@@ -144,7 +111,7 @@ private fun runningIcon() =
     )
 
 @Composable
-private fun TextCryptoViewModel.waitString() =
+private fun CryptoViewModel.waitString() =
     stringResource(
         id = when {
             isSkip -> R.string.crypto_skip
@@ -155,7 +122,7 @@ private fun TextCryptoViewModel.waitString() =
     )
 
 @Composable
-private fun TextCryptoViewModel.runningString() =
+private fun CryptoViewModel.runningString() =
     stringResource(
         id = when {
             isEncrypt -> R.string.crypto_encrypting
