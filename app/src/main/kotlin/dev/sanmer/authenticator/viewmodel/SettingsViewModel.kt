@@ -15,7 +15,6 @@ import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.InputStream
@@ -29,11 +28,24 @@ class SettingsViewModel @Inject constructor(
     private var output = emptyList<Auth>()
     private var input = emptyList<Auth>()
 
+    private var auths by mutableStateOf(emptyList<Auth>())
+    val isAuthsEmpty get() = auths.isEmpty()
+
     var bottomSheet by mutableStateOf(BottomSheet.Closed)
         private set
 
     init {
         Timber.d("SettingsViewModel init")
+        dataObserver()
+    }
+
+    private fun dataObserver() {
+        viewModelScope.launch {
+            dbRepository.getAuthAllAsFlow(enable = true)
+                .collect {
+                    auths = it
+                }
+        }
     }
 
     fun updateBottomSheet(block: (BottomSheet) -> BottomSheet) {
@@ -50,7 +62,6 @@ class SettingsViewModel @Inject constructor(
         callback: () -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
             if (fileType.skip) {
                 output = auths
                 callback()

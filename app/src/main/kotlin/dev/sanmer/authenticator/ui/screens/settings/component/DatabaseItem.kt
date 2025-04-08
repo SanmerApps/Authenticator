@@ -15,9 +15,10 @@ import dev.sanmer.authenticator.viewmodel.SettingsViewModel.FileType
 @Composable
 fun DatabaseItem(
     onDismiss: () -> Unit,
+    isEmpty: Boolean,
     prepare: (FileType, Context, () -> Unit) -> Unit,
     importFrom: (FileType, Context, Uri) -> Unit,
-    exportTo: (FileType, Context, Uri) -> Unit
+    exportTo: (FileType, Context, Uri) -> Unit,
 ) {
     val context = LocalContext.current
     val jsonImport = rememberLauncherForActivityResult(
@@ -47,7 +48,7 @@ fun DatabaseItem(
             onClick = { jsonImport.launch(AuthJson.MIME_TYPE) }
         )
 
-        SettingItem(
+        if (!isEmpty) SettingItem(
             icon = R.drawable.database_export,
             title = stringResource(id = R.string.settings_export_json),
             onClick = { prepare(FileType.Json, context) { jsonExport.launch(AuthJson.FILE_NAME) } }
@@ -59,7 +60,7 @@ fun DatabaseItem(
             onClick = { txtImport.launch(AuthTxt.MIME_TYPE) }
         )
 
-        SettingItem(
+        if (!isEmpty) SettingItem(
             icon = R.drawable.file_import,
             title = stringResource(id = R.string.settings_export_txt),
             onClick = { prepare(FileType.Txt, context) { txtExport.launch(AuthTxt.FILE_NAME) } }
