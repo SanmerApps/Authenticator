@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.repository.PreferenceRepository
+import dev.sanmer.authenticator.repository.SecureRepository
 import dev.sanmer.authenticator.ui.AuthorizeActivity.Action
 import dev.sanmer.authenticator.viewmodel.MainViewModel.LoadState
 import dev.sanmer.crypto.BiometricKey
@@ -24,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthorizeViewModel @Inject constructor(
-    private val preferenceRepository: PreferenceRepository
+    private val preferenceRepository: PreferenceRepository,
+    private val secureRepository: SecureRepository
 ) : ViewModel() {
     var action by mutableStateOf(Action.Auth)
         private set
@@ -67,7 +69,8 @@ class AuthorizeViewModel @Inject constructor(
                 val sessionKey = SessionKey.new()
                 val newKey = sessionKey.getKeyEncryptedByPassword(new).encodeBase64()
                 preferenceRepository.setKeyEncryptedByPassword(newKey)
-                //TODO: setSessionKey & Update db
+                secureRepository.setSessionKey(sessionKey)
+                secureRepository.encryptSecret(sessionKey)
                 type = Type.PasswordSucceed
             }.onFailure {
                 Timber.w(it)
@@ -93,18 +96,20 @@ class AuthorizeViewModel @Inject constructor(
         }
     }
 
-    fun changePassword(current: String, new: String) = checkPassword(current) {
-        val sessionKey = SessionKey.new()
-        val newKey = sessionKey.getKeyEncryptedByPassword(new).encodeBase64()
+    fun changePassword(current: String, new: String) = checkPassword(current) { sessionKey ->
+        val newSessionKey = SessionKey.new()
+        val newKey = newSessionKey.getKeyEncryptedByPassword(new).encodeBase64()
         preferenceRepository.setKeyEncryptedByPassword(newKey)
-        //TODO: setSessionKey & Update db
+        secureRepository.setSessionKey(newSessionKey)
+        secureRepository.encryptSecretByNewKey(sessionKey, newSessionKey)
         type = Type.PasswordSucceed
     }
 
-    fun removePassword(current: String) = checkPassword(current) {
+    fun removePassword(current: String) = checkPassword(current) { sessionKey ->
         preferenceRepository.setKeyEncryptedByPassword("")
         preferenceRepository.setKeyEncryptedByBiometric("")
-        //TODO: setSessionKey & Update db
+        secureRepository.setSessionKey(null)
+        secureRepository.decryptSecret(sessionKey)
         type = Type.PasswordSucceed
     }
 
@@ -134,8 +139,9 @@ class AuthorizeViewModel @Inject constructor(
         viewModelScope.launch {
             val key = preference.keyEncryptedByPassword
             runCatching {
-                SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
-                //TODO: setSessionKey
+                secureRepository.setSessionKey(
+                    SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
+                )
                 type = Type.PasswordSucceed
             }.onFailure {
                 type = Type.PasswordFailed
@@ -158,8 +164,9 @@ class AuthorizeViewModel @Inject constructor(
 
             runCatching {
                 val key = preference.keyEncryptedByBiometric.decodeBase64()
-                SessionKey.decryptKeyByBiometric(key, activity)
-                //TODO: setSessionKey
+                secureRepository.setSessionKey(
+                    SessionKey.decryptKeyByBiometric(key, activity)
+                )
                 type = Type.BiometricSucceed
             }.onFailure {
                 Timber.w(it)

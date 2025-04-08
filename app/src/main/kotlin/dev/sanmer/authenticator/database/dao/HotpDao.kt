@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HotpDao {
     @Query("SELECT * FROM hotp")
+    fun getAll(): List<HotpEntity>
+
+    @Query("SELECT * FROM hotp")
     fun getAllAsFlow(): Flow<List<HotpEntity>>
 
     @Query("SELECT * FROM hotp WHERE secret = :secret")
@@ -33,6 +36,9 @@ interface HotpDao {
 
     @Query("DELETE FROM hotp WHERE secret IN (:secret)")
     suspend fun delete(secret: List<String>)
+
+    @Query("DELETE FROM hotp")
+    suspend fun deleteAll()
 
     @Query("SELECT EXISTS(SELECT 1 FROM hotp WHERE secret = :secret)")
     suspend fun exists(secret: String): Boolean
