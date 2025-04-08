@@ -36,7 +36,6 @@ class BiometricKey(
                 activity.getString(R.string.biometric_cancel)
             )
         ).apply {
-            setSubtitle(activity.getString(R.string.biometric_desc))
             setIsConfirmationRequired(true)
         }
     }

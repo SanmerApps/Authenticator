@@ -50,8 +50,7 @@
     <string name="encode_decoded">Decoded</string>
 
     <!-- Security -->
-    <string name="biometric_title">Verify identity</string>
-    <string name="biometric_desc">Biometrics required to continue</string>
+    <string name="biometric_title">Verify it\'s you</string>
     <string name="biometric_cancel">Cancel</string>
     <string name="security_password">Password</string>
     <string name="security_password_empty">No password set</string>

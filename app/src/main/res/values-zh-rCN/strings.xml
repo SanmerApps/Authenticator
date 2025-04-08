@@ -51,7 +51,6 @@
 
     <!-- Security -->
     <string name="biometric_title">验证身份</string>
-    <string name="biometric_desc">通过生物识别以继续</string>
     <string name="biometric_cancel">取消</string>
     <string name="security_password">密码</string>
     <string name="security_password_empty">未设置密码</string>
