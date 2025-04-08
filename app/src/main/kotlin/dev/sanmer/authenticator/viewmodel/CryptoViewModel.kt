@@ -12,20 +12,19 @@ import dev.sanmer.authenticator.ui.CryptoActivity.Action
 import dev.sanmer.authenticator.ui.CryptoActivity.Default.bypass
 import dev.sanmer.authenticator.ui.CryptoActivity.Default.input
 import dev.sanmer.crypto.PasswordKey
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class CryptoViewModel @Inject constructor() : ViewModel() {
+    private var data = emptyList<String>()
     private var action by mutableStateOf(Action.Encrypt)
     private var bypass = true
 
-    var state by mutableStateOf(State.Wait)
+    var state by mutableStateOf(State.Pending)
         private set
 
-    var data by mutableStateOf(emptyList<String>())
     var password by mutableStateOf("")
         private set
 
@@ -33,14 +32,20 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
     val isEncrypt by lazy { action == Action.Encrypt }
     val isDecrypt by lazy { action == Action.Decrypt }
 
+    val output get() = if (state.isSucceed) data else emptyList()
+
     init {
         Timber.d("TextCryptoViewModel init")
     }
 
-    fun crypto() = when {
-        state.isRunning -> false
-        isSkip -> true
-        else -> viewModelScope.launch(Dispatchers.IO) {
+    fun crypto() {
+        if (state.isRunning) return
+        if (isSkip) {
+            state = State.Succeed
+            return
+        }
+
+        viewModelScope.launch {
             runCatching {
                 val key = PasswordKey.new(password)
                 state = State.Running
@@ -48,12 +53,11 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
                     Action.Encrypt -> data.map { key.encrypt(it) }
                     Action.Decrypt -> data.map { key.decrypt(it) }
                 }
-            }.onSuccess {
-                state = State.Ok
+                state = State.Succeed
             }.onFailure {
                 state = State.Failed
             }
-        }.isCompleted
+        }
     }
 
     fun updateFromIntent(getIntent: () -> Intent) {
@@ -67,19 +71,15 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
         password = value
     }
 
-    fun rewind() {
-        data = emptyList()
-    }
-
     enum class State {
-        Wait,
+        Pending,
         Running,
-        Failed,
-        Ok;
+        Succeed,
+        Failed;
 
         val isRunning inline get() = this == Running
         val isFailed inline get() = this == Failed
-        val isOk inline get() = this == Ok
+        val isSucceed inline get() = this == Succeed
     }
 
 }

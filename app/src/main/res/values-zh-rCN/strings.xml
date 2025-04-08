@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Crypto -->
-    <string name="crypto_skip">跳过</string>
     <string name="crypto_encrypt">加密</string>
-    <string name="crypto_encrypting">加密中</string>
     <string name="crypto_decrypt">解密</string>
-    <string name="crypto_decrypting">解密中</string>
 
     <!-- Home -->
     <string name="home_empty">没有令牌</string>

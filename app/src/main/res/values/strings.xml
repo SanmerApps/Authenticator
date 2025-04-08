@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Crypto -->
-    <string name="crypto_skip">Skip</string>
     <string name="crypto_encrypt">Encrypt</string>
-    <string name="crypto_encrypting">Encrypting</string>
     <string name="crypto_decrypt">Decrypt</string>
-    <string name="crypto_decrypting">Decrypting</string>
 
     <!-- Home -->
     <string name="home_empty">No tokens</string>

@@ -34,7 +34,7 @@ class CryptoActivity : ComponentActivity() {
 
     override fun finish() {
         Intent().apply {
-            putExtra(EXTRA_OUTPUT, viewModel.data.toTypedArray())
+            putExtra(EXTRA_OUTPUT, viewModel.output.toTypedArray())
             setResult(RESULT_OK, this)
         }
         super.finish()
@@ -82,9 +82,7 @@ class CryptoActivity : ComponentActivity() {
             val launcher = activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
                 contract = Crypto(action, bypass),
-                callback = {
-                    if (it.isNotEmpty()) callback(it)
-                }
+                callback = { if (it.isNotEmpty()) callback(it) }
             )
 
             launcher.launch(input)
