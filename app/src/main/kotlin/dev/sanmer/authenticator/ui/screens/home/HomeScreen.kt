@@ -45,7 +45,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val auths by viewModel.auths.collectAsStateWithLifecycle()
     val time by viewModel.time.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -76,7 +75,11 @@ fun HomeScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (auths.isEmpty()) {
+            if (viewModel.loadState.isPending) {
+                return@Box
+            }
+
+            if (viewModel.auths.isEmpty()) {
                 PageIndicator(
                     icon = R.drawable.key,
                     text = stringResource(id = R.string.home_empty),
@@ -87,7 +90,7 @@ fun HomeScreen(
             AuthList(
                 state = listState,
                 navController = navController,
-                auths = auths,
+                auths = viewModel.auths,
                 recycleAuth = viewModel::recycleAuth,
                 updateAuth = viewModel::updateAuth,
                 contentPadding = contentPadding
