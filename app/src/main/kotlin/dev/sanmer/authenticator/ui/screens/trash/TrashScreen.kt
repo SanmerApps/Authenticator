@@ -12,14 +12,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.PageIndicator
@@ -31,7 +29,6 @@ fun TrashScreen(
     viewModel: TrashViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val auths by viewModel.auths.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val listState = rememberLazyListState()
 
@@ -50,7 +47,11 @@ fun TrashScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (auths.isEmpty()) {
+            if (viewModel.loadState.isPending) {
+                return@Box
+            }
+
+            if (viewModel.auths.isEmpty()) {
                 PageIndicator(
                     icon = R.drawable.trash,
                     text = stringResource(id = R.string.trash_empty),
@@ -60,7 +61,7 @@ fun TrashScreen(
 
             AuthList(
                 state = listState,
-                auths = auths,
+                auths = viewModel.auths,
                 restoreAuth = viewModel::restoreAuth,
                 deleteAuth = viewModel::deleteAuth,
                 contentPadding = contentPadding

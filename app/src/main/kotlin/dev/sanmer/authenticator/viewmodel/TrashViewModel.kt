@@ -1,13 +1,13 @@
 package dev.sanmer.authenticator.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -17,8 +17,9 @@ import kotlin.time.Duration
 class TrashViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private val _auths = MutableStateFlow(emptyList<AuthCompat>())
-    val auths get() = _auths.asStateFlow()
+    var loadState by mutableStateOf<LoadState>(LoadState.Pending)
+        private set
+    val auths inline get() = loadState.auths
 
     init {
         Timber.d("TrashViewModel init")
@@ -29,11 +30,11 @@ class TrashViewModel @Inject constructor(
         viewModelScope.launch {
             dbRepository.getAuthInTrashAllAsFlow()
                 .collect { source ->
-                    _auths.update {
+                    loadState = LoadState.Ready(
                         source.map(::AuthCompat).sortedBy {
                             it.auth.issuer.lowercase()
                         }
-                    }
+                    )
                 }
         }
     }
@@ -65,5 +66,19 @@ class TrashViewModel @Inject constructor(
             auth = value.first,
             lifetime = value.second
         )
+    }
+
+    sealed class LoadState {
+        abstract val auths: List<AuthCompat>
+
+        data object Pending : LoadState() {
+            override val auths = emptyList<AuthCompat>()
+        }
+
+        data class Ready(
+            override val auths: List<AuthCompat>
+        ) : LoadState()
+
+        val isPending inline get() = this is Pending
     }
 }
