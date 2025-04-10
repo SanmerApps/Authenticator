@@ -4,26 +4,25 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.database.entity.TrashEntity
+import dev.sanmer.authenticator.database.entity.TotpWithTrash
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TotpDao {
     @Query("SELECT * FROM totp")
-    fun getAll(): List<TotpEntity>
-
-    @Query("SELECT * FROM totp")
     fun getAllAsFlow(): Flow<List<TotpEntity>>
 
+    @Transaction
+    @Query("SELECT * FROM totp")
+    fun getAllWithTrashAsFlow(): Flow<List<TotpWithTrash>>
+
     @Query("SELECT * FROM totp WHERE secret = :secret")
-    fun getBySecretAsFlow(secret: String): Flow<TotpEntity?>
+    fun getBySecretAsFlow(secret: String): Flow<TotpEntity>
 
-    @Query("SELECT * FROM totp LEFT JOIN trash ON trash.secret = totp.secret")
-    fun getMapToTrashAsFlow(): Flow<Map<TotpEntity, TrashEntity?>>
-
-    @Query("SELECT * FROM totp JOIN trash ON trash.secret = totp.secret")
-    fun getAllWithTrashAsFlow(): Flow<Map<TotpEntity, TrashEntity>>
+    @Query("SELECT * FROM totp")
+    suspend fun getAll(): List<TotpEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entities: List<TotpEntity>)

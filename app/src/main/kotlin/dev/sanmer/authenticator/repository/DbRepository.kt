@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -45,43 +44,49 @@ class DbRepository @Inject constructor(
 
     private suspend inline fun TrashEntity.toDecrypted() = copy(secret = secret.toDecrypted())
 
-    private fun getHotpAllAsFlow(enable: Boolean = true) = hotp.getMapToTrashAsFlow()
+    private fun getHotpAllAsFlow(enable: Boolean = true) = hotp.getAllWithTrashAsFlow()
         .map { entries ->
-            entries.mapNotNull { (hotp, trash) ->
+            entries.mapNotNull {
                 when {
-                    enable -> if (trash == null) hotp.toDecrypted() else null
-                    else -> if (trash != null) hotp.toDecrypted() else null
+                    enable -> if (it.trash == null) it.hotp.toDecrypted() else null
+                    else -> if (it.trash != null) it.hotp.toDecrypted() else null
                 }
             }
         }
 
     private suspend fun getHotpBySecretAsFlow(secret: String) = hotp.getBySecretAsFlow(
         secret = secret.toEncrypted()
-    ).filterNotNull()
-        .map { it.toDecrypted() }
+    ).map { it.toDecrypted() }
 
     private suspend fun existsHotp(secret: String) = withContext(Dispatchers.IO) {
         hotp.exists(secret.toEncrypted())
     }
 
-    private fun getTotpAllAsFlow(enable: Boolean = true) = totp.getMapToTrashAsFlow()
+    private fun getTotpAllAsFlow(enable: Boolean = true) = totp.getAllWithTrashAsFlow()
         .map { entries ->
-            entries.mapNotNull { (totp, trash) ->
+            entries.mapNotNull {
                 when {
-                    enable -> if (trash == null) totp.toDecrypted() else null
-                    else -> if (trash != null) totp.toDecrypted() else null
+                    enable -> if (it.trash == null) it.totp.toDecrypted() else null
+                    else -> if (it.trash != null) it.totp.toDecrypted() else null
                 }
             }
         }
 
     private suspend fun getTotpBySecretAsFlow(secret: String) = totp.getBySecretAsFlow(
         secret = secret.toEncrypted()
-    ).filterNotNull()
-        .map { it.toDecrypted() }
+    ).map { it.toDecrypted() }
 
-   private suspend fun existsTotp(secret: String) = withContext(Dispatchers.IO) {
+    private suspend fun existsTotp(secret: String) = withContext(Dispatchers.IO) {
         totp.exists(secret.toEncrypted())
     }
+
+    fun getAuthInTrashAllAsFlow() = trash.getAllWithSecretAsFlow()
+        .map { entries ->
+            entries.map {
+                val auth: Auth = (it.hotp?.toDecrypted() ?: it.totp?.toDecrypted())!!
+                auth to it.trash
+            }
+        }
 
     suspend fun getTrashAll(dead: Boolean = false) = withContext(Dispatchers.IO) {
         when {
@@ -118,13 +123,6 @@ class DbRepository @Inject constructor(
         getTotpAllAsFlow(enable)
     ) { hotp, totp ->
         hotp.toMutableList<Auth>().apply { addAll(totp) }.toList()
-    }
-
-    fun getAuthInTrashAllAsFlow() = combine(
-        hotp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.toDecrypted() }.toList() },
-        totp.getAllWithTrashAsFlow().map { entries -> entries.mapKeys { it.key.toDecrypted() }.toList() }
-    ) { hotp, totp ->
-        hotp.toMutableList<Pair<Auth, TrashEntity>>().apply { addAll(totp) }
     }
 
     suspend fun getAuthBySecretAsFlow(secret: String): Flow<Auth> = when {

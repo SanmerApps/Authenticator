@@ -4,10 +4,17 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import dev.sanmer.authenticator.database.entity.TrashEntity
+import dev.sanmer.authenticator.database.entity.TrashWithSecret
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrashDao {
+    @Transaction
+    @Query("SELECT * FROM trash")
+    fun getAllWithSecretAsFlow(): Flow<List<TrashWithSecret>>
+
     @Query("SELECT * FROM trash")
     suspend fun getAll(): List<TrashEntity>
 
