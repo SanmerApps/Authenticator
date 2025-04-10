@@ -15,7 +15,6 @@ import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.InputStream
@@ -29,11 +28,24 @@ class SettingsViewModel @Inject constructor(
     private var output = emptyList<Auth>()
     private var input = emptyList<Auth>()
 
+    private var auths by mutableStateOf(emptyList<Auth>())
+    val isAuthsEmpty get() = auths.isEmpty()
+
     var bottomSheet by mutableStateOf(BottomSheet.Closed)
         private set
 
     init {
         Timber.d("SettingsViewModel init")
+        dataObserver()
+    }
+
+    private fun dataObserver() {
+        viewModelScope.launch {
+            dbRepository.getAuthAllAsFlow(enable = true)
+                .collect {
+                    auths = it
+                }
+        }
     }
 
     fun updateBottomSheet(block: (BottomSheet) -> BottomSheet) {
@@ -44,9 +56,12 @@ class SettingsViewModel @Inject constructor(
         bottomSheet = BottomSheet.Closed
     }
 
-    fun prepare(fileType: FileType, context: Context, callback: () -> Unit) {
+    fun prepare(
+        fileType: FileType,
+        context: Context,
+        callback: () -> Unit
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val auths = dbRepository.getAuthAllAsFlow(enable = true).first()
             if (fileType.skip) {
                 output = auths
                 callback()
@@ -64,7 +79,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun importFrom(fileType: FileType, context: Context, uri: Uri, callback: () -> Unit) {
+    private fun importFrom(
+        fileType: FileType,
+        context: Context,
+        uri: Uri,
+        bypass: Boolean = true,
+        callback: () -> Unit
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
@@ -76,7 +97,8 @@ class SettingsViewModel @Inject constructor(
                 } else {
                     CryptoActivity.decrypt(
                         context = context,
-                        input = auths.map { it.secret }
+                        input = auths.map { it.secret },
+                        bypass = bypass
                     ) { decryptedSecrets ->
                         input = auths.mapIndexed { index, auth ->
                             auth.copy(secret = decryptedSecrets[index])
@@ -90,19 +112,27 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun importFrom(fileType: FileType, context: Context, uri: Uri) =
-        importFrom(
-            fileType = fileType,
-            context = context,
-            uri = uri
-        ) {
-            val ok = input.all { it.secret.isBase32() }
-            if (ok) viewModelScope.launch {
-                dbRepository.insertAuth(input)
-            }
+    fun importFrom(
+        fileType: FileType,
+        context: Context,
+        uri: Uri
+    ) = importFrom(
+        fileType = fileType,
+        context = context,
+        uri = uri
+    ) {
+        val ok = input.all { it.secret.isBase32() }
+        if (ok) viewModelScope.launch {
+            dbRepository.insertAuth(input)
         }
+    }
 
-    private fun exportTo(fileType: FileType, context: Context, uri: Uri, auths: List<Auth>) {
+    private fun exportTo(
+        fileType: FileType,
+        context: Context,
+        uri: Uri,
+        auths: List<Auth>
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 val cr = context.contentResolver
@@ -113,29 +143,38 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun exportTo(fileType: FileType, context: Context, uri: Uri) =
-        exportTo(
-            fileType = fileType,
-            context = context,
-            uri = uri,
-            auths = output
-        )
+    fun exportTo(
+        fileType: FileType,
+        context: Context,
+        uri: Uri
+    ) = exportTo(
+        fileType = fileType,
+        context = context,
+        uri = uri,
+        auths = output
+    )
 
-    fun decryptFromJson(context: Context, uri: Uri, callback: () -> Unit) =
-        importFrom(
-            fileType = FileType.Json,
-            context = context,
-            uri = uri,
-            callback = callback
-        )
+    fun decryptFromJson(
+        context: Context,
+        uri: Uri,
+        callback: () -> Unit
+    ) = importFrom(
+        fileType = FileType.Json,
+        context = context,
+        uri = uri,
+        bypass = false,
+        callback = callback
+    )
 
-    fun decryptedToJson(context: Context, uri: Uri) =
-        exportTo(
-            fileType = FileType.Json,
-            context = context,
-            uri = uri,
-            auths = input
-        )
+    fun decryptedToJson(
+        context: Context,
+        uri: Uri
+    ) = exportTo(
+        fileType = FileType.Json,
+        context = context,
+        uri = uri,
+        auths = input
+    )
 
     sealed class FileType {
         abstract val skip: Boolean

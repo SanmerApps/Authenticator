@@ -3,7 +3,6 @@ package dev.sanmer.authenticator.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.database.entity.TrashEntity
 import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,9 +61,9 @@ class TrashViewModel @Inject constructor(
         val auth: Auth,
         val lifetime: Duration
     ) {
-        constructor(value: Pair<Auth, TrashEntity>) : this(
+        constructor(value: Pair<Auth, Duration>) : this(
             auth = value.first,
-            lifetime = value.second.lifetime
+            lifetime = value.second
         )
     }
 }

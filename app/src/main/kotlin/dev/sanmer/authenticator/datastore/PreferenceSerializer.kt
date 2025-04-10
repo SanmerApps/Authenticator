@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.sanmer.authenticator.datastore.model.Preference
+import dev.sanmer.authenticator.ktx.deviceProtectedContext
 import kotlinx.serialization.SerializationException
 import java.io.InputStream
 import java.io.OutputStream
@@ -44,7 +45,7 @@ class PreferenceSerializer @Inject constructor() : Serializer<Preference> {
             DataStoreFactory.create(
                 serializer = serializer
             ) {
-                context.dataStoreFile("preference.pb")
+                context.deviceProtectedContext.dataStoreFile("preference.pb")
             }
     }
 }

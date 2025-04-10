@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Crypto -->
-    <string name="crypto_skip">跳过</string>
     <string name="crypto_encrypt">加密</string>
-    <string name="crypto_encrypting">加密中</string>
     <string name="crypto_decrypt">解密</string>
-    <string name="crypto_decrypting">解密中</string>
-    <string name="password_placeholder">密码</string>
 
     <!-- Home -->
     <string name="home_empty">没有令牌</string>
 
     <!-- Edit -->
-    <string name="edit_add_tile">添加令牌</string>
-    <string name="edit_edit_tile">编辑令牌</string>
+    <string name="edit_add_title">添加令牌</string>
+    <string name="edit_edit_title">编辑令牌</string>
     <string name="edit_name">名称</string>
     <string name="edit_issuer">发行方</string>
     <string name="edit_secret">密钥</string>
@@ -41,7 +37,8 @@
     <string name="settings_decrypt">解密 JSON</string>
     <string name="settings_encode_decode">编码与解码</string>
     <string name="settings_preference">偏好</string>
-    <string name="settings_preference_desc">随心而行</string>
+    <string name="settings_preference_desc">安全性、时间服务器</string>
+    <string name="settings_security">安全性</string>
     <string name="settings_ntp_server">时间服务器</string>
 
     <!-- Trash -->
@@ -51,6 +48,21 @@
     <!-- Encode -->
     <string name="encode_encoded">已编码</string>
     <string name="encode_decoded">已解码</string>
+
+    <!-- Security -->
+    <string name="biometric_title">验证身份</string>
+    <string name="biometric_cancel">取消</string>
+    <string name="security_password">密码</string>
+    <string name="security_password_empty">未设置密码</string>
+    <string name="security_biometric">生物识别</string>
+    <string name="security_biometric_desc">使用生物认证解锁应用</string>
+    <string name="security_remove_password">删除密码</string>
+    <string name="security_remove_password_desc">删除当前的密码，同时生物认证也将禁用</string>
+    <string name="security_set_password">设置密码</string>
+    <string name="security_change_password">修改密码</string>
+    <string name="security_enter_password">输入密码</string>
+    <string name="security_new_password">新密码</string>
+    <string name="security_current_password">当前密码</string>
 
     <!-- Ntp -->
     <string name="ntp_rtt">延迟: %1$s</string>

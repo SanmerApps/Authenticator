@@ -39,13 +39,21 @@
         </activity>
 
         <activity
+            android:name=".ui.AuthorizeActivity"
+            android:theme="@style/AppTheme.Transparent"
+            android:exported="false"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+
+        <activity
             android:name=".ui.CryptoActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="${applicationId}.action.ENCRYPT" />
-                <action android:name="${applicationId}.action.DECRYPT" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:theme="@style/AppTheme.Transparent"
+            android:exported="false"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:windowSoftInputMode="adjustResize">
         </activity>
 
     </application>

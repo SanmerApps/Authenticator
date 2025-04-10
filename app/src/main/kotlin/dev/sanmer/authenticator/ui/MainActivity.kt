@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
+import dev.sanmer.authenticator.ui.main.LockScreen
 import dev.sanmer.authenticator.ui.main.MainScreen
 import dev.sanmer.authenticator.ui.provider.LocalPreference
 import dev.sanmer.authenticator.ui.theme.AppTheme
@@ -26,8 +27,12 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { viewModel.isPending }
 
         setContent {
-            when (viewModel.state) {
+            when (viewModel.loadState) {
                 LoadState.Pending -> {}
+                is LoadState.Locked -> AppTheme {
+                    LockScreen()
+                }
+
                 is LoadState.Ready -> CompositionLocalProvider(
                     LocalPreference provides viewModel.preference
                 ) {

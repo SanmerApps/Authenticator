@@ -11,10 +11,17 @@ import java.io.OutputStream
 @Serializable
 data class Preference(
     @ProtoNumber(1)
-    val ntpAddress: String = "",
+    val keyEncryptedByPassword: String = "",
     @ProtoNumber(2)
-    val ntp: Ntp = Ntp.Apple
+    val keyEncryptedByBiometric: String = "",
+    @ProtoNumber(3)
+    val ntpAddress: String = "",
+    @ProtoNumber(4)
+    val ntp: Ntp = Ntp.Cloudflare
 ) {
+    val isEncrypted inline get() = keyEncryptedByPassword.isNotEmpty()
+    val isBiometric inline get() = keyEncryptedByBiometric.isNotEmpty()
+
     fun encodeToStream(output: OutputStream) = output.write(
         ProtoBuf.encodeToByteArray(this)
     )

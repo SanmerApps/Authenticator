@@ -16,11 +16,13 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
-    var state by mutableStateOf<LoadState>(LoadState.Pending)
+    var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
 
-    val isPending inline get() = state is LoadState.Pending
-    val preference inline get() = state.preference
+    val isPending inline get() = loadState is LoadState.Pending
+    val preference inline get() = loadState.preference
+
+    private var isUnlocked = false
 
     init {
         Timber.d("MainViewModel init")
@@ -30,9 +32,22 @@ class MainViewModel @Inject constructor(
     private fun preferenceObserver() {
         viewModelScope.launch {
             preferenceRepository.data.collect {
-                state = LoadState.Ready(it)
+                loadState = if (isReady(it)) {
+                    LoadState.Ready(it)
+                } else {
+                    LoadState.Locked(it)
+                }
             }
         }
+    }
+
+    private fun isReady(preference: Preference): Boolean {
+        return !preference.isEncrypted || isUnlocked || loadState.isReady
+    }
+
+    fun setUnlocked() {
+        isUnlocked = true
+        loadState = LoadState.Ready(preference)
     }
 
     sealed class LoadState {
@@ -42,8 +57,14 @@ class MainViewModel @Inject constructor(
             override val preference = Preference()
         }
 
+        data class Locked(
+            override val preference: Preference
+        ) : LoadState()
+
         data class Ready(
             override val preference: Preference
         ) : LoadState()
+
+        val isReady inline get() = this is Ready
     }
 }

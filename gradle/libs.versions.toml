@@ -3,6 +3,7 @@ androidGradlePlugin = "8.9.1"
 androidxActivity = "1.10.1"
 androidxAnnotation = "1.9.1"
 androidxAppCompat = "1.7.0"
+androidxBiometric = "1.4.0-alpha03"
 androidxCamera = "1.4.2"
 androidxCompose = "1.7.8"
 androidxComposeMaterial3 = "1.3.2"
@@ -31,6 +32,7 @@ ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidxAnnotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "androidxBiometric" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidxCamera" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidxCamera" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "androidxCamera" }

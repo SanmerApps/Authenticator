@@ -10,7 +10,7 @@ import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import dev.sanmer.authenticator.ui.main.CryptoScreen
+import dev.sanmer.authenticator.ui.screens.crypto.CryptoScreen
 import dev.sanmer.authenticator.ui.theme.AppTheme
 import dev.sanmer.authenticator.viewmodel.CryptoViewModel
 import java.util.UUID
@@ -34,82 +34,97 @@ class CryptoActivity : ComponentActivity() {
 
     override fun finish() {
         Intent().apply {
-            putExtra(EXTRA_OUTPUT, viewModel.data.toTypedArray())
+            putExtra(EXTRA_OUTPUT, viewModel.output.toTypedArray())
             setResult(RESULT_OK, this)
         }
         super.finish()
     }
 
-    enum class Action {
-        Encrypt,
-        Decrypt;
+    enum class Action(
+        val original: String,
+    ) {
+        Encrypt(ACTION_ENCRYPT),
+        Decrypt(ACTION_DECRYPT);
 
         companion object Default {
-            fun fromStr(action: String?): Action? {
-                return when (action) {
-                    ACTION_ENCRYPT -> Encrypt
-                    ACTION_DECRYPT -> Decrypt
-                    else -> null
-                }
+            operator fun invoke(action: String?): Action {
+                return entries.first { it.original == action }
             }
         }
     }
 
     companion object Default {
-        const val ACTION_ENCRYPT = "dev.sanmer.authenticator.action.ENCRYPT"
-        const val ACTION_DECRYPT = "dev.sanmer.authenticator.action.DECRYPT"
+        private const val ACTION_ENCRYPT = "dev.sanmer.authenticator.action.ENCRYPT"
+        private const val ACTION_DECRYPT = "dev.sanmer.authenticator.action.DECRYPT"
+        const val EXTRA_BYPASS = "dev.sanmer.authenticator.extra.BYPASS"
         const val EXTRA_INPUT = "dev.sanmer.authenticator.extra.INPUT"
         const val EXTRA_OUTPUT = "dev.sanmer.authenticator.extra.OUTPUT"
 
+        val Intent.bypass: Boolean
+            inline get() = getBooleanExtra(EXTRA_BYPASS, true)
+
         val Intent.input: Array<String>
-            get() = checkNotNull(getStringArrayExtra(EXTRA_INPUT))
+            inline get() = checkNotNull(getStringArrayExtra(EXTRA_INPUT))
 
         val Intent.output: Array<String>
-            get() = checkNotNull(getStringArrayExtra(EXTRA_OUTPUT))
+            inline get() = checkNotNull(getStringArrayExtra(EXTRA_OUTPUT))
 
-        val Encrypt: ActivityResultContract<List<String>, List<String>> = Crypto(Action.Encrypt)
-        val Decrypt: ActivityResultContract<List<String>, List<String>> = Crypto(Action.Decrypt)
-
-        fun encrypt(context: Context, input: List<String>, callback: (List<String>) -> Unit) {
+        private fun start(
+            context: Context,
+            input: List<String>,
+            action: Action,
+            bypass: Boolean,
+            callback: (List<String>) -> Unit
+        ) {
             if (context !is ActivityResultRegistryOwner) return
 
             val activityResultRegistry = context.activityResultRegistry
             val launcher = activityResultRegistry.register(
                 key = UUID.randomUUID().toString(),
-                contract = Encrypt,
-                callback = {
-                    if (it.isNotEmpty()) callback(it)
-                }
+                contract = Crypto(action, bypass),
+                callback = { if (it.isNotEmpty()) callback(it) }
             )
 
             launcher.launch(input)
         }
 
-        fun decrypt(context: Context, input: List<String>, callback: (List<String>) -> Unit) {
-            if (context !is ActivityResultRegistryOwner) return
+        fun encrypt(
+            context: Context,
+            input: List<String>,
+            bypass: Boolean = true,
+            callback: (List<String>) -> Unit
+        ) = start(
+            context = context,
+            input = input,
+            action = Action.Encrypt,
+            bypass = bypass,
+            callback = callback
+        )
 
-            val activityResultRegistry = context.activityResultRegistry
-            val launcher = activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
-                contract = Decrypt,
-                callback = {
-                    if (it.isNotEmpty()) callback(it)
-                }
-            )
-
-            launcher.launch(input)
-        }
+        fun decrypt(
+            context: Context,
+            input: List<String>,
+            bypass: Boolean = true,
+            callback: (List<String>) -> Unit
+        ) = start(
+            context = context,
+            input = input,
+            action = Action.Decrypt,
+            bypass = bypass,
+            callback = callback
+        )
     }
 
-    private class Crypto(private val action: Action) :
-        ActivityResultContract<List<String>, List<String>>() {
+    private class Crypto(
+        private val action: Action,
+        private val bypass: Boolean
+    ) : ActivityResultContract<List<String>, List<String>>() {
         override fun createIntent(context: Context, input: List<String>): Intent {
-            return when (action) {
-                Action.Encrypt -> Intent(ACTION_ENCRYPT)
-                Action.Decrypt -> Intent(ACTION_DECRYPT)
-            }.putExtra(
-                EXTRA_INPUT, input.toTypedArray()
-            )
+            return Intent(context, CryptoActivity::class.java).also {
+                it.action = action.original
+                it.putExtra(EXTRA_BYPASS, bypass)
+                it.putExtra(EXTRA_INPUT, input.toTypedArray())
+            }
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): List<String> {
