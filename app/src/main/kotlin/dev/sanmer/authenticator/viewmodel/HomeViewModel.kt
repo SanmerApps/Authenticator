@@ -27,6 +27,7 @@ class HomeViewModel @Inject constructor(
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
     val auths inline get() = loadState.auths
+    val isPending inline get() = loadState.isPending
 
     val time get() = timeRepository.epochSeconds.map { epochSecond ->
         Instant.ofEpochSecond(epochSecond)

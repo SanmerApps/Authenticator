@@ -47,11 +47,7 @@ fun TrashScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (viewModel.loadState.isPending) {
-                return@Box
-            }
-
-            if (viewModel.auths.isEmpty()) {
+            if (viewModel.auths.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.trash,
                     text = stringResource(id = R.string.trash_empty),

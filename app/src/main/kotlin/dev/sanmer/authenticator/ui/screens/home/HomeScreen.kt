@@ -75,11 +75,7 @@ fun HomeScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (viewModel.loadState.isPending) {
-                return@Box
-            }
-
-            if (viewModel.auths.isEmpty()) {
+            if (viewModel.auths.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.key,
                     text = stringResource(id = R.string.home_empty),

@@ -20,6 +20,7 @@ class TrashViewModel @Inject constructor(
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
     val auths inline get() = loadState.auths
+    val isPending inline get() = loadState.isPending
 
     init {
         Timber.d("TrashViewModel init")
