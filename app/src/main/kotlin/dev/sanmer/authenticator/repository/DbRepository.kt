@@ -83,8 +83,7 @@ class DbRepository @Inject constructor(
     fun getAuthInTrashAllAsFlow() = trash.getAllWithSecretAsFlow()
         .map { entries ->
             entries.map {
-                val auth: Auth = (it.hotp?.toDecrypted() ?: it.totp?.toDecrypted())!!
-                auth to it.trash
+                (it.hotp?.toDecrypted() ?: it.totp?.toDecrypted()) as Auth to it.trash.lifetime
             }
         }
 

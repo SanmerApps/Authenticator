@@ -9,9 +9,7 @@ data class TrashEntity(
     val secret: String,
     val timestamp: Long = System.currentTimeMillis()
 ) {
-    val lifetime by lazy {
-        (System.currentTimeMillis() - timestamp).milliseconds
-    }
+    val lifetime inline get() = (System.currentTimeMillis() - timestamp).milliseconds
 
     companion object Default {
         val LIFETIME_MAX = 7.days
