@@ -24,6 +24,10 @@ enum class Brand(
         res = R.drawable.brand_cloudflare,
         regex = "(?i)Cloudflare"
     ),
+    Gitea(
+        res = R.drawable.brand_gitea,
+        regex = "(?i)Gitea"
+    ),
     Github(
         res = R.drawable.brand_github,
         regex = "(?i)GitHub"
