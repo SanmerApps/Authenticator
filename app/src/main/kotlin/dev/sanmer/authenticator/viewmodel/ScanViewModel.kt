@@ -100,8 +100,8 @@ class ScanViewModel @Inject constructor(
         runCatching {
             val cr = context.contentResolver
             checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
-        }.onSuccess {
-            _uri.update { it }
+        }.onSuccess { content ->
+            _uri.update { content }
         }.onFailure {
             Timber.e(it)
         }
