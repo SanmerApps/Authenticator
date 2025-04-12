@@ -28,19 +28,22 @@ class TrashViewModel @Inject constructor(
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getTotpAllTrashedAsFlow()
+            dbRepository.getTotpAllDecryptedTrashedAsFlow()
                 .collect { totp ->
                     loadState = LoadState.Ready(totp)
                 }
         }
     }
 
+    fun restoreAll() {
+        viewModelScope.launch {
+            dbRepository.updateTotp(totp.map { it.copy(deletedAt = 0) })
+        }
+    }
+
     fun restore(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.updateTotp(
-                entity = entity.copy(deletedAt = 0),
-                encrypt = false
-            )
+            dbRepository.updateTotp(entity.copy(deletedAt = 0))
         }
     }
 

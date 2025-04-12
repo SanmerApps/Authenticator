@@ -72,10 +72,7 @@ class HomeViewModel @Inject constructor(
 
     fun recycle(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.updateTotp(
-                entity = entity.copy(deletedAt = System.currentTimeMillis()),
-                encrypt = true
-            )
+            dbRepository.updateTotp(entity.copy(deletedAt = System.currentTimeMillis()))
         }
     }
 

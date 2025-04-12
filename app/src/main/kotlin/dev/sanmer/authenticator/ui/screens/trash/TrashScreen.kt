@@ -35,6 +35,7 @@ fun TrashScreen(
     Scaffold(
         topBar = {
             TopBar(
+                onRestore = viewModel::restoreAll,
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
@@ -67,6 +68,7 @@ fun TrashScreen(
 
 @Composable
 private fun TopBar(
+    onRestore: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
@@ -77,6 +79,16 @@ private fun TopBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
+    actions = {
+        IconButton(
+            onClick = onRestore
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.restore),
                 contentDescription = null
             )
         }

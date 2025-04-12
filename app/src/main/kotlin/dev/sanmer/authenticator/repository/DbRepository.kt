@@ -19,17 +19,18 @@ class DbRepository @Inject constructor(
 
     private suspend inline fun String.toDecrypted() = secureRepository.decrypt(this)
 
-    fun getTotpAllDecryptedAsFlow() = totp.getAllEnabledAsFlow()
+    suspend fun getTotpAllDecryptedAsFlow() = totp.getAllEnabledAsFlow()
         .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }
 
     suspend fun getTotpDecryptedByIdAsFlow(id: Long) = totp.getByIdAsFlow(id).filterNotNull()
         .map { it.copy(secret = it.secret.toDecrypted()) }
 
+    suspend fun getTotpAllDecryptedTrashedAsFlow() = totp.getAllTrashedAsFlow()
+        .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }
+
     suspend fun getTotpAllTrashed(dead: Boolean) = withContext(Dispatchers.IO) {
         totp.getAllTrashed().filter { if(dead) it.lifetime > TotpEntity.LIFETIME_MAX else true }
     }
-
-    fun getTotpAllTrashedAsFlow() = totp.getAllTrashedAsFlow()
 
     suspend fun updateTotp(id: Long, auth: TotpAuth) = withContext(Dispatchers.IO) {
         totp.update(
@@ -37,9 +38,15 @@ class DbRepository @Inject constructor(
         )
     }
 
-    suspend fun updateTotp(entity: TotpEntity, encrypt: Boolean) = withContext(Dispatchers.IO) {
+    suspend fun updateTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
         totp.update(
-            if (encrypt) entity.copy(secret = entity.secret.toEncrypted()) else entity
+            entity.copy(secret = entity.secret.toEncrypted())
+        )
+    }
+
+    suspend fun updateTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
+        totp.update(
+            entities.map { it.copy(secret = it.secret.toEncrypted()) }
         )
     }
 
