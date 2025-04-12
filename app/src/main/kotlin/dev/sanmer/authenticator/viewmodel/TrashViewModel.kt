@@ -6,12 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
@@ -19,7 +18,7 @@ class TrashViewModel @Inject constructor(
 ) : ViewModel() {
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
-    val auths inline get() = loadState.auths
+    val totp inline get() = loadState.totp
     val isPending inline get() = loadState.isPending
 
     init {
@@ -29,55 +28,37 @@ class TrashViewModel @Inject constructor(
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getAuthInTrashAllAsFlow()
-                .collect { source ->
-                    loadState = LoadState.Ready(
-                        source.map(::AuthCompat).sortedBy {
-                            it.auth.issuer.lowercase()
-                        }
-                    )
+            dbRepository.getTotpAllTrashedAsFlow()
+                .collect { totp ->
+                    loadState = LoadState.Ready(totp)
                 }
         }
     }
 
-    fun restoreAuth(auth: Auth) {
+    fun restore(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.deleteTrash(auth.secret)
+            dbRepository.updateTotp(
+                entity = entity.copy(deletedAt = 0),
+                encrypt = false
+            )
         }
     }
 
-    fun restoreAuthAll() {
+    fun delete(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.deleteTrashAll()
+            dbRepository.deleteTotp(entity)
         }
-    }
-
-    fun deleteAuth(auth: Auth) {
-        viewModelScope.launch {
-            dbRepository.deleteAuth(auth)
-            dbRepository.deleteTrash(auth.secret)
-        }
-    }
-
-    data class AuthCompat(
-        val auth: Auth,
-        val lifetime: Duration
-    ) {
-        constructor(value: Pair<Auth, Duration>) : this(
-            auth = value.first,
-            lifetime = value.second
-        )
     }
 
     sealed class LoadState {
-        abstract val auths: List<AuthCompat>
+        abstract val totp: List<TotpEntity>
 
         data object Pending : LoadState() {
-            override val auths = emptyList<AuthCompat>()
+            override val totp = emptyList<TotpEntity>()
         }
 
         data class Ready(
-            override val auths: List<AuthCompat>
+            override val totp: List<TotpEntity>
         ) : LoadState()
 
         val isPending inline get() = this is Pending

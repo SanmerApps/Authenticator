@@ -71,8 +71,8 @@ sealed class Screen(
     companion object Routes {
         fun Home() = "Home"
         fun Settings() = "Settings"
-        fun Edit(secret: String = " ", encode: Boolean = true) =
-            if (encode) "Edit/${Uri.encode(secret)}" else "Edit/${secret}"
+        fun Edit(data: Any = " ", encode: Boolean = true) =
+            if (encode) "Edit/${Uri.encode(data.toString())}" else "Edit/${data}"
         fun Scan() = "Scan"
         fun Trash() = "Trash"
         fun Encode() = "Encode"
@@ -91,10 +91,10 @@ sealed class Screen(
     )
 
     class Edit(navController: NavController) : Screen(
-        route = Edit("{secret}", false),
+        route = Edit("{data}", false),
         content = { EditScreen(navController = navController) },
         arguments = listOf(
-            navArgument("secret") { type = NavType.StringType }
+            navArgument("data") { type = NavType.StringType }
         )
     )
 

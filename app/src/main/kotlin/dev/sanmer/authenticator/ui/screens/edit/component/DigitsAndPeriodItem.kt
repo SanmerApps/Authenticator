@@ -10,24 +10,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.model.AuthType
 
 @Composable
-fun DigitsItem(
-    type: Auth.Type,
+fun DigitsAndPeriodItem(
+    type: AuthType,
     digits: String,
     onDigitsChange: (String) -> Unit,
-    counter: String,
-    onCounterChange: (String) -> Unit,
     period: String,
     onPeriodChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    readOnly: Boolean = true
-) = BaseContent(
-    modifier = modifier,
-    leading = null
-) {
-    BaseOutlinedTextField(
+    readOnly: Boolean
+) = TextFieldContent {
+    TextField(
         value = digits,
         onValueChange = onDigitsChange,
         label = stringResource(id = R.string.edit_digits),
@@ -41,18 +35,15 @@ fun DigitsItem(
 
     Spacer(modifier = Modifier.width(15.dp))
 
-    BaseOutlinedTextField(
+    TextField(
         value = when (type) {
-            Auth.Type.HOTP -> counter
-            Auth.Type.TOTP -> period
+            AuthType.TOTP -> period
         },
         onValueChange = when (type) {
-            Auth.Type.HOTP -> onCounterChange
-            Auth.Type.TOTP -> onPeriodChange
+            AuthType.TOTP -> onPeriodChange
         },
         label = when (type) {
-            Auth.Type.HOTP -> stringResource(id = R.string.edit_counter)
-            Auth.Type.TOTP -> stringResource(id = R.string.edit_period)
+            AuthType.TOTP -> stringResource(id = R.string.edit_period)
         },
         modifier = Modifier.weight(1f),
         keyboardOptions = KeyboardOptions(

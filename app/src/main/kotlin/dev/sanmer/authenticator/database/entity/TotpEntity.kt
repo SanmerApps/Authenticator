@@ -1,12 +1,17 @@
 package dev.sanmer.authenticator.database.entity
 
 import androidx.room.Entity
-import dev.sanmer.authenticator.model.auth.TotpAuth
+import androidx.room.PrimaryKey
+import dev.sanmer.authenticator.model.serializer.TotpAuth
 import dev.sanmer.otp.HOTP
-import kotlinx.coroutines.flow.StateFlow
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
-@Entity(tableName = "totp", primaryKeys = ["secret"])
+@Entity(tableName = "totp")
 data class TotpEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val deletedAt: Long = 0,
     val issuer: String,
     val name: String,
     val secret: String,
@@ -14,26 +19,31 @@ data class TotpEntity(
     val digits: Int,
     val period: Long
 ) {
+    val lifetime inline get() = (System.currentTimeMillis() - deletedAt).milliseconds
+
+    val displayName inline get() = "$issuer ($name)"
+
     constructor(
-        original: TotpAuth
+        auth: TotpAuth
     ) : this(
-        issuer = original.issuer,
-        name = original.name,
-        secret = original.secret,
-        hash = original.hash,
-        digits = original.digits,
-        period = original.period
+        issuer = auth.issuer,
+        name = auth.name,
+        secret = auth.secret,
+        hash = auth.hash,
+        digits = auth.digits,
+        period = auth.period
     )
 
-    fun auth(
-        epochSeconds: StateFlow<Long>
-    ) = TotpAuth(
+    val totp get() = TotpAuth(
         issuer = issuer,
         name = name,
         secret = secret,
         hash = hash,
         digits = digits,
-        period = period,
-        epochSecondsFlow = epochSeconds
+        period = period
     )
+
+    companion object Default {
+        val LIFETIME_MAX = 7.days
+    }
 }

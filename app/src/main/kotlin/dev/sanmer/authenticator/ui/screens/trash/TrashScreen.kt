@@ -35,7 +35,6 @@ fun TrashScreen(
     Scaffold(
         topBar = {
             TopBar(
-                onRestore = viewModel::restoreAuthAll,
                 navController = navController,
                 scrollBehavior = scrollBehavior
             )
@@ -47,7 +46,7 @@ fun TrashScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (viewModel.auths.isEmpty() && !viewModel.isPending) {
+            if (viewModel.totp.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.trash,
                     text = stringResource(id = R.string.trash_empty),
@@ -57,9 +56,9 @@ fun TrashScreen(
 
             AuthList(
                 state = listState,
-                auths = viewModel.auths,
-                restoreAuth = viewModel::restoreAuth,
-                deleteAuth = viewModel::deleteAuth,
+                totp = viewModel.totp,
+                restore = viewModel::restore,
+                delete = viewModel::delete,
                 contentPadding = contentPadding
             )
         }
@@ -68,7 +67,6 @@ fun TrashScreen(
 
 @Composable
 private fun TopBar(
-    onRestore: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
@@ -79,16 +77,6 @@ private fun TopBar(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = null
-            )
-        }
-    },
-    actions = {
-        IconButton(
-            onClick = onRestore
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.restore),
                 contentDescription = null
             )
         }

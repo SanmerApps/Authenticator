@@ -1,18 +1,10 @@
 package dev.sanmer.authenticator.repository
 
-import dev.sanmer.authenticator.database.dao.HotpDao
 import dev.sanmer.authenticator.database.dao.TotpDao
-import dev.sanmer.authenticator.database.dao.TrashDao
-import dev.sanmer.authenticator.database.entity.HotpEntity
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.database.entity.TrashEntity
-import dev.sanmer.authenticator.model.auth.Auth
-import dev.sanmer.authenticator.model.auth.HotpAuth
-import dev.sanmer.authenticator.model.auth.TotpAuth
+import dev.sanmer.authenticator.model.serializer.TotpAuth
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,137 +12,54 @@ import javax.inject.Singleton
 
 @Singleton
 class DbRepository @Inject constructor(
-    private val trash: TrashDao,
-    private val hotp: HotpDao,
     private val totp: TotpDao,
-    private val timeRepository: TimeRepository,
     private val secureRepository: SecureRepository
 ) {
-    private suspend inline fun String.toDecrypted() = secureRepository.decrypt(this)
-
     private suspend inline fun String.toEncrypted() = secureRepository.encrypt(this)
 
-    private suspend inline fun HotpEntity.toDecrypted() = auth()
-        .let { it.copy(secret = it.secret.toDecrypted()) }
+    private suspend inline fun String.toDecrypted() = secureRepository.decrypt(this)
 
-    private suspend inline fun HotpAuth.toEncrypted() = copy(secret = secret.toEncrypted())
-        .let(::HotpEntity)
+    fun getTotpAllDecryptedAsFlow() = totp.getAllEnabledAsFlow()
+        .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }
 
-    private suspend inline fun TotpEntity.toDecrypted() = auth(timeRepository.epochSeconds)
-        .let { it.copy(secret = it.secret.toDecrypted()) }
+    suspend fun getTotpDecryptedByIdAsFlow(id: Long) = totp.getByIdAsFlow(id).filterNotNull()
+        .map { it.copy(secret = it.secret.toDecrypted()) }
 
-    private suspend inline fun TotpAuth.toEncrypted() = copy(secret = secret.toEncrypted())
-        .let(::TotpEntity)
-
-    private suspend inline fun TrashEntity.toDecrypted() = copy(secret = secret.toDecrypted())
-
-    private fun getHotpAllAsFlow(enable: Boolean = true) = hotp.getAllWithTrashAsFlow()
-        .map { entries ->
-            entries.mapNotNull {
-                when {
-                    enable -> if (it.trash == null) it.hotp.toDecrypted() else null
-                    else -> if (it.trash != null) it.hotp.toDecrypted() else null
-                }
-            }
-        }
-
-    private suspend fun getHotpBySecretAsFlow(secret: String) = hotp.getBySecretAsFlow(
-        secret = secret.toEncrypted()
-    ).map { it.toDecrypted() }
-
-    private suspend fun existsHotp(secret: String) = withContext(Dispatchers.IO) {
-        hotp.exists(secret.toEncrypted())
+    suspend fun getTotpAllTrashed(dead: Boolean) = withContext(Dispatchers.IO) {
+        totp.getAllTrashed().filter { if(dead) it.lifetime > TotpEntity.LIFETIME_MAX else true }
     }
 
-    private fun getTotpAllAsFlow(enable: Boolean = true) = totp.getAllWithTrashAsFlow()
-        .map { entries ->
-            entries.mapNotNull {
-                when {
-                    enable -> if (it.trash == null) it.totp.toDecrypted() else null
-                    else -> if (it.trash != null) it.totp.toDecrypted() else null
-                }
-            }
-        }
+    fun getTotpAllTrashedAsFlow() = totp.getAllTrashedAsFlow()
 
-    private suspend fun getTotpBySecretAsFlow(secret: String) = totp.getBySecretAsFlow(
-        secret = secret.toEncrypted()
-    ).map { it.toDecrypted() }
-
-    private suspend fun existsTotp(secret: String) = withContext(Dispatchers.IO) {
-        totp.exists(secret.toEncrypted())
-    }
-
-    fun getAuthInTrashAllAsFlow() = trash.getAllWithSecretAsFlow()
-        .map { entries ->
-            entries.map {
-                (it.hotp?.toDecrypted() ?: it.totp?.toDecrypted()) as Auth to it.trash.lifetime
-            }
-        }
-
-    suspend fun getTrashAll(dead: Boolean = false) = withContext(Dispatchers.IO) {
-        when {
-            dead -> trash.getAll().filter { it.lifetime >= TrashEntity.LIFETIME_MAX }
-            else -> trash.getAll()
-        }.map { it.toDecrypted() }
-    }
-
-    suspend fun insertTrash(secret: String) = withContext(Dispatchers.IO) {
-        trash.insert(TrashEntity(secret = secret.toEncrypted()))
-    }
-
-    suspend fun insertTrash(secrets: List<String>) = withContext(Dispatchers.IO) {
-        val timestamp: Long = System.currentTimeMillis()
-        trash.insert(
-            secrets.map { TrashEntity(secret = it.toEncrypted(), timestamp = timestamp) }
+    suspend fun updateTotp(id: Long, auth: TotpAuth) = withContext(Dispatchers.IO) {
+        totp.update(
+            TotpEntity(auth).copy(id = id, secret = auth.secret.toEncrypted())
         )
     }
 
-    suspend fun deleteTrash(secret: String) = withContext(Dispatchers.IO) {
-        trash.delete(secret.toEncrypted())
+    suspend fun updateTotp(entity: TotpEntity, encrypt: Boolean) = withContext(Dispatchers.IO) {
+        totp.update(
+            if (encrypt) entity.copy(secret = entity.secret.toEncrypted()) else entity
+        )
     }
 
-    suspend fun deleteTrash(secrets: List<String>) = withContext(Dispatchers.IO) {
-        trash.delete(secrets.map { it.toEncrypted() })
+    suspend fun insertTotp(auth: TotpAuth) = withContext(Dispatchers.IO) {
+        totp.insert(
+            TotpEntity(auth).copy(secret = auth.secret.toEncrypted())
+        )
     }
 
-    suspend fun deleteTrashAll() = withContext(Dispatchers.IO) {
-        trash.deleteAll()
+    suspend fun insertTotp(auths: List<TotpAuth>) = withContext(Dispatchers.IO) {
+        totp.insert(
+            auths.map { TotpEntity(it).copy(secret = it.secret.toEncrypted()) }
+        )
     }
 
-    fun getAuthAllAsFlow(enable: Boolean = true) = combine(
-        getHotpAllAsFlow(enable),
-        getTotpAllAsFlow(enable)
-    ) { hotp, totp ->
-        hotp.toMutableList<Auth>().apply { addAll(totp) }.toList()
+    suspend fun deleteTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
+        totp.delete(entity)
     }
 
-    suspend fun getAuthBySecretAsFlow(secret: String): Flow<Auth> = when {
-        existsHotp(secret) -> getHotpBySecretAsFlow(secret)
-        existsTotp(secret) -> getTotpBySecretAsFlow(secret)
-        else -> emptyFlow()
-    }
-
-    suspend fun insertAuth(values: List<Auth>) = withContext(Dispatchers.IO) {
-        hotp.insert(values.filterIsInstance<HotpAuth>().map { it.toEncrypted() })
-        totp.insert(values.filterIsInstance<TotpAuth>().map { it.toEncrypted() })
-    }
-
-    suspend fun updateAuth(value: Auth) = withContext(Dispatchers.IO) {
-        when (value) {
-            is HotpAuth -> hotp.update(value.toEncrypted())
-            is TotpAuth -> totp.update(value.toEncrypted())
-        }
-    }
-
-    suspend fun deleteAuth(value: Auth) = withContext(Dispatchers.IO) {
-        when (value) {
-            is HotpAuth -> hotp.delete(value.secret.toEncrypted())
-            is TotpAuth -> totp.delete(value.secret.toEncrypted())
-        }
-    }
-
-    suspend fun deleteAuth(secrets: List<String>) = withContext(Dispatchers.IO) {
-        hotp.delete(secrets.map { it.toEncrypted() })
-        totp.delete(secrets.map { it.toEncrypted() })
+    suspend fun deleteTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
+        totp.delete(entities)
     }
 }

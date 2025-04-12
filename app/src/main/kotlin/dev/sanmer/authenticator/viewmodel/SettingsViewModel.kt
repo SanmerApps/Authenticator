@@ -8,9 +8,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.model.serializer.AuthTxt
+import dev.sanmer.authenticator.model.serializer.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
@@ -25,11 +25,11 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private var output = emptyList<Auth>()
-    private var input = emptyList<Auth>()
+    private var output = emptyList<TotpAuth>()
+    private var input = emptyList<TotpAuth>()
 
-    private var auths by mutableStateOf(emptyList<Auth>())
-    val isAuthsEmpty get() = auths.isEmpty()
+    private var totp by mutableStateOf(emptyList<TotpAuth>())
+    val isEmpty get() = totp.isEmpty()
 
     var bottomSheet by mutableStateOf(BottomSheet.Closed)
         private set
@@ -41,9 +41,9 @@ class SettingsViewModel @Inject constructor(
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getAuthAllAsFlow(enable = true)
-                .collect {
-                    auths = it
+            dbRepository.getTotpAllDecryptedAsFlow()
+                .collect { entries ->
+                    totp = entries.map { it.totp }
                 }
         }
     }
@@ -62,15 +62,15 @@ class SettingsViewModel @Inject constructor(
         callback: () -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (fileType.skip) {
-                output = auths
+            if (fileType.bypass) {
+                output = totp
                 callback()
             } else {
                 CryptoActivity.encrypt(
                     context = context,
-                    input = auths.map { it.secret }
+                    input = totp.map { it.secret }
                 ) { encryptedSecrets ->
-                    output = auths.mapIndexed { index, auth ->
+                    output = totp.mapIndexed { index, auth ->
                         auth.copy(secret = encryptedSecrets[index])
                     }
                     callback()
@@ -91,7 +91,7 @@ class SettingsViewModel @Inject constructor(
                 val cr = context.contentResolver
                 checkNotNull(cr.openInputStream(uri)).use(fileType::decodeFrom)
             }.onSuccess { auths ->
-                if (fileType.skip) {
+                if (fileType.bypass) {
                     input = auths
                     callback()
                 } else {
@@ -121,9 +121,10 @@ class SettingsViewModel @Inject constructor(
         context = context,
         uri = uri
     ) {
-        val ok = input.all { it.secret.isBase32() }
-        if (ok) viewModelScope.launch {
-            dbRepository.insertAuth(input)
+        viewModelScope.launch {
+            dbRepository.insertTotp(
+                input.filter { it.secret.isBase32() }
+            )
         }
     }
 
@@ -131,7 +132,7 @@ class SettingsViewModel @Inject constructor(
         fileType: FileType,
         context: Context,
         uri: Uri,
-        auths: List<Auth>
+        auths: List<TotpAuth>
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
@@ -177,30 +178,31 @@ class SettingsViewModel @Inject constructor(
     )
 
     sealed class FileType {
-        abstract val skip: Boolean
-        abstract fun decodeFrom(input: InputStream): List<Auth>
-        abstract fun decodeTo(auths: List<Auth>, output: OutputStream)
+        abstract val bypass: Boolean
+        abstract fun decodeFrom(input: InputStream): List<TotpAuth>
+        abstract fun decodeTo(auths: List<TotpAuth>, output: OutputStream)
 
         data object Txt : FileType() {
-            override val skip = true
+            override val bypass = true
 
-            override fun decodeFrom(input: InputStream): List<Auth> {
-                return AuthTxt.decodeFrom(input).auths.map { it.auth }
+            override fun decodeFrom(input: InputStream): List<TotpAuth> {
+                return AuthTxt.decodeFrom(input).totp
             }
 
-            override fun decodeTo(auths: List<Auth>, output: OutputStream) {
+            override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
+                Timber.d("auths: ${auths.size}")
                 AuthTxt(auths).encodeTo(output)
             }
         }
 
         data object Json : FileType() {
-            override val skip = false
+            override val bypass = false
 
-            override fun decodeFrom(input: InputStream): List<Auth> {
-                return AuthJson.decodeFrom(input).auths.map { it.auth }
+            override fun decodeFrom(input: InputStream): List<TotpAuth> {
+                return AuthJson.decodeFrom(input).totp
             }
 
-            override fun decodeTo(auths: List<Auth>, output: OutputStream) {
+            override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
                 AuthJson(auths).encodeTo(output)
             }
         }

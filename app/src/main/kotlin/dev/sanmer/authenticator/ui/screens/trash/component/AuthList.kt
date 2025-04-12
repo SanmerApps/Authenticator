@@ -11,16 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.ui.ktx.plus
-import dev.sanmer.authenticator.viewmodel.TrashViewModel
 
 @Composable
 fun AuthList(
     state: LazyListState,
-    auths: List<TrashViewModel.AuthCompat>,
-    restoreAuth: (Auth) -> Unit,
-    deleteAuth: (Auth) -> Unit,
+    totp: List<TotpEntity>,
+    restore: (TotpEntity) -> Unit,
+    delete: (TotpEntity) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) = LazyColumn(
     modifier = Modifier
@@ -31,12 +30,11 @@ fun AuthList(
     verticalArrangement = Arrangement.spacedBy(15.dp),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    items(auths) {
+    items(totp) {
         AuthItem(
-            auth = it.auth,
-            lifetime = it.lifetime,
-            onRestore = { restoreAuth(it.auth) },
-            onDelete = { deleteAuth(it.auth) }
+            entity = it,
+            onRestore = { restore(it) },
+            onDelete = { delete(it) }
         )
     }
 }

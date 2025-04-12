@@ -58,7 +58,7 @@ fun SettingsScreen(
         )
         BottomSheet.Database -> DatabaseItem(
             onDismiss = viewModel::closeBottomSheet,
-            isEmpty = viewModel.isAuthsEmpty,
+            isEmpty = viewModel.isEmpty,
             prepare = viewModel::prepare,
             importFrom = viewModel::importFrom,
             exportTo = viewModel::exportTo

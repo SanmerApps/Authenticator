@@ -1,8 +1,5 @@
 package dev.sanmer.authenticator.model.serializer
 
-import dev.sanmer.authenticator.model.auth.Auth
-import dev.sanmer.authenticator.model.auth.HotpAuth
-import dev.sanmer.authenticator.model.auth.TotpAuth
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -12,22 +9,9 @@ import java.io.OutputStream
 
 @Serializable
 data class AuthJson(
-    val hotp: List<HotpSerializable> = emptyList(),
-    val totp: List<TotpSerializable> = emptyList()
-) : AuthSerializable<OtpSerializable> {
-    constructor(
-        auths: List<Auth>
-    ) : this(
-        hotp = auths.filterIsInstance<HotpAuth>().map(::HotpSerializable),
-        totp = auths.filterIsInstance<TotpAuth>().map(::TotpSerializable)
-    )
-
-    override val auths: List<OtpSerializable>
-        get() = hotp.toMutableList<OtpSerializable>()
-            .apply { addAll(totp) }
-            .toList()
-
-    override fun encodeTo(output: OutputStream) {
+    val totp: List<TotpAuth>
+) {
+    fun encodeTo(output: OutputStream) {
         endpointJson.encodeToStream(this, output)
     }
 

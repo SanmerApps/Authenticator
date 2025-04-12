@@ -27,20 +27,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.auth.Auth
-import dev.sanmer.authenticator.model.auth.Otp
+import dev.sanmer.authenticator.model.impl.TotpImpl
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.logo.Logo
 
 @Composable
-fun <T> AuthItem(
-    auth: T,
+fun AuthItem(
+    auth: TotpImpl,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
-) where T : Auth, T : Otp {
+) {
     SwipeContent(
         content = { release ->
             AuthItemButtons(
@@ -65,11 +64,11 @@ fun <T> AuthItem(
 }
 
 @Composable
-private fun <T> AuthItemContent(
-    auth: T,
+private fun AuthItemContent(
+    auth: TotpImpl,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
-) where T : Auth, T : Otp = Row(
+) = Row(
     modifier = Modifier
         .sizeIn(maxWidth = 450.dp)
         .fillMaxWidth()
@@ -86,8 +85,11 @@ private fun <T> AuthItemContent(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(12.dp)
 ) {
-    val logo by remember(auth.issuer) { derivedStateOf { Logo.getOrDefault(auth.issuer) } }
-    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.now())
+    val logo by remember(auth.entity.issuer) {
+        derivedStateOf { Logo.getOrDefault(auth.entity.issuer) }
+    }
+
+    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = "")
 
     Image(
         painter = painterResource(id = logo.res),
@@ -109,7 +111,7 @@ private fun <T> AuthItemContent(
         )
 
         Text(
-            text = auth.displayName,
+            text = auth.entity.displayName,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline
         )
