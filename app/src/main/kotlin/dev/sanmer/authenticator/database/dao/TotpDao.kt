@@ -1,44 +1,45 @@
 package dev.sanmer.authenticator.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.Update
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.database.entity.TotpWithTrash
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TotpDao {
-    @Query("SELECT * FROM totp")
-    fun getAllAsFlow(): Flow<List<TotpEntity>>
+    @Query("SELECT * FROM totp WHERE deletedAt != 0")
+    suspend fun getAllTrashed(): List<TotpEntity>
 
-    @Transaction
-    @Query("SELECT * FROM totp")
-    fun getAllWithTrashAsFlow(): Flow<List<TotpWithTrash>>
+    @Query("SELECT * FROM totp WHERE deletedAt = 0")
+    fun getAllEnabledAsFlow(): Flow<List<TotpEntity>>
 
-    @Query("SELECT * FROM totp WHERE secret = :secret")
-    fun getBySecretAsFlow(secret: String): Flow<TotpEntity>
+    @Query("SELECT * FROM totp WHERE deletedAt != 0")
+    fun getAllTrashedAsFlow(): Flow<List<TotpEntity>>
+
+    @Query("SELECT * FROM totp WHERE id = :id")
+    fun getByIdAsFlow(id: Long): Flow<TotpEntity?>
 
     @Query("SELECT * FROM totp")
     suspend fun getAll(): List<TotpEntity>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
+    suspend fun insert(entity: TotpEntity)
+
+    @Insert
     suspend fun insert(entities: List<TotpEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Update
     suspend fun update(entity: TotpEntity)
 
-    @Query("DELETE FROM totp WHERE secret = :secret")
-    suspend fun delete(secret: String)
+    @Update
+    suspend fun update(entities: List<TotpEntity>)
 
-    @Query("DELETE FROM totp WHERE secret IN (:secret)")
-    suspend fun delete(secret: List<String>)
+    @Delete
+    suspend fun delete(entity: TotpEntity)
 
-    @Query("DELETE FROM totp")
-    suspend fun deleteAll()
-
-    @Query("SELECT EXISTS(SELECT 1 FROM totp WHERE secret = :secret)")
-    suspend fun exists(secret: String): Boolean
+    @Delete
+    suspend fun delete(entities: List<TotpEntity>)
 }

@@ -9,19 +9,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.model.auth.Auth
-import dev.sanmer.authenticator.model.auth.HotpAuth
-import dev.sanmer.authenticator.model.auth.Otp
-import dev.sanmer.authenticator.model.auth.TotpAuth
+import dev.sanmer.authenticator.model.AuthType
 import dev.sanmer.authenticator.model.serializer.AuthTxt
+import dev.sanmer.authenticator.model.serializer.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
-import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.security.SecureRandom
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,9 +26,9 @@ class EditViewModel @Inject constructor(
     private val dbRepository: DbRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val secret = savedStateHandle.secret
-    val isOtpUri = secret.isOtpUri()
-    val edit = secret.isNotBlank() && !isOtpUri
+    private val data = savedStateHandle.data
+    private val id = data.toLongOrNull()
+    val isEdit = id != null
 
     var input by mutableStateOf(Input())
         private set
@@ -39,37 +36,22 @@ class EditViewModel @Inject constructor(
     var uriString by mutableStateOf("")
         private set
 
-    var showQr by mutableStateOf(false)
-        private set
-
     private val result = mutableStateMapOf<Value, Boolean>()
 
     init {
         Timber.d("EditViewModel init")
-        updateFromUri(secret)
+        updateFromUri(data)
         dataObserver()
     }
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getAuthBySecretAsFlow(secret)
-                .collect { auth ->
-                    updateFromAuth(auth)
-                    updateUriString(auth)
+            dbRepository.getTotpDecryptedByIdAsFlow(id ?: Long.MIN_VALUE)
+                .map { it.totp }
+                .collect { totp ->
+                    update { Input(totp) }
+                    uriString = totp.uri.toString()
                 }
-        }
-    }
-
-    private fun updateUriString(auth: Auth) {
-        when (auth) {
-            is Otp -> uriString = auth.uri.toString()
-        }
-    }
-
-    private fun updateFromAuth(auth: Auth) {
-        when (auth) {
-            is HotpAuth -> update { Input(auth) }
-            is TotpAuth -> update { Input(auth) }
         }
     }
 
@@ -84,11 +66,10 @@ class EditViewModel @Inject constructor(
 
    private fun updateFromUri(uriString: String) {
         if (!uriString.isOtpUri()) return
-
         runCatching {
             AuthTxt.parse(uriString)
-        }.onSuccess {
-            updateFromAuth(it.auth)
+        }.onSuccess { totp ->
+            update { Input(totp) }
         }.onFailure {
             Timber.e(it, "uri = $uriString")
         }
@@ -99,74 +80,43 @@ class EditViewModel @Inject constructor(
     }
 
     fun save(block: () -> Unit = {}) {
-        if (!isAllOk()) return
-
-        viewModelScope.launch {
-            dbRepository.updateAuth(input.auth)
-            block()
+        if (isAllOk()) {
+            viewModelScope.launch {
+                when {
+                    id != null -> dbRepository.updateTotp(id, input.auth)
+                    else -> dbRepository.insertTotp(input.auth)
+                }
+                block()
+            }
         }
     }
 
-    fun updateShowQr(block: (Boolean) -> Boolean) {
-        showQr = block(showQr)
-    }
-
-    fun randomSecret() {
-        val secret = ByteArray(32).apply {
-            SecureRandom().nextBytes(this)
-        }.encodeBase32Default()
-
-        update { it.copy(secret = secret) }
-    }
-
     data class Input(
-        val type: Auth.Type = Auth.Type.TOTP,
+        val type: AuthType = AuthType.TOTP,
         val name: String = "",
         val issuer: String = "",
         val secret: String = "",
         val hash: HOTP.Hash = HOTP.Hash.SHA1,
         val digits: String = "6",
-        val counter: String = "0",
         val period: String = "30"
     ) {
-        constructor(hotp: HotpAuth) : this(
-            type = Auth.Type.HOTP,
-            name = hotp.name,
-            issuer = hotp.issuer,
-            secret = hotp.secret,
-            hash = hotp.hash,
-            digits = hotp.digits.toString(),
-            counter = hotp.counter.toString()
+        constructor(auth: TotpAuth) : this(
+            name = auth.name,
+            issuer = auth.issuer,
+            secret = auth.secret,
+            hash = auth.hash,
+            digits = auth.digits.toString(),
+            period = auth.period.toString()
         )
 
-        constructor(totp: TotpAuth) : this(
-            type = Auth.Type.TOTP,
-            name = totp.name,
-            issuer = totp.issuer,
-            secret = totp.secret,
-            hash = totp.hash,
-            digits = totp.digits.toString(),
-            period = totp.period.toString()
+        val auth inline get() = TotpAuth(
+            name = name.trim(),
+            issuer = issuer.trim(),
+            secret = secret.replace("\\s+".toRegex(), ""),
+            hash = hash,
+            digits = digits.toIntOrNull() ?: 6,
+            period = period.toLongOrNull() ?: 30
         )
-
-        val auth: Auth get() = when (type) {
-            Auth.Type.HOTP -> HotpAuth(
-                name = name.trim(),
-                issuer = issuer.trim(),
-                secret = secret.replace("\\s+".toRegex(), ""),
-                hash = hash,
-                digits = digits.toIntOrNull() ?: 6,
-                counter = counter.toLongOrNull() ?: 0
-            )
-            Auth.Type.TOTP -> TotpAuth(
-                name = name.trim(),
-                issuer = issuer.trim(),
-                secret = secret.replace("\\s+".toRegex(), ""),
-                hash = hash,
-                digits = digits.toIntOrNull() ?: 6,
-                period = period.toLongOrNull() ?: 30
-            )
-        }
     }
 
     enum class Value(val ok: (String) -> Boolean) {
@@ -180,7 +130,7 @@ class EditViewModel @Inject constructor(
     }
 
     companion object Default {
-        private val SavedStateHandle.secret: String
-            inline get() = checkNotNull(Uri.decode(get("secret")))
+        private val SavedStateHandle.data: String
+            inline get() = checkNotNull(Uri.decode(get("data")))
     }
 }

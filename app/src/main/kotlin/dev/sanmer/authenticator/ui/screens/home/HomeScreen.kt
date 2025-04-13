@@ -75,7 +75,7 @@ fun HomeScreen(
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if (viewModel.auths.isEmpty() && !viewModel.isPending) {
+            if (viewModel.totp.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.key,
                     text = stringResource(id = R.string.home_empty),
@@ -86,9 +86,8 @@ fun HomeScreen(
             AuthList(
                 state = listState,
                 navController = navController,
-                auths = viewModel.auths,
-                recycleAuth = viewModel::recycleAuth,
-                updateAuth = viewModel::updateAuth,
+                totp = viewModel.totp,
+                recycle = viewModel::recycle,
                 contentPadding = contentPadding
             )
         }

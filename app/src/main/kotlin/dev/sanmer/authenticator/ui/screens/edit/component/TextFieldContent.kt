@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,7 +32,7 @@ import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.DropdownMenu
 
 @Composable
-fun BaseContentIcon(
+fun TextFieldContentIcon(
     @DrawableRes icon: Int
 ) = Box(
     modifier = Modifier.size(48.dp),
@@ -44,7 +45,10 @@ fun BaseContentIcon(
 }
 
 @Composable
-fun BaseContent(
+fun TextFieldContentSpacer() = Spacer(modifier = Modifier.width(48.dp))
+
+@Composable
+fun TextFieldContent(
     modifier: Modifier = Modifier,
     leading: @Composable (() -> Unit)? = null,
     trailing: @Composable (() -> Unit)? = null,
@@ -56,35 +60,18 @@ fun BaseContent(
     if (leading != null) {
         leading()
     } else {
-        Spacer(modifier = Modifier.size(48.dp))
+        TextFieldContentSpacer()
     }
     content()
     if (trailing != null) {
         trailing()
     } else {
-        Spacer(modifier = Modifier.size(48.dp))
+        TextFieldContentSpacer()
     }
 }
 
 @Composable
-fun BaseContent(
-    modifier: Modifier = Modifier,
-    @DrawableRes leadingIcon: Int? = null,
-    @DrawableRes trailingIcon: Int? = null,
-    content: @Composable RowScope.() -> Unit
-) = BaseContent(
-    modifier = modifier,
-    leading = leadingIcon?.let {
-        { BaseContentIcon(icon = it) }
-    },
-    trailing = trailingIcon?.let {
-        { BaseContentIcon(icon = it) }
-    },
-    content = content
-)
-
-@Composable
-fun BaseOutlinedTextField(
+fun TextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -111,7 +98,7 @@ fun BaseOutlinedTextField(
 )
 
 @Composable
-fun <T> BaseDropdownMenu(
+fun <T> TextFieldDropdownMenu(
     value: T,
     values: Collection<T>,
     onValueChange: (T) -> Unit,
@@ -137,7 +124,7 @@ fun <T> BaseDropdownMenu(
         contentAlignment = Alignment.BottomStart,
         offset = DpOffset(0.dp, 3.dp),
         surface = {
-            BaseOutlinedTextField(
+            TextField(
                 value = value.toString(),
                 onValueChange = {},
                 label = label,

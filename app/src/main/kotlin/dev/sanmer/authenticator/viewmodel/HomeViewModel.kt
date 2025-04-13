@@ -6,7 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.database.entity.TotpEntity
+import dev.sanmer.authenticator.model.impl.TotpImpl
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.TimeRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +27,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
-    val auths inline get() = loadState.auths
+    val totp inline get() = loadState.totp
     val isPending inline get() = loadState.isPending
 
     val time get() = timeRepository.epochSeconds.map { epochSecond ->
@@ -47,42 +48,43 @@ class HomeViewModel @Inject constructor(
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getAuthAllAsFlow(enable = true)
-                .collect { auths ->
-                    loadState = LoadState.Ready(auths.sortedBy { it.issuer.lowercase() })
+            dbRepository.getTotpAllDecryptedAsFlow()
+                .collect { totp ->
+                    loadState = LoadState.Ready(
+                        totp = totp.map {
+                            TotpImpl(
+                                entity = it,
+                                epochSeconds = timeRepository.epochSeconds
+                            )
+                        }.sortedBy { it.entity.issuer.lowercase() },
+                    )
                 }
         }
     }
 
     private fun clearTrash() {
         viewModelScope.launch {
-            val secrets = dbRepository.getTrashAll(dead = true).map { it.secret }
-            dbRepository.deleteAuth(secrets)
-            dbRepository.deleteTrash(secrets)
+            dbRepository.deleteTotp(
+                dbRepository.getTotpAllTrashed(dead = true)
+            )
         }
     }
 
-    fun updateAuth(auth: Auth) {
+    fun recycle(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.updateAuth(auth)
-        }
-    }
-
-    fun recycleAuth(auth: Auth) {
-        viewModelScope.launch {
-            dbRepository.insertTrash(auth.secret)
+            dbRepository.updateTotp(entity.copy(deletedAt = System.currentTimeMillis()))
         }
     }
 
     sealed class LoadState {
-        abstract val auths: List<Auth>
+        abstract val totp: List<TotpImpl>
 
         data object Pending : LoadState() {
-            override val auths = emptyList<Auth>()
+            override val totp = emptyList<TotpImpl>()
         }
 
         data class Ready(
-            override val auths: List<Auth>
+            override val totp: List<TotpImpl>
         ) : LoadState()
 
         val isPending inline get() = this is Pending

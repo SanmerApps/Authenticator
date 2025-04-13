@@ -16,7 +16,6 @@
     <string name="edit_type">类型</string>
     <string name="edit_hash">哈希算法</string>
     <string name="edit_digits">位数</string>
-    <string name="edit_counter">计数器</string>
     <string name="edit_period">周期</string>
     <string name="edit_qrcode">二维码</string>
 
@@ -68,10 +67,6 @@
     <string name="ntp_rtt">延迟: %1$s</string>
     <string name="ntp_offset">偏移: %1$s</string>
     <string name="ntp_timeout">超时</string>
-
-    <!-- Search -->
-    <string name="search_placeholder">搜索…</string>
-    <string name="empty_list">空列表</string>
 
     <!-- Message -->
     <string name="loading">加载中…</string>

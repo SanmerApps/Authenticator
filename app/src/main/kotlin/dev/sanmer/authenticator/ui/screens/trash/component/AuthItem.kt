@@ -29,18 +29,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.ktx.hidden
-import dev.sanmer.authenticator.model.auth.Auth
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.logo.Logo
-import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 @Composable
 fun AuthItem(
-    auth: Auth,
-    lifetime: Duration,
+    entity: TotpEntity,
     onRestore: () -> Unit,
     onDelete: () -> Unit
 ) = SwipeContent(
@@ -58,16 +56,14 @@ fun AuthItem(
     },
     surface = {
         AuthItemContent(
-            auth = auth,
-            lifetime = lifetime
+            entity = entity
         )
     }
 )
 
 @Composable
 private fun AuthItemContent(
-    auth: Auth,
-    lifetime: Duration
+    entity: TotpEntity
 ) = Row(
     modifier = Modifier
         .sizeIn(maxWidth = 450.dp)
@@ -81,10 +77,10 @@ private fun AuthItemContent(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(12.dp)
 ) {
-    val logo by remember(auth.issuer) { derivedStateOf { Logo.getOrDefault(auth.issuer) } }
-    val hiddenSecret by remember { derivedStateOf { auth.secret.hidden() } }
+    val logo by remember(entity.issuer) { derivedStateOf { Logo.getOrDefault(entity.issuer) } }
+    val hiddenSecret by remember { derivedStateOf { entity.secret.hidden() } }
     val lifetimeString by remember {
-        derivedStateOf { lifetime.toString(unit = DurationUnit.HOURS, decimals = 2) }
+        derivedStateOf { entity.lifetime.toString(unit = DurationUnit.HOURS, decimals = 2) }
     }
 
     Image(
@@ -116,7 +112,7 @@ private fun AuthItemContent(
         }
 
         Text(
-            text = auth.displayName,
+            text = entity.displayName,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline
         )

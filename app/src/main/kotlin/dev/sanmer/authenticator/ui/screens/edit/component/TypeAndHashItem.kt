@@ -7,24 +7,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.auth.Auth
+import dev.sanmer.authenticator.model.AuthType
 import dev.sanmer.otp.HOTP
 
 @Composable
-fun TypeItem(
-    type: Auth.Type,
-    onTypeChange: (Auth.Type) -> Unit,
+fun TypeAndHashItem(
+    type: AuthType,
+    onTypeChange: (AuthType) -> Unit,
     hash: HOTP.Hash,
     onHashChange: (HOTP.Hash) -> Unit,
-    modifier: Modifier = Modifier,
-    readOnly: Boolean = true
-) = BaseContent(
-    modifier = modifier,
-    leadingIcon = R.drawable.math_function
+    readOnly: Boolean
+) = TextFieldContent(
+    leading = { TextFieldContentIcon(icon = R.drawable.math_function) }
 ) {
-    BaseDropdownMenu(
+    TextFieldDropdownMenu(
         value = type,
-        values = Auth.Type.entries,
+        values = AuthType.entries,
         onValueChange = onTypeChange,
         label = stringResource(id = R.string.edit_type),
         readOnly = readOnly,
@@ -33,7 +31,7 @@ fun TypeItem(
 
     Spacer(modifier = Modifier.width(15.dp))
 
-    BaseDropdownMenu(
+    TextFieldDropdownMenu(
         value = hash,
         values = HOTP.Hash.entries,
         onValueChange = onHashChange,

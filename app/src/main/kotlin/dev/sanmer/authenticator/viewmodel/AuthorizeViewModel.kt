@@ -100,6 +100,7 @@ class AuthorizeViewModel @Inject constructor(
         val newSessionKey = SessionKey.new()
         val newKey = newSessionKey.getKeyEncryptedByPassword(new).encodeBase64()
         preferenceRepository.setKeyEncryptedByPassword(newKey)
+        preferenceRepository.setKeyEncryptedByBiometric("")
         secureRepository.setSessionKey(newSessionKey)
         secureRepository.encryptSecretByNewKey(sessionKey, newSessionKey)
         type = Type.PasswordSucceed

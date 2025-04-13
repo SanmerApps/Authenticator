@@ -24,16 +24,14 @@ fun TextFieldItem(
         keyboardType = KeyboardType.Text,
         imeAction = ImeAction.Next
     )
-) = BaseContent(
+) = TextFieldContent(
     modifier = modifier,
-    leading = leadingIcon?.let {
-        { BaseContentIcon(icon = it) }
-    },
+    leading = leadingIcon?.let { { TextFieldContentIcon(icon = it) } },
     trailing = trailingIcon
 ) {
     val passwordVisualTransformation = remember { PasswordVisualTransformation() }
 
-    BaseOutlinedTextField(
+    TextField(
         value = value,
         onValueChange = onValueChange,
         label = label,
