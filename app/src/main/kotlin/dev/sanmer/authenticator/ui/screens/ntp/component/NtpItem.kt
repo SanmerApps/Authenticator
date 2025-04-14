@@ -1,7 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.ntp.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,12 +20,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.component.LabelText
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.authenticator.viewmodel.NtpViewModel
 import kotlin.time.Duration
@@ -129,7 +127,7 @@ private fun RTTLabel(
         } else {
             stringResource(id = R.string.ntp_timeout)
         },
-        backgroundColor = if (isSystemInDarkTheme()) {
+        containerColor = if (isSystemInDarkTheme()) {
             when (value) {
                 in 0..<100 -> colorResource(R.color.material_green_900)
                 in 100..500 -> colorResource(R.color.material_yellow_900)
@@ -144,19 +142,3 @@ private fun RTTLabel(
         }
     )
 }
-
-@Composable
-private fun LabelText(
-    text: String,
-    backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer
-) = Text(
-    text = text,
-    style = MaterialTheme.typography.labelMedium,
-    color = MaterialTheme.colorScheme.onSecondaryContainer,
-    modifier = Modifier
-        .background(
-            color = backgroundColor,
-            shape = CircleShape
-        )
-        .padding(horizontal = 8.dp, vertical = 2.dp)
-)

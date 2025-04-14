@@ -5,13 +5,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.component.LabelText
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.ktx.isScrollingUp
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
@@ -112,23 +111,14 @@ private fun ActionButton(
 private fun TopBar(
     time: LocalTime,
     scrollBehavior: TopAppBarScrollBehavior
-) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.app_name)) },
-        actions = {
-            Text(
-                text = time.toString(),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                modifier = Modifier
-                    .padding(end = 15.dp)
-                    .background(
-                        color =  MaterialTheme.colorScheme.secondaryContainer,
-                        shape = CircleShape
-                    )
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
-            )
-        },
-        scrollBehavior = scrollBehavior
-    )
-}
+) = TopAppBar(
+    title = { Text(text = stringResource(id = R.string.app_name)) },
+    actions = {
+        LabelText(
+            text = time.toString(),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(end = 15.dp)
+        )
+    },
+    scrollBehavior = scrollBehavior
+)

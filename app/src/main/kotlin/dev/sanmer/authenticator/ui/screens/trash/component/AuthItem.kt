@@ -1,7 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.trash.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -31,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.ktx.hidden
+import dev.sanmer.authenticator.ui.component.LabelText
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.logo.Logo
@@ -149,18 +148,3 @@ private fun AuthItemButtons(
         )
     }
 }
-
-@Composable
-private fun LabelText(
-    text: String
-) = Text(
-    text = text,
-    style = MaterialTheme.typography.labelLarge,
-    color = MaterialTheme.colorScheme.onSecondaryContainer,
-    modifier = Modifier
-        .background(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            shape = CircleShape
-        )
-        .padding(horizontal = 10.dp)
-)
