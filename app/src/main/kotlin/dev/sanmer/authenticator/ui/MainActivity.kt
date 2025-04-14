@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     AppTheme {
                         Crossfade(
                             targetState = viewModel.isLocked,
-                            animationSpec = tween(800)
+                            animationSpec = tween(400)
                         ) { isLocked ->
                             if (isLocked) {
                                 LockScreen()
