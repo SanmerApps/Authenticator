@@ -19,10 +19,9 @@ class MainViewModel @Inject constructor(
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
 
-    val isPending inline get() = loadState is LoadState.Pending
+    val isPending inline get() = loadState.isPending
+    val isLocked inline get() = loadState.isLocked
     val preference inline get() = loadState.preference
-
-    private var isUnlocked = false
 
     init {
         Timber.d("MainViewModel init")
@@ -32,7 +31,7 @@ class MainViewModel @Inject constructor(
     private fun preferenceObserver() {
         viewModelScope.launch {
             preferenceRepository.data.collect {
-                loadState = if (isReady(it)) {
+                loadState = if (loadState.isReady || !it.isEncrypted ) {
                     LoadState.Ready(it)
                 } else {
                     LoadState.Locked(it)
@@ -41,12 +40,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun isReady(preference: Preference): Boolean {
-        return !preference.isEncrypted || isUnlocked || loadState.isReady
-    }
-
     fun setUnlocked() {
-        isUnlocked = true
         loadState = LoadState.Ready(preference)
     }
 
@@ -65,6 +59,8 @@ class MainViewModel @Inject constructor(
             override val preference: Preference
         ) : LoadState()
 
+        val isPending inline get() = this is Pending
+        val isLocked inline get() = this is Locked
         val isReady inline get() = this is Ready
     }
 }

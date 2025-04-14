@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,15 +31,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             when (viewModel.loadState) {
                 LoadState.Pending -> {}
-                is LoadState.Locked -> AppTheme {
-                    LockScreen()
-                }
-
-                is LoadState.Ready -> CompositionLocalProvider(
+                else -> CompositionLocalProvider(
                     LocalPreference provides viewModel.preference
                 ) {
                     AppTheme {
-                        MainScreen()
+                        Crossfade(
+                            targetState = viewModel.isLocked,
+                            animationSpec = tween(800)
+                        ) { isLocked ->
+                            if (isLocked) {
+                                LockScreen()
+                            } else {
+                                MainScreen()
+                            }
+                        }
                     }
                 }
             }
