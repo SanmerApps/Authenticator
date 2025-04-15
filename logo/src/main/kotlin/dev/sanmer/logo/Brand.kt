@@ -20,9 +20,33 @@ enum class Brand(
         res = R.drawable.brand_aws,
         regex = "(?i)AWS|Amazon\\s*Web\\s*Service"
     ),
+    Azure(
+        res = R.drawable.brand_azure,
+        regex = "(?i)Azure"
+    ),
     Cloudflare(
         res = R.drawable.brand_cloudflare,
         regex = "(?i)Cloudflare"
+    ),
+    Coinbase(
+        res = R.drawable.brand_coinbase,
+        regex = "(?i)Coinbase"
+    ),
+    Crowdin(
+        res = R.drawable.brand_crowdin,
+        regex = "(?i)Crowdin"
+    ),
+    DigitalOcean(
+        res = R.drawable.brand_digitalocean,
+        regex = "(?i)Digital\\s*Ocean"
+    ),
+    Discord(
+        res = R.drawable.brand_discord,
+        regex = "(?i)Discord"
+    ),
+    Facebook(
+        res = R.drawable.brand_facebook,
+        regex = "(?i)Facebook"
     ),
     Gitea(
         res = R.drawable.brand_gitea,
@@ -32,9 +56,17 @@ enum class Brand(
         res = R.drawable.brand_github,
         regex = "(?i)GitHub"
     ),
+    GitLab(
+        res = R.drawable.brand_gitlab,
+        regex = "(?i)GitLab"
+    ),
     Google(
         res = R.drawable.brand_google,
         regex = "(?i)Google"
+    ),
+    Instagram(
+        res = R.drawable.brand_instagram,
+        regex = "(?i)Instagram"
     ),
     JetBrains(
         res = R.drawable.brand_jetbrains,
@@ -44,9 +76,13 @@ enum class Brand(
         res = R.drawable.brand_lark,
         regex = "(?i)Lark|Feishu"
     ),
+    Mega(
+        res = R.drawable.brand_mega,
+        regex = "(?i)Mega"
+    ),
     Meta(
         res = R.drawable.brand_meta,
-        regex = "(?i)Meta|Facebook"
+        regex = "(?i)Meta"
     ),
     Microsoft(
         res = R.drawable.brand_microsoft,
@@ -56,9 +92,25 @@ enum class Brand(
         res = R.drawable.brand_okx,
         regex = "(?i)OKX"
     ),
+    OnlyFans(
+        res = R.drawable.brand_onlyfans,
+        regex = "(?i)OnlyFans"
+    ),
+    OpenAI(
+        res = R.drawable.brand_openai,
+        regex = "(?i)OpenAI"
+    ),
     ORCID(
         res = R.drawable.brand_orcid,
         regex = "(?i)ORCID"
+    ),
+    Patreon(
+        res = R.drawable.brand_patreon,
+        regex = "(?i)Patreon"
+    ),
+    PayPal(
+        res = R.drawable.brand_paypal,
+        regex = "(?i)PayPal"
     ),
     TencentCloud(
         res = R.drawable.brand_tencent_cloud,

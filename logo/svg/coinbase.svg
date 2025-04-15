@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+    xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Coinbase" transform="matrix(26.6562,0,0,26.6562,86.2997,85.5)">
+        <path d="M16,24C11.58,24 8,20.42 8,16C8,11.58 11.58,8 16,8C19.96,8 23.247,10.887 23.88,14.667L31.94,14.667C31.26,6.453 24.387,0 16,0C7.167,0 0,7.167 0,16C0,24.833 7.167,32 16,32C24.387,32 31.26,25.547 31.94,17.333L23.88,17.333C23.247,21.113 19.96,24 16,24Z" style="fill:rgb(0,82,255);fill-rule:nonzero;"/>
+    </g>
+</svg>

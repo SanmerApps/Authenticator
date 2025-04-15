@@ -15,7 +15,7 @@ data class Logo(
             if (logos.contains(name)) return logos[name]
 
             val brand = Brand.entries.firstOrNull {
-                it.regex.toRegex().containsMatchIn(name)
+                name.contains(it.regex.toRegex())
             }
             if (brand != null) {
                 return Logo(
@@ -26,7 +26,7 @@ data class Logo(
             }
 
             val normal = Normal.entries.firstOrNull {
-                it.regex.toRegex().containsMatchIn(name)
+                name.contains(it.regex.toRegex())
             }
             if (normal != null) {
                 return Logo(
