@@ -46,7 +46,7 @@ fun SecurityItem(
                 color = MaterialTheme.colorScheme.outlineVariant,
                 shape = CircleShape
             )
-            .size(45.dp),
+            .size(40.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
