@@ -26,12 +26,12 @@ class NtpViewModel @Inject constructor(
     private val timeRepository: TimeRepository
 ) : ViewModel() {
     private val _ntps = MutableStateFlow(defaultNtps)
-    val ntps get() = _ntps.map { list ->
+    val ntps = _ntps.map { list ->
         list.sortedBy { it.ntpTime.rtt }
     }
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Pending)
-    val syncState get() = _syncState.asStateFlow()
+    val syncState = _syncState.asStateFlow()
 
     init {
         Timber.d("NtpViewModel init")

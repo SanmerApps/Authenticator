@@ -30,7 +30,7 @@ class HomeViewModel @Inject constructor(
     val totp inline get() = loadState.totp
     val isPending inline get() = loadState.isPending
 
-    val time get() = timeRepository.epochSeconds.map { epochSecond ->
+    val time = timeRepository.epochSeconds.map { epochSecond ->
         Instant.ofEpochSecond(epochSecond)
             .atZone(ZoneId.systemDefault())
             .toLocalTime()

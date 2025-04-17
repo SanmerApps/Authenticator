@@ -40,7 +40,7 @@ class ScanViewModel @Inject constructor(
     val cameraController by lazy { LifecycleCameraController(context) }
 
     private val _uri = MutableStateFlow("")
-    val uri get() = _uri.asStateFlow()
+    val uri = _uri.asStateFlow()
 
     init {
         Timber.d("ScanViewModel init")
