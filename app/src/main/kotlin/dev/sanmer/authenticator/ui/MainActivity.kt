@@ -7,7 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 import dev.sanmer.authenticator.ui.main.LockScreen
@@ -36,6 +39,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppTheme {
                         Crossfade(
+                            modifier = Modifier.background(
+                                color = MaterialTheme.colorScheme.background
+                            ),
                             targetState = viewModel.isLocked,
                             animationSpec = tween(400)
                         ) { isLocked ->
