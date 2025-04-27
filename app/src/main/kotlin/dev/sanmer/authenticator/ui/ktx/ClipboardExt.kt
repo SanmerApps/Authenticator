@@ -3,10 +3,10 @@ package dev.sanmer.authenticator.ui.ktx
 import android.content.ClipData
 import android.content.ClipDescription
 import android.os.PersistableBundle
-import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.toClipEntry
 
-fun ClipboardManager.setSensitiveText(
+suspend fun Clipboard.setSensitiveText(
     content: String
 ) {
     val data = ClipData.newPlainText("plain text", content).apply {
@@ -15,5 +15,5 @@ fun ClipboardManager.setSensitiveText(
         }
     }
 
-    setClip(data.toClipEntry())
+    setClipEntry(data.toClipEntry())
 }

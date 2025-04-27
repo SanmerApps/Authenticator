@@ -14,10 +14,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeAndHashItem
 import dev.sanmer.authenticator.viewmodel.EditViewModel
 import dev.sanmer.authenticator.viewmodel.EditViewModel.Value
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditScreen(
@@ -145,11 +147,16 @@ private fun TopBar(
         }
     },
     actions = {
-        val clipboardManager = LocalClipboardManager.current
+        val clipboard = LocalClipboard.current
+        val scope = rememberCoroutineScope()
 
         if (uri.isNotBlank()) {
             IconButton(
-                onClick = { clipboardManager.setSensitiveText(uri) },
+                onClick = {
+                    scope.launch {
+                        clipboard.setSensitiveText(uri)
+                    }
+                },
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.clipboard_text),
