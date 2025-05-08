@@ -89,7 +89,7 @@ private fun AuthItemContent(
         derivedStateOf { Logo.getOrDefault(auth.entity.issuer) }
     }
 
-    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = "")
+    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.now())
 
     Image(
         painter = painterResource(id = logo.res),

@@ -20,4 +20,11 @@ data class TotpImpl(
             counter = it / entity.period
         )
     }
+
+    fun now() = HOTP.otp(
+        hash = entity.hash,
+        secret = secret,
+        digits = entity.digits,
+        counter = epochSeconds.value / entity.period
+    )
 }
