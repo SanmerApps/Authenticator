@@ -24,6 +24,14 @@ enum class Brand(
         res = R.drawable.brand_azure,
         regex = "(?i)Azure"
     ),
+    Binance(
+        res = R.drawable.brand_binance,
+        regex = "(?i)Binance"
+    ),
+    Bybit(
+        res = R.drawable.brand_bybit,
+        regex = "(?i)Bybit"
+    ),
     Cloudflare(
         res = R.drawable.brand_cloudflare,
         regex = "(?i)Cloudflare"
@@ -111,6 +119,10 @@ enum class Brand(
     PayPal(
         res = R.drawable.brand_paypal,
         regex = "(?i)PayPal"
+    ),
+    Pixiv(
+        res = R.drawable.brand_pixiv,
+        regex = "(?i)Pixiv"
     ),
     TencentCloud(
         res = R.drawable.brand_tencent_cloud,
