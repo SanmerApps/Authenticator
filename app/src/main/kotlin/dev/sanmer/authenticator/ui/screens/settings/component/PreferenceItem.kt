@@ -20,7 +20,7 @@ fun PreferenceItem(
             icon = R.drawable.shield,
             title = stringResource(id = R.string.settings_security),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Security())
+                navController.navigateSingleTopTo(Screen.Security)
                 onDismiss()
             }
         )
@@ -29,7 +29,7 @@ fun PreferenceItem(
             icon = R.drawable.timezone,
             title = stringResource(id = R.string.settings_ntp_server),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Ntp())
+                navController.navigateSingleTopTo(Screen.Ntp)
                 onDismiss()
             }
         )

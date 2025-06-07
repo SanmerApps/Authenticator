@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.viewmodel
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,11 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.sanmer.authenticator.model.AuthType
 import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.model.serializer.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
+import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
@@ -26,9 +27,8 @@ class EditViewModel @Inject constructor(
     private val dbRepository: DbRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val data = savedStateHandle.data
-    private val id = data.toLongOrNull()
-    val isEdit = id != null
+    private val edit = savedStateHandle.toRoute<Screen.Edit>()
+    val isEdit = edit.id != -1L
 
     var input by mutableStateOf(Input())
         private set
@@ -40,13 +40,13 @@ class EditViewModel @Inject constructor(
 
     init {
         Timber.d("EditViewModel init")
-        updateFromUri(data)
+        updateFromUri(edit.uri)
         dataObserver()
     }
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getTotpDecryptedByIdAsFlow(id ?: Long.MIN_VALUE)
+            dbRepository.getTotpDecryptedByIdAsFlow(edit.id)
                 .map { it.totp }
                 .collect { totp ->
                     update { Input(totp) }
@@ -83,7 +83,7 @@ class EditViewModel @Inject constructor(
         if (isAllOk()) {
             viewModelScope.launch {
                 when {
-                    id != null -> dbRepository.updateTotp(id, input.auth)
+                    isEdit -> dbRepository.updateTotp(edit.id, input.auth)
                     else -> dbRepository.insertTotp(input.auth)
                 }
                 block()
@@ -127,10 +127,5 @@ class EditViewModel @Inject constructor(
 
     private inline fun Value.ok(value: String, block: (Value, Boolean) -> Unit) {
         block(this, ok(value))
-    }
-
-    companion object Default {
-        private val SavedStateHandle.data: String
-            inline get() = checkNotNull(Uri.decode(get("data")))
     }
 }

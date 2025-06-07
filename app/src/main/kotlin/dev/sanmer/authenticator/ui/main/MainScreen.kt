@@ -1,22 +1,9 @@
 package dev.sanmer.authenticator.ui.main
 
-import android.net.Uri
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import dev.sanmer.authenticator.ui.screens.edit.EditScreen
 import dev.sanmer.authenticator.ui.screens.encode.EncodeScreen
 import dev.sanmer.authenticator.ui.screens.home.HomeScreen
@@ -25,6 +12,7 @@ import dev.sanmer.authenticator.ui.screens.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screens.security.SecurityScreen
 import dev.sanmer.authenticator.ui.screens.settings.SettingsScreen
 import dev.sanmer.authenticator.ui.screens.trash.TrashScreen
+import kotlinx.serialization.Serializable
 
 @Composable
 fun MainScreen() {
@@ -32,87 +20,83 @@ fun MainScreen() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home()
+        startDestination = Screen.Home
     ) {
-        Screen.Home(navController).addTo(this)
-        Screen.Settings(navController).addTo(this)
-        Screen.Edit(navController).addTo(this)
-        Screen.Scan(navController).addTo(this)
-        Screen.Trash(navController).addTo(this)
-        Screen.Encode(navController).addTo(this)
-        Screen.Ntp(navController).addTo(this)
-        Screen.Security(navController).addTo(this)
+        composable<Screen.Home> {
+            HomeScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Settings> {
+            SettingsScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Edit> {
+            EditScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Scan> {
+            ScanScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Trash> {
+            TrashScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Encode> {
+            EncodeScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Ntp> {
+            NtpScreen(
+                navController = navController
+            )
+        }
+
+        composable<Screen.Security> {
+            SecurityScreen(
+                navController = navController
+            )
+        }
     }
 }
 
-sealed class Screen(
-    private val route: String,
-    private val content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
-    private val arguments: List<NamedNavArgument> = emptyList(),
-    private val enterTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) = { fadeIn() },
-    private val exitTransition: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) = { fadeOut() },
-) {
-    fun addTo(builder: NavGraphBuilder) = builder.composable(
-        route = this@Screen.route,
-        arguments = this@Screen.arguments,
-        enterTransition = this@Screen.enterTransition,
-        exitTransition = this@Screen.exitTransition,
-        content = this@Screen.content
-    )
+sealed class Screen {
+    @Serializable
+    data object Home : Screen()
 
-    @Suppress("FunctionName")
-    companion object Routes {
-        fun Home() = "Home"
-        fun Settings() = "Settings"
-        fun Edit(data: Any = " ", encode: Boolean = true) =
-            if (encode) "Edit/${Uri.encode(data.toString())}" else "Edit/${data}"
-        fun Scan() = "Scan"
-        fun Trash() = "Trash"
-        fun Encode() = "Encode"
-        fun Ntp() = "Ntp"
-        fun Security() = "Security"
-    }
+    @Serializable
+    data object Settings : Screen()
 
-    class Home(navController: NavController) : Screen(
-        route = Home(),
-        content = { HomeScreen(navController = navController) }
-    )
+    @Serializable
+    data class Edit(
+        val id: Long,
+        val uri: String
+    ) : Screen()
 
-    class Settings(navController: NavController) : Screen(
-        route = Settings(),
-        content = { SettingsScreen(navController = navController) }
-    )
+    @Serializable
+    data object Scan : Screen()
 
-    class Edit(navController: NavController) : Screen(
-        route = Edit("{data}", false),
-        content = { EditScreen(navController = navController) },
-        arguments = listOf(
-            navArgument("data") { type = NavType.StringType }
-        )
-    )
+    @Serializable
+    data object Trash : Screen()
 
-    class Scan(navController: NavController) : Screen(
-        route = Scan(),
-        content = { ScanScreen(navController = navController) }
-    )
+    @Serializable
+    data object Encode : Screen()
 
-    class Trash(navController: NavController) : Screen(
-        route = Trash(),
-        content = { TrashScreen(navController = navController) }
-    )
+    @Serializable
+    data object Ntp : Screen()
 
-    class Encode(navController: NavController) : Screen(
-        route = Encode(),
-        content = { EncodeScreen(navController = navController) }
-    )
-
-    class Ntp(navController: NavController) : Screen(
-        route = Ntp(),
-        content = { NtpScreen(navController = navController) }
-    )
-
-    class Security(navController: NavController) : Screen(
-        route = Security(),
-        content = { SecurityScreen(navController = navController) }
-    )
+    @Serializable
+    data object Security : Screen()
 }

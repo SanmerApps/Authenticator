@@ -39,7 +39,7 @@ fun AuthList(
             AuthItem(
                 auth = it,
                 enabled = false,
-                onEdit = { navController.navigateSingleTopTo(Screen.Edit(it.entity.id)) },
+                onEdit = { navController.navigateSingleTopTo(Screen.Edit(it.entity.id, "")) },
                 onDelete = { recycle(it.entity) }
             )
         }

@@ -55,7 +55,7 @@ fun ScanScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(uri) {
-        if (uri.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(uri))
+        if (uri.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(-1, uri))
         onDispose { viewModel.rewind() }
     }
 

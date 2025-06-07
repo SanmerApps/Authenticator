@@ -48,7 +48,7 @@ fun ToolItem(
             icon = R.drawable.a_b,
             title = stringResource(id = R.string.settings_encode_decode),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Encode())
+                navController.navigateSingleTopTo(Screen.Encode)
                 onDismiss()
             }
         )

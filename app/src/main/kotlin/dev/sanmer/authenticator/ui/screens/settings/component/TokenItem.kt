@@ -20,7 +20,7 @@ fun TokenItem(
             icon = R.drawable.pencil_plus,
             title = stringResource(id = R.string.settings_enter),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Edit())
+                navController.navigateSingleTopTo(Screen.Edit(-1, ""))
                 onDismiss()
             }
         )
@@ -29,7 +29,7 @@ fun TokenItem(
             icon = R.drawable.scan,
             title = stringResource(id = R.string.settings_scan),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Scan())
+                navController.navigateSingleTopTo(Screen.Scan)
                 onDismiss()
             }
         )
