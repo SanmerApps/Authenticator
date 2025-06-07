@@ -77,7 +77,7 @@ fun HomeScreen(
             if (viewModel.totp.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.key,
-                    text = stringResource(id = R.string.home_empty),
+                    text = R.string.home_empty,
                     modifier = Modifier.padding(contentPadding)
                 )
             }

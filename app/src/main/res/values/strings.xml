@@ -68,8 +68,4 @@
     <string name="ntp_offset">Offset: %1$s</string>
     <string name="ntp_timeout">Timeout</string>
 
-    <!-- Message -->
-    <string name="loading">Loading…</string>
-    <string name="unknown_error">Unknown error</string>
-
 </resources>

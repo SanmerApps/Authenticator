@@ -68,8 +68,4 @@
     <string name="ntp_offset">偏移: %1$s</string>
     <string name="ntp_timeout">超时</string>
 
-    <!-- Message -->
-    <string name="loading">加载中…</string>
-    <string name="unknown_error">未知错误</string>
-
 </resources>

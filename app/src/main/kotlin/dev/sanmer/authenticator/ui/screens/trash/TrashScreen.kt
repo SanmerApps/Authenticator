@@ -50,7 +50,7 @@ fun TrashScreen(
             if (viewModel.totp.isEmpty() && !viewModel.isPending) {
                 PageIndicator(
                     icon = R.drawable.trash,
-                    text = stringResource(id = R.string.trash_empty),
+                    text = R.string.trash_empty,
                     modifier = Modifier.padding(contentPadding)
                 )
             }
