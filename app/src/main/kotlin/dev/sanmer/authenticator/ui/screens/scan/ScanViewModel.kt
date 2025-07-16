@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.scan
 
 import android.Manifest
 import android.content.Context
@@ -13,21 +13,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.sanmer.authenticator.Logger
+import dev.sanmer.authenticator.annotation.ApplicationContext
 import dev.sanmer.authenticator.compat.PermissionCompat
 import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
-import javax.inject.Inject
 
-@HiltViewModel
-class ScanViewModel @Inject constructor(
-    @param:ApplicationContext private val context: Context
+class ScanViewModel(
+    @ApplicationContext private val context: Context
 ) : ViewModel(), ImageAnalysis.Analyzer {
     private val _isAllowed: Boolean
         get() = PermissionCompat.checkPermission(
@@ -42,8 +39,10 @@ class ScanViewModel @Inject constructor(
     private val _uri = MutableStateFlow("")
     val uri = _uri.asStateFlow()
 
+    private val logger = Logger.Android("ScanViewModel")
+
     init {
-        Timber.d("ScanViewModel init")
+        logger.d("init")
     }
 
     private fun requestPermission(context: Context, callback: () -> Unit) {
@@ -103,7 +102,7 @@ class ScanViewModel @Inject constructor(
         }.onSuccess { content ->
             _uri.update { content }
         }.onFailure {
-            Timber.e(it)
+            logger.e(it)
         }
     }
 

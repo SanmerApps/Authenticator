@@ -6,16 +6,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.finishActivity
 import dev.sanmer.authenticator.ui.screens.authorize.component.PasswordTextField
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingBottomSheet
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CryptoScreen(
-    viewModel: CryptoViewModel = hiltViewModel()
+    viewModel: CryptoViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
 

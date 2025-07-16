@@ -15,15 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.finishActivity
 import dev.sanmer.authenticator.ui.AuthorizeActivity
-import dev.sanmer.authenticator.viewmodel.MainViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LockScreen(
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
 

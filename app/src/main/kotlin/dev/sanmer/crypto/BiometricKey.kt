@@ -11,11 +11,11 @@ import androidx.biometric.BiometricPrompt
 import androidx.biometric.registerForAuthenticationResult
 import androidx.fragment.app.FragmentActivity
 import dev.sanmer.authenticator.BuildConfig
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -47,12 +47,12 @@ class BiometricKey(
             val request = activity.registerForAuthenticationResult { result ->
                 when (result) {
                     is AuthenticationResult.Error -> {
-                        Timber.w("onAuthenticationError(${result.errorCode}): ${result.errString}")
+                        logger.w("onAuthenticationError(${result.errorCode}): ${result.errString}")
                         continuation.resumeWithException(IllegalStateException("${result.errString}"))
                     }
 
                     is AuthenticationResult.Success -> {
-                        Timber.d("onAuthenticationSucceeded: ${result.authType}")
+                        logger.d("onAuthenticationSucceeded: ${result.authType}")
                         continuation.resume(result)
                     }
                 }
@@ -90,6 +90,8 @@ class BiometricKey(
     }
 
     companion object Default {
+        private val logger = Logger.Android("BiometricKey")
+
         fun canAuthenticate(context: Context) = BiometricManager.from(context)
             .canAuthenticate(Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
 
@@ -99,9 +101,9 @@ class BiometricKey(
                 .generateKey()
 
         private fun getSecretKey() = KeyStore.getInstance("AndroidKeyStore")
-                .apply { load(null) }
-                .getKey(BuildConfig.APPLICATION_ID, null)
-                .let { requireNotNull(it) { "Expect key(alias=${BuildConfig.APPLICATION_ID})" } }
+            .apply { load(null) }
+            .getKey(BuildConfig.APPLICATION_ID, null)
+            .let { requireNotNull(it) { "Expect key(alias=${BuildConfig.APPLICATION_ID})" } }
 
         fun new(): SecretKey = generateSecretKey(
             KeyGenParameterSpec.Builder(
@@ -119,10 +121,12 @@ class BiometricKey(
         suspend fun SessionKey.getKeyEncryptedByBiometric(activity: FragmentActivity) =
             BiometricKey(activity).encrypt(key.encoded)
 
-        suspend fun SessionKey.Default.decryptKeyByBiometric(key: ByteArray, activity: FragmentActivity) =
-            SessionKey(
-                key = BiometricKey(activity).decrypt(key).toSecretKey()
-            )
+        suspend fun SessionKey.Default.decryptKeyByBiometric(
+            key: ByteArray,
+            activity: FragmentActivity
+        ) = SessionKey(
+            key = BiometricKey(activity).decrypt(key).toSecretKey()
+        )
 
     }
 }

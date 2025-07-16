@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.crypto
 
 import android.content.Intent
 import androidx.compose.runtime.derivedStateOf
@@ -7,19 +7,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.sanmer.authenticator.ui.CryptoActivity.Action
+import dev.sanmer.authenticator.Logger
+import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.authenticator.ui.CryptoActivity.Default.bypass
 import dev.sanmer.authenticator.ui.CryptoActivity.Default.input
 import dev.sanmer.crypto.PasswordKey
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class CryptoViewModel @Inject constructor() : ViewModel() {
+class CryptoViewModel : ViewModel() {
     private var data = emptyList<String>()
-    private var action by mutableStateOf(Action.Encrypt)
+    private var action by mutableStateOf(CryptoActivity.Action.Encrypt)
     private var bypass = true
 
     var state by mutableStateOf(State.Pending)
@@ -29,13 +26,15 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
         private set
 
     val isSkip by derivedStateOf { password.isEmpty() && bypass }
-    val isEncrypt by lazy { action == Action.Encrypt }
-    val isDecrypt by lazy { action == Action.Decrypt }
+    val isEncrypt by lazy { action == CryptoActivity.Action.Encrypt }
+    val isDecrypt by lazy { action == CryptoActivity.Action.Decrypt }
 
     val output get() = if (state.isSucceed) data else emptyList()
 
+    private val logger = Logger.Android("CryptoViewModel")
+
     init {
-        Timber.d("TextCryptoViewModel init")
+        logger.d("init")
     }
 
     fun crypto() {
@@ -47,11 +46,11 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
 
         viewModelScope.launch {
             runCatching {
-                val key = PasswordKey.new(password)
+                val key = PasswordKey.Default.new(password)
                 state = State.Running
                 data = when (action) {
-                    Action.Encrypt -> data.map { key.encrypt(it) }
-                    Action.Decrypt -> data.map { key.decrypt(it) }
+                    CryptoActivity.Action.Encrypt -> data.map { key.encrypt(it) }
+                    CryptoActivity.Action.Decrypt -> data.map { key.decrypt(it) }
                 }
                 state = State.Succeed
             }.onFailure {
@@ -62,7 +61,7 @@ class CryptoViewModel @Inject constructor() : ViewModel() {
 
     fun updateFromIntent(getIntent: () -> Intent) {
         val intent = getIntent()
-        action = Action(intent.action)
+        action = CryptoActivity.Action.Default(intent.action)
         bypass = intent.bypass
         data = intent.input.toList()
     }

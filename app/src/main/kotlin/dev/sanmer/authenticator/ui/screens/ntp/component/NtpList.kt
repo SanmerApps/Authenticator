@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.provider.LocalPreference
-import dev.sanmer.authenticator.viewmodel.NtpViewModel
+import dev.sanmer.authenticator.ui.screens.ntp.NtpViewModel
 
 @Composable
 fun NtpList(

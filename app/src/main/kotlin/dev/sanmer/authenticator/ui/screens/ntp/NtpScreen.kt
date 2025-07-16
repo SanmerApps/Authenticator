@@ -30,16 +30,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.screens.ntp.component.NtpList
-import dev.sanmer.authenticator.viewmodel.NtpViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NtpScreen(
-    viewModel: NtpViewModel = hiltViewModel(),
+    viewModel: NtpViewModel = koinViewModel(),
     navController: NavController
 ) {
     val ntps by viewModel.ntps.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -78,7 +77,7 @@ fun NtpScreen(
 @Composable
 private fun TopBar(
     syncState: NtpViewModel.SyncState,
-    onSync: () ->  Unit,
+    onSync: () -> Unit,
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(

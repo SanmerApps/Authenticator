@@ -7,17 +7,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
-import dagger.hilt.android.AndroidEntryPoint
 import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeScreen
+import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeViewModel
 import dev.sanmer.authenticator.ui.theme.AppTheme
-import dev.sanmer.authenticator.viewmodel.AuthorizeViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
 
-@AndroidEntryPoint
 class AuthorizeActivity : FragmentActivity() {
-    private val viewModel: AuthorizeViewModel by viewModels()
+    private val viewModel by viewModel<AuthorizeViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +60,8 @@ class AuthorizeActivity : FragmentActivity() {
         private const val ACTION_CHANGE_PASSWORD = "dev.sanmer.authenticator.action.CHANGE_PASSWORD"
         private const val ACTION_REMOVE_PASSWORD = "dev.sanmer.authenticator.action.REMOVE_PASSWORD"
         private const val ACTION_SETUP_BIOMETRIC = "dev.sanmer.authenticator.action.SETUP_BIOMETRIC"
-        private const val ACTION_REMOVE_BIOMETRIC = "dev.sanmer.authenticator.action.REMOVE_BIOMETRIC"
+        private const val ACTION_REMOVE_BIOMETRIC =
+            "dev.sanmer.authenticator.action.REMOVE_BIOMETRIC"
         private const val ACTION_AUTH = "dev.sanmer.authenticator.action.AUTH"
         const val EXTRA_SUCCEED = "dev.sanmer.authenticator.extra.SUCCEED"
 

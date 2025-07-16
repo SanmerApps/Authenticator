@@ -4,13 +4,22 @@ import android.app.Application
 import android.util.Log
 import androidx.camera.camera2.Camera2Config
 import androidx.camera.core.CameraXConfig
-import dagger.hilt.android.HiltAndroidApp
-import timber.log.Timber
+import dev.sanmer.authenticator.di.DataStore
+import dev.sanmer.authenticator.di.Database
+import dev.sanmer.authenticator.di.Repositories
+import dev.sanmer.authenticator.di.ViewModels
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
-@HiltAndroidApp
 class App : Application(), CameraXConfig.Provider {
-    init {
-        Timber.plant(Timber.DebugTree())
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@App)
+            modules(DataStore, Database, Repositories, ViewModels)
+        }
     }
 
     override fun getCameraXConfig() =

@@ -1,8 +1,8 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.ntp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.repository.PreferenceRepository
 import dev.sanmer.authenticator.repository.TimeRepository
@@ -16,12 +16,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 import kotlin.time.Duration
 
-@HiltViewModel
-class NtpViewModel @Inject constructor(
+class NtpViewModel(
     private val preferenceRepository: PreferenceRepository,
     private val timeRepository: TimeRepository
 ) : ViewModel() {
@@ -33,8 +30,10 @@ class NtpViewModel @Inject constructor(
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Pending)
     val syncState = _syncState.asStateFlow()
 
+    private val logger = Logger.Android("NtpViewModel")
+
     init {
-        Timber.d("NtpViewModel init")
+        logger.d("init")
         timeObserver()
         syncAll()
     }
@@ -64,7 +63,12 @@ class NtpViewModel @Inject constructor(
                         timeRepository.sync(preference)
                     } else {
                         sync(ntp.server)
-                    }.getOrDefault(NtpServer.NtpTime(Duration.INFINITE, Duration.ZERO))
+                    }.getOrDefault(
+                        NtpServer.NtpTime(
+                            Duration.Companion.INFINITE,
+                            Duration.Companion.ZERO
+                        )
+                    )
 
                     _syncState.update { SyncState.Updating(it.size, it.finished + 1) }
                     _ntps.update {
@@ -87,9 +91,9 @@ class NtpViewModel @Inject constructor(
         runCatching {
             server.sync()
         }.onSuccess {
-            Timber.d("ntp(${server.address}): $it")
+            logger.d("ntp(${server.address}): $it")
         }.onFailure {
-            Timber.e(it, "address = ${server.address}")
+            logger.e(it)
         }
 
     data class NtpCompat(
@@ -107,15 +111,18 @@ class NtpViewModel @Inject constructor(
             override val size = 1
             override val finished = -1
         }
+
         data class Ready(
             override val size: Int
         ) : SyncState() {
             override val finished = 0
         }
+
         data class Updating(
             override val size: Int,
             override val finished: Int
         ) : SyncState()
+
         data class Finished(
             override val size: Int,
             override val finished: Int

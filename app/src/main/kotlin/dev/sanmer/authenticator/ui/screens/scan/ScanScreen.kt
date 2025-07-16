@@ -35,19 +35,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
-import dev.sanmer.authenticator.viewmodel.ScanViewModel
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ScanScreen(
-    viewModel: ScanViewModel = hiltViewModel(),
+    viewModel: ScanViewModel = koinViewModel(),
     navController: NavController
 ) {
     val uri by viewModel.uri.collectAsStateWithLifecycle()

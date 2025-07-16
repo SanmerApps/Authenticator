@@ -26,7 +26,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
@@ -36,12 +35,12 @@ import dev.sanmer.authenticator.ui.ktx.isScrollingUp
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.authenticator.ui.screens.home.component.AuthList
-import dev.sanmer.authenticator.viewmodel.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalTime
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
     navController: NavController
 ) {
     val time by viewModel.time.collectAsStateWithLifecycle()

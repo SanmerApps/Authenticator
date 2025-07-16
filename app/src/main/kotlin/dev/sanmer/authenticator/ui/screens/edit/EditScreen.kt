@@ -22,21 +22,20 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.setSensitiveText
+import dev.sanmer.authenticator.ui.screens.edit.EditViewModel.Value
 import dev.sanmer.authenticator.ui.screens.edit.component.DigitsAndPeriodItem
 import dev.sanmer.authenticator.ui.screens.edit.component.SecretItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeAndHashItem
-import dev.sanmer.authenticator.viewmodel.EditViewModel
-import dev.sanmer.authenticator.viewmodel.EditViewModel.Value
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditScreen(
-    viewModel: EditViewModel = hiltViewModel(),
+    viewModel: EditViewModel = koinViewModel(),
     navController: NavController
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()

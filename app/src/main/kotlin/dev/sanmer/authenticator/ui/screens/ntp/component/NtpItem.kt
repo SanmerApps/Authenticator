@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.LabelText
 import dev.sanmer.authenticator.ui.ktx.surface
-import dev.sanmer.authenticator.viewmodel.NtpViewModel
+import dev.sanmer.authenticator.ui.screens.ntp.NtpViewModel
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 

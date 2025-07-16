@@ -35,14 +35,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.viewmodel.EncodeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EncodeScreen(
-    viewModel: EncodeViewModel = hiltViewModel(),
+    viewModel: EncodeViewModel = koinViewModel(),
     navController: NavController
 ) {
     val configuration = LocalConfiguration.current

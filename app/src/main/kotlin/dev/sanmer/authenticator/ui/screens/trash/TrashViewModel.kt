@@ -1,19 +1,16 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.trash
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.repository.DbRepository
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class TrashViewModel @Inject constructor(
+class TrashViewModel(
     private val dbRepository: DbRepository
 ) : ViewModel() {
     var loadState by mutableStateOf<LoadState>(LoadState.Pending)
@@ -21,8 +18,10 @@ class TrashViewModel @Inject constructor(
     val totp inline get() = loadState.totp
     val isPending inline get() = loadState.isPending
 
+    private val logger = Logger.Android("TrashViewModel")
+
     init {
-        Timber.d("TrashViewModel init")
+        logger.d("init")
         dataObserver()
     }
 

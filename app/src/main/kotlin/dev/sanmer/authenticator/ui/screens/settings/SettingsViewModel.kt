@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.settings
 
 import android.content.Context
 import android.net.Uri
@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.model.serializer.TotpAuth
@@ -16,13 +16,10 @@ import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val dbRepository: DbRepository
 ) : ViewModel() {
     private var output = emptyList<TotpAuth>()
@@ -34,8 +31,10 @@ class SettingsViewModel @Inject constructor(
     var bottomSheet by mutableStateOf(BottomSheet.Closed)
         private set
 
+    private val logger = Logger.Android("SettingsViewModel")
+
     init {
-        Timber.d("SettingsViewModel init")
+        logger.d("init")
         dataObserver()
     }
 
@@ -66,7 +65,7 @@ class SettingsViewModel @Inject constructor(
                 output = totp
                 callback()
             } else {
-                CryptoActivity.encrypt(
+                CryptoActivity.Default.encrypt(
                     context = context,
                     input = totp.map { it.secret }
                 ) { encryptedSecrets ->
@@ -95,7 +94,7 @@ class SettingsViewModel @Inject constructor(
                     input = auths
                     callback()
                 } else {
-                    CryptoActivity.decrypt(
+                    CryptoActivity.Default.decrypt(
                         context = context,
                         input = auths.map { it.secret },
                         bypass = bypass
@@ -107,7 +106,7 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                Timber.e(it)
+                logger.e(it)
             }
         }
     }
@@ -139,7 +138,7 @@ class SettingsViewModel @Inject constructor(
                 val cr = context.contentResolver
                 checkNotNull(cr.openOutputStream(uri)).use { fileType.decodeTo(auths, it) }
             }.onFailure {
-                Timber.e(it)
+                logger.e(it)
             }
         }
     }
@@ -186,11 +185,10 @@ class SettingsViewModel @Inject constructor(
             override val bypass = true
 
             override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthTxt.decodeFrom(input).totp
+                return AuthTxt.Default.decodeFrom(input).totp
             }
 
             override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
-                Timber.d("auths: ${auths.size}")
                 AuthTxt(auths).encodeTo(output)
             }
         }
@@ -199,7 +197,7 @@ class SettingsViewModel @Inject constructor(
             override val bypass = false
 
             override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthJson.decodeFrom(input).totp
+                return AuthJson.Default.decodeFrom(input).totp
             }
 
             override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
