@@ -4,8 +4,7 @@ import androidx.annotation.DrawableRes
 
 @Suppress("SpellCheckingInspection")
 enum class Brand(
-    @DrawableRes
-    val res: Int,
+    @field:DrawableRes val res: Int,
     internal val regex: String
 ) {
     Aliyun(

@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.authorize
 
 import android.content.Intent
 import androidx.compose.runtime.getValue
@@ -7,11 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.repository.PreferenceRepository
 import dev.sanmer.authenticator.repository.SecureRepository
-import dev.sanmer.authenticator.ui.AuthorizeActivity.Action
-import dev.sanmer.authenticator.viewmodel.MainViewModel.LoadState
+import dev.sanmer.authenticator.ui.AuthorizeActivity
+import dev.sanmer.authenticator.ui.main.MainViewModel
 import dev.sanmer.crypto.BiometricKey
 import dev.sanmer.crypto.BiometricKey.Default.decryptKeyByBiometric
 import dev.sanmer.crypto.BiometricKey.Default.getKeyEncryptedByBiometric
@@ -20,36 +20,35 @@ import dev.sanmer.encoding.decodeBase64
 import dev.sanmer.encoding.encodeBase64
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class AuthorizeViewModel @Inject constructor(
+class AuthorizeViewModel(
     private val preferenceRepository: PreferenceRepository,
     private val secureRepository: SecureRepository
 ) : ViewModel() {
-    var action by mutableStateOf(Action.Auth)
+    var action by mutableStateOf(AuthorizeActivity.Action.Auth)
         private set
 
     var type by mutableStateOf<Type>(Type.PasswordPending)
         private set
 
-    var loadState by mutableStateOf<LoadState>(LoadState.Pending)
+    var loadState by mutableStateOf<MainViewModel.LoadState>(MainViewModel.LoadState.Pending)
         private set
     private val preference inline get() = loadState.preference
 
     var isSupportedBiometric by mutableStateOf(false)
         private set
 
+    private val logger = Logger.Android("AuthorizeViewModel")
+
     init {
-        Timber.d("AuthorizeViewModel init")
+        logger.d("init")
         preferenceObserver()
     }
 
     private fun preferenceObserver() {
         viewModelScope.launch {
             preferenceRepository.data.collect {
-                loadState = LoadState.Ready(it)
+                loadState = MainViewModel.LoadState.Ready(it)
                 if (it.isBiometric) {
                     type = Type.BiometricPending
                     isSupportedBiometric = true
@@ -60,20 +59,20 @@ class AuthorizeViewModel @Inject constructor(
 
     fun updateFromIntent(getIntent: () -> Intent) {
         val intent = getIntent()
-        action = Action(intent.action)
+        action = AuthorizeActivity.Action.Default(intent.action)
     }
 
     fun setupPassword(new: String) {
         viewModelScope.launch {
             runCatching {
-                val sessionKey = SessionKey.new()
+                val sessionKey = SessionKey.Default.new()
                 val newKey = sessionKey.getKeyEncryptedByPassword(new).encodeBase64()
                 preferenceRepository.setKeyEncryptedByPassword(newKey)
                 secureRepository.setSessionKey(sessionKey)
                 secureRepository.encryptSecret(sessionKey)
                 type = Type.PasswordSucceed
             }.onFailure {
-                Timber.w(it)
+                logger.w(it)
             }
         }
     }
@@ -87,17 +86,17 @@ class AuthorizeViewModel @Inject constructor(
             val key = preference.keyEncryptedByPassword
             runCatching {
                 callback(
-                    SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
+                    SessionKey.Default.decryptKeyByPassword(key.decodeBase64(), current)
                 )
             }.onFailure {
                 type = Type.PasswordFailed
-                Timber.w(it)
+                logger.w(it)
             }
         }
     }
 
     fun changePassword(current: String, new: String) = checkPassword(current) { sessionKey ->
-        val newSessionKey = SessionKey.new()
+        val newSessionKey = SessionKey.Default.new()
         val newKey = newSessionKey.getKeyEncryptedByPassword(new).encodeBase64()
         preferenceRepository.setKeyEncryptedByPassword(newKey)
         preferenceRepository.setKeyEncryptedByBiometric("")
@@ -119,13 +118,13 @@ class AuthorizeViewModel @Inject constructor(
         activity: FragmentActivity
     ) = checkPassword(current) { sessionKey ->
         runCatching {
-            BiometricKey.new()
+            BiometricKey.Default.new()
             val key = sessionKey.getKeyEncryptedByBiometric(activity).encodeBase64()
             preferenceRepository.setKeyEncryptedByBiometric(key)
             type = Type.BiometricSucceed
         }.onFailure {
             type = Type.BiometricFailed
-            Timber.w(it)
+            logger.w(it)
         }
     }
 
@@ -141,12 +140,12 @@ class AuthorizeViewModel @Inject constructor(
             val key = preference.keyEncryptedByPassword
             runCatching {
                 secureRepository.setSessionKey(
-                    SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
+                    SessionKey.Default.decryptKeyByPassword(key.decodeBase64(), current)
                 )
                 type = Type.PasswordSucceed
             }.onFailure {
                 type = Type.PasswordFailed
-                Timber.w(it)
+                logger.w(it)
             }
         }
     }
@@ -156,9 +155,9 @@ class AuthorizeViewModel @Inject constructor(
     }
 
     fun loadSessionKeyByBiometric(activity: FragmentActivity) {
-        if (action != Action.Auth) return
+        if (action != AuthorizeActivity.Action.Auth) return
         viewModelScope.launch {
-            if (!BiometricKey.canAuthenticate(activity)) {
+            if (!BiometricKey.Default.canAuthenticate(activity)) {
                 isSupportedBiometric = false
                 return@launch
             }
@@ -166,11 +165,11 @@ class AuthorizeViewModel @Inject constructor(
             runCatching {
                 val key = preference.keyEncryptedByBiometric.decodeBase64()
                 secureRepository.setSessionKey(
-                    SessionKey.decryptKeyByBiometric(key, activity)
+                    SessionKey.Default.decryptKeyByBiometric(key, activity)
                 )
                 type = Type.BiometricSucceed
             }.onFailure {
-                Timber.w(it)
+                logger.w(it)
                 type = Type.PasswordPending
             }
         }

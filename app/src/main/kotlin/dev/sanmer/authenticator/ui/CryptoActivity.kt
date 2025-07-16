@@ -8,16 +8,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
-import dagger.hilt.android.AndroidEntryPoint
 import dev.sanmer.authenticator.ui.screens.crypto.CryptoScreen
+import dev.sanmer.authenticator.ui.screens.crypto.CryptoViewModel
 import dev.sanmer.authenticator.ui.theme.AppTheme
-import dev.sanmer.authenticator.viewmodel.CryptoViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
 
-@AndroidEntryPoint
 class CryptoActivity : ComponentActivity() {
-    private val viewModel: CryptoViewModel by viewModels()
+    private val viewModel by viewModel<CryptoViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

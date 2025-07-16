@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.model.serializer.AuthJson
 import dev.sanmer.authenticator.model.serializer.AuthTxt
-import dev.sanmer.authenticator.viewmodel.SettingsViewModel.FileType
+import dev.sanmer.authenticator.ui.screens.settings.SettingsViewModel.FileType
 
 @Composable
 fun DatabaseItem(

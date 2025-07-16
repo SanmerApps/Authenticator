@@ -3,8 +3,7 @@ package dev.sanmer.logo
 import androidx.annotation.DrawableRes
 
 data class Logo(
-    @DrawableRes
-    val res: Int,
+    @field:DrawableRes val res: Int,
     val name: String,
     val refillable: Boolean
 ) {

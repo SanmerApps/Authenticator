@@ -4,7 +4,6 @@ import java.time.Instant
 plugins {
     alias(libs.plugins.self.application)
     alias(libs.plugins.self.compose)
-    alias(libs.plugins.self.hilt)
     alias(libs.plugins.self.room)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -100,13 +99,13 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.datastore.core)
-    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.protobuf)
-    implementation(libs.timber)
 }

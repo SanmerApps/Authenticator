@@ -3,8 +3,7 @@ package dev.sanmer.logo
 import androidx.annotation.DrawableRes
 
 enum class Normal(
-    @DrawableRes
-    val res: Int,
+    @field:DrawableRes val res: Int,
     internal val regex: String
 ) {
     Cloud(

@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.edit
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -8,7 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.model.AuthType
 import dev.sanmer.authenticator.model.serializer.AuthTxt
 import dev.sanmer.authenticator.model.serializer.TotpAuth
@@ -19,11 +19,8 @@ import dev.sanmer.otp.HOTP
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class EditViewModel @Inject constructor(
+class EditViewModel(
     private val dbRepository: DbRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -38,8 +35,10 @@ class EditViewModel @Inject constructor(
 
     private val result = mutableStateMapOf<Value, Boolean>()
 
+    private val logger = Logger.Android("EditViewModel")
+
     init {
-        Timber.d("EditViewModel init")
+        logger.d("init")
         updateFromUri(edit.uri)
         dataObserver()
     }
@@ -64,14 +63,14 @@ class EditViewModel @Inject constructor(
 
     fun isError(value: Value) = !(result[value] ?: true)
 
-   private fun updateFromUri(uriString: String) {
+    private fun updateFromUri(uriString: String) {
         if (!uriString.isOtpUri()) return
         runCatching {
-            AuthTxt.parse(uriString)
+            AuthTxt.Default.parse(uriString)
         }.onSuccess { totp ->
             update { Input(totp) }
         }.onFailure {
-            Timber.e(it, "uri = $uriString")
+            logger.e(it)
         }
     }
 
@@ -109,14 +108,15 @@ class EditViewModel @Inject constructor(
             period = auth.period.toString()
         )
 
-        val auth inline get() = TotpAuth(
-            name = name.trim(),
-            issuer = issuer.trim(),
-            secret = secret.replace("\\s+".toRegex(), ""),
-            hash = hash,
-            digits = digits.toIntOrNull() ?: 6,
-            period = period.toLongOrNull() ?: 30
-        )
+        val auth
+            inline get() = TotpAuth(
+                name = name.trim(),
+                issuer = issuer.trim(),
+                secret = secret.replace("\\s+".toRegex(), ""),
+                hash = hash,
+                digits = digits.toIntOrNull() ?: 6,
+                period = period.toLongOrNull() ?: 30
+            )
     }
 
     enum class Value(val ok: (String) -> Boolean) {

@@ -17,16 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.screens.trash.component.AuthList
-import dev.sanmer.authenticator.viewmodel.TrashViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrashScreen(
-    viewModel: TrashViewModel = hiltViewModel(),
+    viewModel: TrashViewModel = koinViewModel(),
     navController: NavController
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()

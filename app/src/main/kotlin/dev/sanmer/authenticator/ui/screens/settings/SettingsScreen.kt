@@ -27,25 +27,24 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.viewUrl
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.main.Screen
+import dev.sanmer.authenticator.ui.screens.settings.SettingsViewModel.BottomSheet
 import dev.sanmer.authenticator.ui.screens.settings.component.DatabaseItem
 import dev.sanmer.authenticator.ui.screens.settings.component.PreferenceItem
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingIcon
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingItem
 import dev.sanmer.authenticator.ui.screens.settings.component.TokenItem
 import dev.sanmer.authenticator.ui.screens.settings.component.ToolItem
-import dev.sanmer.authenticator.viewmodel.SettingsViewModel
-import dev.sanmer.authenticator.viewmodel.SettingsViewModel.BottomSheet
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel(),
+    viewModel: SettingsViewModel = koinViewModel(),
     navController: NavController
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -56,6 +55,7 @@ fun SettingsScreen(
             onDismiss = viewModel::closeBottomSheet,
             navController = navController,
         )
+
         BottomSheet.Database -> DatabaseItem(
             onDismiss = viewModel::closeBottomSheet,
             isEmpty = viewModel.isEmpty,
@@ -63,12 +63,14 @@ fun SettingsScreen(
             importFrom = viewModel::importFrom,
             exportTo = viewModel::exportTo
         )
+
         BottomSheet.Tool -> ToolItem(
             onDismiss = viewModel::closeBottomSheet,
             navController = navController,
             decryptedToJson = viewModel::decryptedToJson,
             decryptFromJson = viewModel::decryptFromJson
         )
+
         BottomSheet.Preference -> PreferenceItem(
             onDismiss = viewModel::closeBottomSheet,
             navController = navController,

@@ -1,11 +1,11 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.model.impl.TotpImpl
 import dev.sanmer.authenticator.repository.DbRepository
@@ -14,14 +14,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val dbRepository: DbRepository,
     private val timeRepository: TimeRepository
 ) : ViewModel() {
@@ -36,12 +33,14 @@ class HomeViewModel @Inject constructor(
             .toLocalTime()
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.Companion.Eagerly,
         initialValue = LocalTime.now()
     )
 
+    private val logger = Logger.Android("HomeViewModel")
+
     init {
-        Timber.d("HomeViewModel init")
+        logger.d("init")
         dataObserver()
         clearTrash()
     }

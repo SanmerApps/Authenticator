@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.viewmodel
+package dev.sanmer.authenticator.ui.screens.encode
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -7,16 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.sanmer.authenticator.Logger
 import dev.sanmer.encoding.decodeBase32
 import dev.sanmer.encoding.decodeBase64
 import dev.sanmer.encoding.encodeBase32Default
 import dev.sanmer.encoding.encodeBase64
-import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class EncodeViewModel @Inject constructor() : ViewModel() {
+class EncodeViewModel : ViewModel() {
     var encoded by mutableStateOf(TextFieldValue())
         private set
 
@@ -28,8 +25,10 @@ class EncodeViewModel @Inject constructor() : ViewModel() {
 
     private val errors = mutableStateMapOf<Error, Boolean>()
 
+    private val logger = Logger.Android("EncodeViewModel")
+
     init {
-        Timber.d("EncodeViewModel init")
+        logger.d("init")
     }
 
     fun updateEncoded(value: TextFieldValue) {
