@@ -47,14 +47,14 @@ jobs:
 
       - name: Upload apk
         if: success() && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.release-name.outputs.name }}
           path: app/build/outputs/apk/release/*.apk*
 
       - name: Upload mapping
         if: success() && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.release-name.outputs.name }}-mapping
           path: app/build/outputs/mapping/release
