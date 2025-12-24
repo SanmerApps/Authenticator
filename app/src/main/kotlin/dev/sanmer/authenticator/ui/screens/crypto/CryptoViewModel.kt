@@ -46,7 +46,7 @@ class CryptoViewModel : ViewModel() {
 
         viewModelScope.launch {
             runCatching {
-                val key = PasswordKey.Default.new(password)
+                val key = PasswordKey.new(password)
                 state = State.Running
                 data = when (action) {
                     CryptoActivity.Action.Encrypt -> data.map { key.encrypt(it) }

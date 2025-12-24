@@ -66,7 +66,7 @@ class EditViewModel(
     private fun updateFromUri(uriString: String) {
         if (!uriString.isOtpUri()) return
         runCatching {
-            AuthTxt.Default.parse(uriString)
+            AuthTxt.parse(uriString)
         }.onSuccess { totp ->
             update { Input(totp) }
         }.onFailure {

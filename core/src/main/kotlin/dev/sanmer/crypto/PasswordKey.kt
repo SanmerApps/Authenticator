@@ -21,7 +21,7 @@ class PasswordKey private constructor(
         }
     }
 
-    override suspend fun encrypt(input: ByteArray) = withContext(Dispatchers.IO) {
+    override suspend fun encrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
         val iv = randomIv
         val key = generateSecretKey(salt)
         val cipher = Cipher.getInstance(Crypto.ALGORITHM)
@@ -29,7 +29,7 @@ class PasswordKey private constructor(
         salt + iv + cipher.doFinal(input)
     }
 
-    override suspend fun decrypt(input: ByteArray) = withContext(Dispatchers.IO) {
+    override suspend fun decrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
         val salt = input.copyOfRange(0, Crypto.SALT_LENGTH)
         val iv = input.copyOfRange(Crypto.SALT_LENGTH, Crypto.SALT_LENGTH + Crypto.IV_LENGTH)
         val data = input.copyOfRange(Crypto.SALT_LENGTH + Crypto.IV_LENGTH, input.size)

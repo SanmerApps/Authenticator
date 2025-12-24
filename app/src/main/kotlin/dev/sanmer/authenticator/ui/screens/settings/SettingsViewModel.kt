@@ -65,7 +65,7 @@ class SettingsViewModel(
                 output = totp
                 callback()
             } else {
-                CryptoActivity.Default.encrypt(
+                CryptoActivity.encrypt(
                     context = context,
                     input = totp.map { it.secret }
                 ) { encryptedSecrets ->
@@ -94,7 +94,7 @@ class SettingsViewModel(
                     input = auths
                     callback()
                 } else {
-                    CryptoActivity.Default.decrypt(
+                    CryptoActivity.decrypt(
                         context = context,
                         input = auths.map { it.secret },
                         bypass = bypass
@@ -185,7 +185,7 @@ class SettingsViewModel(
             override val bypass = true
 
             override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthTxt.Default.decodeFrom(input).totp
+                return AuthTxt.decodeFrom(input).totp
             }
 
             override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
@@ -197,7 +197,7 @@ class SettingsViewModel(
             override val bypass = false
 
             override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthJson.Default.decodeFrom(input).totp
+                return AuthJson.decodeFrom(input).totp
             }
 
             override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {

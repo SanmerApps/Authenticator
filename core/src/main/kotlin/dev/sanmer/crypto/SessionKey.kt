@@ -12,14 +12,14 @@ import javax.crypto.spec.SecretKeySpec
 class SessionKey(
     val key: SecretKey
 ) : Crypto {
-    override suspend fun encrypt(input: ByteArray) = withContext(Dispatchers.IO) {
+    override suspend fun encrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
         val iv = randomIv
         val cipher = Cipher.getInstance(Crypto.ALGORITHM)
         cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(Crypto.TAG_LENGTH, iv))
         iv + cipher.doFinal(input)
     }
 
-    override suspend fun decrypt(input: ByteArray) = withContext(Dispatchers.IO) {
+    override suspend fun decrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
         val iv = input.copyOfRange(0, Crypto.IV_LENGTH)
         val data = input.copyOfRange(Crypto.IV_LENGTH, input.size)
 
