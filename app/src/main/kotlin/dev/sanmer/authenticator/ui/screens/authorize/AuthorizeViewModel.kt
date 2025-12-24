@@ -1,10 +1,10 @@
 package dev.sanmer.authenticator.ui.screens.authorize
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.authenticator.Logger
@@ -65,7 +65,7 @@ class AuthorizeViewModel(
     fun setupPassword(new: String) {
         viewModelScope.launch {
             runCatching {
-                val sessionKey = SessionKey.Default.new()
+                val sessionKey = SessionKey.new()
                 val newKey = sessionKey.getKeyEncryptedByPassword(new).encodeBase64()
                 preferenceRepository.setKeyEncryptedByPassword(newKey)
                 secureRepository.setSessionKey(sessionKey)
@@ -86,7 +86,7 @@ class AuthorizeViewModel(
             val key = preference.keyEncryptedByPassword
             runCatching {
                 callback(
-                    SessionKey.Default.decryptKeyByPassword(key.decodeBase64(), current)
+                    SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
                 )
             }.onFailure {
                 type = Type.PasswordFailed
@@ -96,7 +96,7 @@ class AuthorizeViewModel(
     }
 
     fun changePassword(current: String, new: String) = checkPassword(current) { sessionKey ->
-        val newSessionKey = SessionKey.Default.new()
+        val newSessionKey = SessionKey.new()
         val newKey = newSessionKey.getKeyEncryptedByPassword(new).encodeBase64()
         preferenceRepository.setKeyEncryptedByPassword(newKey)
         preferenceRepository.setKeyEncryptedByBiometric("")
@@ -115,11 +115,11 @@ class AuthorizeViewModel(
 
     fun setupBiometric(
         current: String,
-        activity: FragmentActivity
+        context: Context
     ) = checkPassword(current) { sessionKey ->
         runCatching {
-            BiometricKey.Default.new()
-            val key = sessionKey.getKeyEncryptedByBiometric(activity).encodeBase64()
+            BiometricKey.new()
+            val key = sessionKey.getKeyEncryptedByBiometric(context).encodeBase64()
             preferenceRepository.setKeyEncryptedByBiometric(key)
             type = Type.BiometricSucceed
         }.onFailure {
@@ -140,7 +140,7 @@ class AuthorizeViewModel(
             val key = preference.keyEncryptedByPassword
             runCatching {
                 secureRepository.setSessionKey(
-                    SessionKey.Default.decryptKeyByPassword(key.decodeBase64(), current)
+                    SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
                 )
                 type = Type.PasswordSucceed
             }.onFailure {
@@ -154,10 +154,10 @@ class AuthorizeViewModel(
         type = Type.BiometricPending
     }
 
-    fun loadSessionKeyByBiometric(activity: FragmentActivity) {
+    fun loadSessionKeyByBiometric(context: Context) {
         if (action != AuthorizeActivity.Action.Auth) return
         viewModelScope.launch {
-            if (!BiometricKey.Default.canAuthenticate(activity)) {
+            if (!BiometricKey.canAuthenticate(context)) {
                 isSupportedBiometric = false
                 return@launch
             }
@@ -165,7 +165,7 @@ class AuthorizeViewModel(
             runCatching {
                 val key = preference.keyEncryptedByBiometric.decodeBase64()
                 secureRepository.setSessionKey(
-                    SessionKey.Default.decryptKeyByBiometric(key, activity)
+                    SessionKey.decryptKeyByBiometric(key, context)
                 )
                 type = Type.BiometricSucceed
             }.onFailure {

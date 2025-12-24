@@ -11,11 +11,16 @@ import androidx.fragment.app.FragmentActivity
 import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeScreen
 import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeViewModel
 import dev.sanmer.authenticator.ui.theme.AppTheme
+import dev.sanmer.crypto.BiometricKey
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
 
 class AuthorizeActivity : FragmentActivity() {
     private val viewModel by viewModel<AuthorizeViewModel>()
+
+    init {
+        BiometricKey.init(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

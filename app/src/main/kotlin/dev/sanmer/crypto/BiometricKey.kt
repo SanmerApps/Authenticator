@@ -5,95 +5,80 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.biometric.AuthenticationRequest.Biometric
 import androidx.biometric.AuthenticationResult
+import androidx.biometric.AuthenticationResultLauncher
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.registerForAuthenticationResult
 import androidx.fragment.app.FragmentActivity
 import dev.sanmer.authenticator.BuildConfig
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.R
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
-class BiometricKey(
-    private val activity: FragmentActivity
-) : Crypto {
+class BiometricKey(context: Context) : Crypto {
     private val key by lazy { getSecretKey() }
 
-    private val biometric by lazy {
+    private val builder by lazy {
         Biometric.Builder(
-            title = activity.getString(R.string.biometric_title),
+            title = context.getString(R.string.biometric_title),
             authFallback = Biometric.Fallback.NegativeButton(
-                activity.getString(R.string.biometric_cancel)
+                context.getString(R.string.biometric_cancel)
             )
         ).apply {
             setIsConfirmationRequired(true)
         }
     }
 
-    private suspend fun Biometric.authenticate(
-        activity: FragmentActivity
-    ) = withContext(Dispatchers.Main) {
-        suspendCancellableCoroutine { continuation ->
-            val request = activity.registerForAuthenticationResult { result ->
-                when (result) {
-                    is AuthenticationResult.Error -> {
-                        logger.w("onAuthenticationError(${result.errorCode}): ${result.errString}")
-                        continuation.resumeWithException(IllegalStateException("${result.errString}"))
-                    }
+    private suspend fun Cipher.authenticated(): Cipher {
+        val launcher = checkNotNull(launcher) { "BiometricKey uninitialized" }
+        val biometric = builder.setMinStrength(
+            Biometric.Strength.Class3(BiometricPrompt.CryptoObject(this@authenticated))
+        ).build()
 
-                    is AuthenticationResult.Success -> {
-                        logger.d("onAuthenticationSucceeded: ${result.authType}")
-                        continuation.resume(result)
-                    }
-                }
-            }
-
-            request.launch(this@authenticate)
-            continuation.invokeOnCancellation {
-                request.cancel()
-            }
+        launcher.launch(biometric)
+        return when (val result = channel.receive()) {
+            is AuthenticationResult.Error -> throw IllegalStateException(result.errString.toString())
+            is AuthenticationResult.Success -> requireNotNull(result.crypto?.cipher) { "Expect cipher" }
         }
     }
 
-    private suspend fun <T> Cipher.authenticate(block: (Cipher) -> T): T {
-        val result = biometric.apply {
-            setMinStrength(
-                Biometric.Strength.Class3(BiometricPrompt.CryptoObject(this@authenticate))
-            )
-        }.build().authenticate(activity)
-        return block(requireNotNull(result.crypto?.cipher) { "Expect Cipher" })
+    override suspend fun encrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
+        val cipher = Cipher.getInstance(Crypto.ALGORITHM).let {
+            it.init(Cipher.ENCRYPT_MODE, key)
+            it.authenticated()
+        }
+        cipher.iv + cipher.doFinal(input)
     }
 
-    override suspend fun encrypt(input: ByteArray) = withContext(Dispatchers.IO) {
-        val cipher = Cipher.getInstance(Crypto.ALGORITHM)
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        cipher.authenticate { it.iv + it.doFinal(input)!! }
-    }
-
-    override suspend fun decrypt(input: ByteArray) = withContext(Dispatchers.IO) {
+    override suspend fun decrypt(input: ByteArray): ByteArray = withContext(Dispatchers.IO) {
         val iv = input.copyOfRange(0, Crypto.IV_LENGTH)
         val data = input.copyOfRange(Crypto.IV_LENGTH, input.size)
 
-        val cipher = Cipher.getInstance(Crypto.ALGORITHM)
-        cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(Crypto.TAG_LENGTH, iv))
-        cipher.authenticate { it.doFinal(data)!! }
+        val cipher = Cipher.getInstance(Crypto.ALGORITHM).let {
+            it.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(Crypto.TAG_LENGTH, iv))
+            it.authenticated()
+        }
+        cipher.doFinal(data)
     }
 
     companion object Default {
-        private val logger = Logger.Android("BiometricKey")
-
         fun canAuthenticate(context: Context) = BiometricManager.from(context)
             .canAuthenticate(Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+
+        private var launcher: AuthenticationResultLauncher? = null
+        private val channel = Channel<AuthenticationResult>()
+        fun init(activity: FragmentActivity) {
+            launcher = activity.registerForAuthenticationResult { result ->
+                channel.trySend(result)
+            }
+        }
 
         private fun generateSecretKey(keyGenParameterSpec: KeyGenParameterSpec) =
             KeyGenerator.getInstance(Crypto.KEY_ALGORITHM, "AndroidKeyStore")
@@ -118,14 +103,14 @@ class BiometricKey(
                 .build()
         )
 
-        suspend fun SessionKey.getKeyEncryptedByBiometric(activity: FragmentActivity) =
-            BiometricKey(activity).encrypt(key.encoded)
+        suspend fun SessionKey.getKeyEncryptedByBiometric(context: Context) =
+            BiometricKey(context).encrypt(key.encoded)
 
         suspend fun SessionKey.Default.decryptKeyByBiometric(
             key: ByteArray,
-            activity: FragmentActivity
+            context: Context
         ) = SessionKey(
-            key = BiometricKey(activity).decrypt(key).toSecretKey()
+            key = BiometricKey(context).decrypt(key).toSecretKey()
         )
 
     }

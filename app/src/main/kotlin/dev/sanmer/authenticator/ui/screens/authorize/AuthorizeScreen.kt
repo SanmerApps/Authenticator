@@ -2,9 +2,7 @@ package dev.sanmer.authenticator.ui.screens.authorize
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.fragment.app.FragmentActivity
 import dev.sanmer.authenticator.ktx.finishActivity
 import dev.sanmer.authenticator.ui.AuthorizeActivity.Action
 import dev.sanmer.authenticator.ui.screens.authorize.component.ChangePasswordItem
@@ -17,11 +15,10 @@ fun AuthorizeScreen(
 ) {
     if (!viewModel.loadState.isReady) return
     val context = LocalContext.current
-    val activity = remember { context as FragmentActivity }
 
     DisposableEffect(viewModel.type) {
         if (viewModel.type.isBiometricPending) {
-            viewModel.loadSessionKeyByBiometric(activity)
+            viewModel.loadSessionKeyByBiometric(context)
         }
         if (viewModel.type.isSucceed) {
             context.finishActivity()
@@ -63,7 +60,7 @@ fun AuthorizeScreen(
             onDismiss = context::finishActivity,
             action = viewModel.action,
             isPasswordError = viewModel.type.isPasswordFailed,
-            onEnter = { viewModel.setupBiometric(it, activity) }
+            onEnter = { viewModel.setupBiometric(it, context) }
         )
 
         Action.RemoveBiometric -> EnterPasswordItem(
