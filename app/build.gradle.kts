@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import java.time.Instant
 
 plugins {
@@ -9,18 +8,18 @@ plugins {
 }
 
 val baseVersionName = "0.2.5"
-val devVersion = exec("git tag --contains HEAD").isEmpty()
-val shaSuffix = gitCommitSha.let { ".${it.substring(0, 7)}" }
-val devSuffix = if (devVersion) ".dev" else ""
+val gitCommitTag = gitCommitTag()
+val gitCommitSha = gitCommitSha()
+val gitCommitNum = gitCommitNum()
+val devSuffix = if (gitCommitTag.isEmpty()) ".dev" else ""
 
 android {
     namespace = "dev.sanmer.authenticator"
 
     defaultConfig {
         applicationId = namespace
-        versionName = "${baseVersionName}${shaSuffix}${devSuffix}"
-        versionCode = gitCommitCount
-
+        versionName = "${baseVersionName}.${gitCommitSha}${devSuffix}"
+        versionCode = gitCommitNum
         ndk.abiFilters += listOf("arm64-v8a", "x86_64")
     }
 
@@ -29,7 +28,7 @@ android {
         localeFilters += listOf("en", "zh-rCN")
     }
 
-    val releaseSigning = if (hasReleaseKeyStore) {
+    val releaseSigning = if (hasReleaseKeyStore()) {
         signingConfigs.create("release") {
             storeFile = releaseKeyStore
             storePassword = releaseKeyStorePassword
@@ -58,36 +57,29 @@ android {
 
         all {
             signingConfig = releaseSigning
-            buildConfigField("boolean", "DEV_VERSION", devVersion.toString())
+            buildConfigField("String", "GIT_SHA", "\"$gitCommitSha\"")
             buildConfigField("long", "BUILD_TIME", Instant.now().toEpochMilli().toString())
         }
     }
 
-    buildFeatures {
-        buildConfig = true
+    packaging {
+        jniLibs.excludes += setOf(
+            "**/libdatastore_shared_counter.so"
+        )
+        resources.excludes += setOf(
+            "META-INF/**",
+            "kotlin/**",
+            "**.bin",
+            "**.properties"
+        )
     }
-
-    packaging.resources.excludes += setOf(
-        "META-INF/**",
-        "kotlin/**",
-        "**.bin",
-        "**.properties"
-    )
 
     dependenciesInfo.includeInApk = false
-
-    applicationVariants.configureEach {
-        outputs.configureEach {
-            if (this is ApkVariantOutputImpl) {
-                outputFileName = "Authenticator-${versionName}-${versionCode}-${name}.apk"
-            }
-        }
-    }
 }
 
 dependencies {
-    implementation(projects.core)
-    implementation(projects.logo)
+    implementation(project(":core"))
+    implementation(project(":logo"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
