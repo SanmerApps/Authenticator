@@ -16,7 +16,7 @@ fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: CornerBasedShape = MaterialTheme.shapes.small,
+    shape: CornerBasedShape = MaterialTheme.shapes.medium,
     contentAlignment: Alignment = Alignment.TopStart,
     offset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(focusable = true),

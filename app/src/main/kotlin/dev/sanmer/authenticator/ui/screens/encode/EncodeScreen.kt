@@ -91,7 +91,7 @@ fun EncodeScreen(
             OutlinedTextField(
                 value = viewModel.decoded,
                 onValueChange = { viewModel.updateDecoded(it) },
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.large,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Encode),
                 placeholder = { Text(text = stringResource(id = R.string.encode_decoded)) }
@@ -118,7 +118,7 @@ fun EncodeScreen(
             OutlinedTextField(
                 value = viewModel.encoded,
                 onValueChange = { viewModel.updateEncoded(it) },
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.large,
                 modifier = Modifier.size(width = maxWidth.dp, height = 180.dp),
                 isError = viewModel.isError(EncodeViewModel.Error.Decode),
                 placeholder = { Text(text = stringResource(id = R.string.encode_encoded)) }

@@ -118,7 +118,7 @@ private fun AuthItemContent(
         .surface(
             shape = MaterialTheme.shapes.large,
             backgroundColor = MaterialTheme.colorScheme.surface,
-            border = CardDefaults.outlinedCardBorder()
+            border = CardDefaults.outlinedCardBorder(false)
         )
         .clickable(
             enabled = enabled,

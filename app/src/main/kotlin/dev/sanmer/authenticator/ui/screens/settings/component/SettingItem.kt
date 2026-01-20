@@ -1,8 +1,6 @@
 package dev.sanmer.authenticator.ui.screens.settings.component
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,11 +14,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -36,15 +32,14 @@ fun SettingItem(
     onClick: () -> Unit
 ) = Row(
     modifier = Modifier
-        .fillMaxWidth()
-        .clip(shape = MaterialTheme.shapes.large)
-        .background(color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-        .border(
-            border = CardDefaults.outlinedCardBorder(),
-            shape = MaterialTheme.shapes.large
+        .surface(
+            shape = MaterialTheme.shapes.large,
+            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+            border = CardDefaults.outlinedCardBorder(false)
         )
         .clickable(onClick = onClick)
-        .padding(all = 20.dp),
+        .padding(all = 20.dp)
+        .fillMaxWidth(),
     horizontalArrangement = Arrangement.spacedBy(20.dp),
     verticalAlignment = Alignment.CenterVertically
 ) {
@@ -87,8 +82,8 @@ fun SettingItem(
     modifier = Modifier
         .surface(
             shape = MaterialTheme.shapes.medium,
-            backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            border = CardDefaults.outlinedCardBorder()
+            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+            border = CardDefaults.outlinedCardBorder(false)
         )
         .clickable(enabled = enabled, onClick = onClick)
         .padding(all = 15.dp)
@@ -114,7 +109,8 @@ fun SettingBottomSheet(
     content: @Composable ColumnScope.() -> Unit
 ) = ModalBottomSheet(
     onDismissRequest = onDismiss,
-    shape = MaterialTheme.shapes.large.bottom(0.dp)
+    shape = MaterialTheme.shapes.large.bottom(0.dp),
+    containerColor = MaterialTheme.colorScheme.surface
 ) {
     Text(
         text = title,

@@ -17,7 +17,7 @@ fun TokenItem(
         title = stringResource(id = R.string.settings_token)
     ) {
         SettingItem(
-            icon = R.drawable.pencil_plus,
+            icon = R.drawable.edit,
             title = stringResource(id = R.string.settings_enter),
             onClick = {
                 navController.navigateSingleTopTo(Screen.Edit(-1, ""))
