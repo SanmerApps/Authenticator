@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import dev.sanmer.authenticator.ui.component.DragHandle
 import dev.sanmer.authenticator.ui.component.Logo
 import dev.sanmer.authenticator.ui.ktx.bottom
 import dev.sanmer.authenticator.ui.ktx.surface
@@ -110,8 +111,10 @@ fun SettingBottomSheet(
 ) = ModalBottomSheet(
     onDismissRequest = onDismiss,
     shape = MaterialTheme.shapes.large.bottom(0.dp),
-    containerColor = MaterialTheme.colorScheme.surface
+    dragHandle = null
 ) {
+    DragHandle()
+
     Text(
         text = title,
         style = MaterialTheme.typography.headlineSmall,

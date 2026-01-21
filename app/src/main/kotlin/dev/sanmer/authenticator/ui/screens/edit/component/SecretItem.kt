@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.component.DragHandle
 import dev.sanmer.authenticator.ui.ktx.bottom
 import dev.sanmer.qrcode.QRCode
 
@@ -92,8 +93,11 @@ private fun QRCodeBottomSheet(
     onDismiss: () -> Unit,
 ) = ModalBottomSheet(
     onDismissRequest = onDismiss,
-    shape = MaterialTheme.shapes.large.bottom(0.dp)
+    shape = MaterialTheme.shapes.large.bottom(0.dp),
+    dragHandle = null
 ) {
+    DragHandle()
+
     Text(
         text = stringResource(id = R.string.edit_qrcode),
         style = MaterialTheme.typography.headlineSmall,
