@@ -50,7 +50,6 @@
 
     <!-- Security -->
     <string name="biometric_title">Verify it\'s you</string>
-    <string name="biometric_cancel">Cancel</string>
     <string name="security_password">Password</string>
     <string name="security_password_empty">No password set</string>
     <string name="security_biometric">Biometric</string>

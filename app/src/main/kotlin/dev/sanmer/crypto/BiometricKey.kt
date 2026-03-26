@@ -27,10 +27,7 @@ class BiometricKey(context: Context) : Crypto {
 
     private val builder by lazy {
         Biometric.Builder(
-            title = context.getString(R.string.biometric_title),
-            authFallback = Biometric.Fallback.NegativeButton(
-                context.getString(R.string.biometric_cancel)
-            )
+            title = context.getString(R.string.biometric_title)
         ).apply {
             setIsConfirmationRequired(true)
         }
@@ -44,8 +41,9 @@ class BiometricKey(context: Context) : Crypto {
 
         launcher.launch(biometric)
         return when (val result = channel.receive()) {
+            is AuthenticationResult.Success -> checkNotNull(result.crypto?.cipher) { "Expect cipher" }
             is AuthenticationResult.Error -> throw IllegalStateException(result.errString.toString())
-            is AuthenticationResult.Success -> requireNotNull(result.crypto?.cipher) { "Expect cipher" }
+            is AuthenticationResult.CustomFallbackSelected -> throw IllegalStateException("CustomFallbackSelected")
         }
     }
 
