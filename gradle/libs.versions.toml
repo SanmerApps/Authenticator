@@ -18,7 +18,7 @@ googleZxing = "3.5.4"
 koin = "4.2.0"
 kotlin = "2.3.20"
 kotlinxCoroutines = "1.10.2"
-kotlinxSerialization = "1.10.0"
+kotlinxSerialization = "1.11.0"
 ksp = "2.3.6"
 
 [libraries]
