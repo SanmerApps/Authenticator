@@ -77,6 +77,12 @@ android {
     dependenciesInfo.includeInApk = false
 }
 
+androidComponents.onVariants { variant ->
+    variant.outputs.forEach {
+        it.outputFileName = "Authenticator-${it.versionName.get()}-${it.versionCode.get()}-${variant.buildType}.apk"
+    }
+}
+
 dependencies {
     implementation(project(":core"))
     implementation(project(":logo"))

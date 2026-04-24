@@ -33,14 +33,14 @@ class BiometricKey(context: Context) : Crypto {
         }
     }
 
-    private suspend fun Cipher.authenticated(): Cipher {
+    private suspend fun Cipher.authenticated() = withContext(Dispatchers.Main) {
         val launcher = checkNotNull(launcher) { "BiometricKey uninitialized" }
         val biometric = builder.setMinStrength(
             Biometric.Strength.Class3(BiometricPrompt.CryptoObject(this@authenticated))
         ).build()
 
         launcher.launch(biometric)
-        return when (val result = channel.receive()) {
+        when (val result = channel.receive()) {
             is AuthenticationResult.Success -> checkNotNull(result.crypto?.cipher) { "Expect cipher" }
             is AuthenticationResult.Error -> throw IllegalStateException(result.errString.toString())
             is AuthenticationResult.CustomFallbackSelected -> throw IllegalStateException("CustomFallbackSelected")
