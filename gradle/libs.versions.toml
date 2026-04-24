@@ -19,7 +19,7 @@ koin = "4.2.1"
 kotlin = "2.3.21"
 kotlinxCoroutines = "1.10.2"
 kotlinxSerialization = "1.11.0"
-ksp = "2.3.6"
+ksp = "2.3.7"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle-api", version.ref = "androidGradlePlugin" }
