@@ -15,7 +15,7 @@ import kotlin.time.DurationUnit
 interface NtpServer {
     val address: String
     val port: Int get() = NTP_PORT
-    val timeout: Duration get() = 5.seconds
+    val timeout: Duration get() = 1.seconds
 
     suspend fun address() = address.toInetAddress()
     suspend fun sync() = sync(this)

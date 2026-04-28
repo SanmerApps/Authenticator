@@ -7,7 +7,8 @@ import dev.sanmer.ntp.NtpServer
 import dev.sanmer.otp.TOTP
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,7 @@ class TimeRepositoryImpl(
     private val preferenceRepository: PreferenceRepository
 ) : TimeRepository {
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private var job = SupervisorJob()
+    private var job: Job = NonCancellable
 
     private val _ntpTime = MutableStateFlow(NtpServer.NtpTime())
     override val ntpTime get() = _ntpTime.asStateFlow()
@@ -59,9 +60,8 @@ class TimeRepositoryImpl(
     private fun start(ntpTime: NtpServer.NtpTime) {
         if (job.isActive) {
             job.cancel()
-            job = SupervisorJob()
         }
-        coroutineScope.launch(job) {
+        job = coroutineScope.launch {
             delay(1000 - (ntpTime.currentTimeMillis % 1000))
             while (isActive) {
                 _epochSeconds.value = ntpTime.currentTimeMillis / 1000
@@ -70,7 +70,7 @@ class TimeRepositoryImpl(
         }
     }
 
-    override suspend fun sync(preference: Preference): Result<NtpServer.NtpTime> {
+    override suspend fun sync(preference: Preference, times: Int): Result<NtpServer.NtpTime> {
         val server = when (preference.ntp) {
             Ntp.Custom -> NtpServer.Custom(preference.ntpAddress)
             Ntp.Alibaba -> NtpServer.Alibaba
@@ -83,12 +83,17 @@ class TimeRepositoryImpl(
             Ntp.Tencent -> NtpServer.Tencent
         }
 
-        return runCatching {
-            _ntpTime.updateAndGet { server.sync() }
-        }.onSuccess {
-            logger.i("ntp(${server.address}): $it")
-        }.onFailure {
-            logger.e(it)
+        var result = Result.failure<NtpServer.NtpTime>(Throwable())
+        repeat(times) {
+            result = runCatching {
+                _ntpTime.updateAndGet { server.sync() }
+            }.onSuccess {
+                logger.i("NTP(${server.address}): $it")
+                return Result.success(it)
+            }
+        }
+        return result.onFailure {
+            logger.w(it)
         }
     }
 }

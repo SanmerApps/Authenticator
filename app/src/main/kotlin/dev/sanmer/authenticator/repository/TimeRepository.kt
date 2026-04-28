@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.StateFlow
 interface TimeRepository {
     val ntpTime: StateFlow<NtpServer.NtpTime>
     val epochSeconds: StateFlow<Long>
-    suspend fun sync(preference: Preference): Result<NtpServer.NtpTime>
+    suspend fun sync(preference: Preference, times: Int = 3): Result<NtpServer.NtpTime>
 }

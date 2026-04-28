@@ -64,10 +64,7 @@ class NtpViewModel(
                     } else {
                         sync(ntp.server)
                     }.getOrDefault(
-                        NtpServer.NtpTime(
-                            Duration.Companion.INFINITE,
-                            Duration.Companion.ZERO
-                        )
+                        NtpServer.NtpTime(Duration.INFINITE, Duration.ZERO)
                     )
 
                     _syncState.update { SyncState.Updating(it.size, it.finished + 1) }
@@ -91,9 +88,9 @@ class NtpViewModel(
         runCatching {
             server.sync()
         }.onSuccess {
-            logger.d("ntp(${server.address}): $it")
+            logger.d("NTP(${server.address}): $it")
         }.onFailure {
-            logger.e(it)
+            logger.w(it)
         }
 
     data class NtpCompat(
