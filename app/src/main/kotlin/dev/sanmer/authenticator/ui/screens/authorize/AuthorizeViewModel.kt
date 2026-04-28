@@ -8,13 +8,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.authenticator.Logger
+import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.PreferenceRepository
-import dev.sanmer.authenticator.repository.SecureRepository
 import dev.sanmer.authenticator.ui.AuthorizeActivity
 import dev.sanmer.authenticator.ui.main.MainViewModel
 import dev.sanmer.crypto.BiometricKey
 import dev.sanmer.crypto.BiometricKey.Default.decryptKeyByBiometric
 import dev.sanmer.crypto.BiometricKey.Default.getKeyEncryptedByBiometric
+import dev.sanmer.crypto.Crypto
 import dev.sanmer.crypto.SessionKey
 import dev.sanmer.encoding.decodeBase64
 import dev.sanmer.encoding.encodeBase64
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class AuthorizeViewModel(
     private val preferenceRepository: PreferenceRepository,
-    private val secureRepository: SecureRepository
+    private val dbRepository: DbRepository
 ) : ViewModel() {
     var action by mutableStateOf(AuthorizeActivity.Action.Auth)
         private set
@@ -68,8 +69,8 @@ class AuthorizeViewModel(
                 val sessionKey = SessionKey.new()
                 val newKey = sessionKey.getKeyEncryptedByPassword(new).encodeBase64()
                 preferenceRepository.setKeyEncryptedByPassword(newKey)
-                secureRepository.setSessionKey(sessionKey)
-                secureRepository.encryptSecret(sessionKey)
+                dbRepository.encrypt(sessionKey)
+                dbRepository.setSessionKey(sessionKey)
                 type = Type.PasswordSucceed
             }.onFailure {
                 logger.w(it)
@@ -100,16 +101,16 @@ class AuthorizeViewModel(
         val newKey = newSessionKey.getKeyEncryptedByPassword(new).encodeBase64()
         preferenceRepository.setKeyEncryptedByPassword(newKey)
         preferenceRepository.setKeyEncryptedByBiometric("")
-        secureRepository.setSessionKey(newSessionKey)
-        secureRepository.encryptSecretByNewKey(sessionKey, newSessionKey)
+        dbRepository.reEncrypt(sessionKey, newSessionKey)
+        dbRepository.setSessionKey(newSessionKey)
         type = Type.PasswordSucceed
     }
 
     fun removePassword(current: String) = checkPassword(current) { sessionKey ->
         preferenceRepository.setKeyEncryptedByPassword("")
         preferenceRepository.setKeyEncryptedByBiometric("")
-        secureRepository.setSessionKey(null)
-        secureRepository.decryptSecret(sessionKey)
+        dbRepository.decrypt(sessionKey)
+        dbRepository.setSessionKey(Crypto.None)
         type = Type.PasswordSucceed
     }
 
@@ -139,7 +140,7 @@ class AuthorizeViewModel(
         viewModelScope.launch {
             val key = preference.keyEncryptedByPassword
             runCatching {
-                secureRepository.setSessionKey(
+                dbRepository.setSessionKey(
                     SessionKey.decryptKeyByPassword(key.decodeBase64(), current)
                 )
                 type = Type.PasswordSucceed
@@ -164,7 +165,7 @@ class AuthorizeViewModel(
 
             runCatching {
                 val key = preference.keyEncryptedByBiometric.decodeBase64()
-                secureRepository.setSessionKey(
+                dbRepository.setSessionKey(
                     SessionKey.decryptKeyByBiometric(key, context)
                 )
                 type = Type.BiometricSucceed

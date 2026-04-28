@@ -15,6 +15,25 @@ interface Crypto {
     suspend fun decrypt(input: ByteArray): ByteArray
     suspend fun decrypt(input: String) = decrypt(input.decodeBase64()).toString(Charsets.UTF_8)
 
+    object None : Crypto {
+        override suspend fun encrypt(input: ByteArray): ByteArray {
+            return input
+        }
+
+        override suspend fun encrypt(input: String): String {
+            return input
+        }
+
+        override suspend fun decrypt(input: ByteArray): ByteArray {
+            return input
+        }
+
+        override suspend fun decrypt(input: String): String {
+            return input
+        }
+
+    }
+
     companion object Default {
         const val FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256"
         const val ALGORITHM = "AES/GCM/NoPadding"

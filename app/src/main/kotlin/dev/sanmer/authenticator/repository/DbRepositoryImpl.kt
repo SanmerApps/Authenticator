@@ -3,18 +3,54 @@ package dev.sanmer.authenticator.repository
 import dev.sanmer.authenticator.database.dao.TotpDao
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.model.serializer.TotpAuth
+import dev.sanmer.crypto.Crypto
+import dev.sanmer.encoding.decodeBase64
+import dev.sanmer.encoding.encodeBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class DbRepositoryImpl(
-    private val totp: TotpDao,
-    private val secureRepository: SecureRepository
+    private val totp: TotpDao
 ) : DbRepository {
-    private suspend inline fun String.toEncrypted() = secureRepository.encrypt(this)
+    private var key: Crypto = Crypto.None
 
-    private suspend inline fun String.toDecrypted() = secureRepository.decrypt(this)
+    private suspend inline fun String.toEncrypted() = key.encrypt(this)
+
+    private suspend inline fun String.toDecrypted() = key.decrypt(this)
+
+    override fun setSessionKey(key: Crypto) {
+        this.key = key
+    }
+
+    override suspend fun encrypt(key: Crypto) = withContext(Dispatchers.IO) {
+        totp.update(
+            totp.getAll().map {
+                val encrypted = key.encrypt(it.secret)
+                it.copy(secret = encrypted)
+            }
+        )
+    }
+
+    override suspend fun decrypt(key: Crypto) = withContext(Dispatchers.IO) {
+        totp.update(
+            totp.getAll().map {
+                val decrypted = key.decrypt(it.secret)
+                it.copy(secret = decrypted)
+            }
+        )
+    }
+
+    override suspend fun reEncrypt(old: Crypto, new: Crypto) = withContext(Dispatchers.IO) {
+        totp.update(
+            totp.getAll().map {
+                val decrypted = old.decrypt(it.secret.decodeBase64())
+                val encrypted = new.encrypt(decrypted)
+                it.copy(secret = encrypted.encodeBase64())
+            }
+        )
+    }
 
     override suspend fun getTotpAllDecryptedAsFlow() = totp.getAllEnabledAsFlow()
         .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }

@@ -2,9 +2,15 @@ package dev.sanmer.authenticator.repository
 
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.model.serializer.TotpAuth
+import dev.sanmer.crypto.Crypto
 import kotlinx.coroutines.flow.Flow
 
 interface DbRepository {
+    fun setSessionKey(key: Crypto)
+    suspend fun encrypt(key: Crypto)
+    suspend fun decrypt(key: Crypto)
+    suspend fun reEncrypt(old: Crypto, new: Crypto)
+
     suspend fun getTotpAllDecryptedAsFlow(): Flow<List<TotpEntity>>
     suspend fun getTotpDecryptedByIdAsFlow(id: Long): Flow<TotpEntity>
     suspend fun getTotpAllDecryptedTrashedAsFlow(): Flow<List<TotpEntity>>
