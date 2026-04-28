@@ -10,7 +10,9 @@ import androidx.camera.view.PreviewView
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -85,7 +87,9 @@ fun ScanScreen(
         ActionButtons(
             modifier = Modifier.align(Alignment.BottomEnd),
             scanImage = viewModel::scanImage,
-            onBack = navController::navigateUp
+            onBack = navController::navigateUp,
+            torchEnabled = viewModel.torchEnabled,
+            enableTorch = viewModel::enableTorch
         )
     }
 }
@@ -129,7 +133,9 @@ fun CameraXPreview(
 private fun ActionButtons(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
-    scanImage: (Context, Uri) -> Unit
+    scanImage: (Context, Uri) -> Unit,
+    torchEnabled: Boolean,
+    enableTorch: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val pickImage = rememberLauncherForActivityResult(
@@ -141,13 +147,14 @@ private fun ActionButtons(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(all = 20.dp),
+        verticalAlignment = Alignment.Bottom
     ) {
         ActionButton(
             onClick = {
                 pickImage.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
-            }
+            },
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.photo),
@@ -157,13 +164,26 @@ private fun ActionButtons(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        ActionButton(
-            onClick = onBack
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.x),
-                contentDescription = null
-            )
+            ActionButton(
+                onClick = { enableTorch(!torchEnabled) }
+            ) {
+                Icon(
+                    painter = painterResource(id = if (torchEnabled) R.drawable.bolt else R.drawable.bolt_off),
+                    contentDescription = null
+                )
+            }
+
+            ActionButton(
+                onClick = onBack
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.x),
+                    contentDescription = null
+                )
+            }
         }
     }
 }

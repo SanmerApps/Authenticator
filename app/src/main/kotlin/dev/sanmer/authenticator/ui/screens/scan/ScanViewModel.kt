@@ -1,10 +1,12 @@
 package dev.sanmer.authenticator.ui.screens.scan
 
 import android.Manifest
+import android.app.Application
 import android.content.Context
 import android.net.Uri
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.TorchState
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.view.LifecycleCameraController
@@ -14,8 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import dev.sanmer.authenticator.Logger
-import dev.sanmer.authenticator.annotation.ApplicationContext
 import dev.sanmer.authenticator.compat.PermissionCompat
+import dev.sanmer.otp.OtpUri.Default.isOtpUri
 import dev.sanmer.qrcode.QRCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +26,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 class ScanViewModel(
-    @ApplicationContext private val context: Context
+    private val context: Application
 ) : ViewModel(), ImageAnalysis.Analyzer {
     private val _isAllowed: Boolean
         get() = PermissionCompat.checkPermission(
@@ -32,6 +34,8 @@ class ScanViewModel(
         )
 
     var isAllowed by mutableStateOf(_isAllowed)
+        private set
+    var torchEnabled by mutableStateOf(false)
         private set
 
     val cameraController by lazy { LifecycleCameraController(context) }
@@ -52,6 +56,10 @@ class ScanViewModel(
         }
     }
 
+    fun enableTorch(enabled: Boolean) {
+        cameraController.enableTorch(enabled)
+    }
+
     fun bindToLifecycle(context: Context, lifecycleOwner: LifecycleOwner) =
         requestPermission(context) {
             cameraController.previewResolutionSelector =
@@ -64,6 +72,9 @@ class ScanViewModel(
             cameraController.setImageAnalysisAnalyzer(context.mainExecutor, this)
 
             cameraController.bindToLifecycle(lifecycleOwner)
+            cameraController.torchState.observe(lifecycleOwner) {
+                torchEnabled = it == TorchState.ON
+            }
         }
 
     fun unbind() {
@@ -86,8 +97,9 @@ class ScanViewModel(
                 height = image.height,
             )
 
-            _uri.update { content }
-
+            if (content.isOtpUri()) {
+                _uri.update { content }
+            }
         } catch (_: Throwable) {
 
         } finally {
@@ -100,7 +112,7 @@ class ScanViewModel(
             val cr = context.contentResolver
             checkNotNull(cr.openInputStream(uri)).use(QRCode::decodeFromStream)
         }.onSuccess { content ->
-            _uri.update { content }
+            content?.let { _uri.update { content } }
         }.onFailure {
             logger.e(it)
         }

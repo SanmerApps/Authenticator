@@ -6,7 +6,6 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
-import com.google.zxing.DecodeHintType
 import com.google.zxing.EncodeHintType
 import com.google.zxing.LuminanceSource
 import com.google.zxing.NotFoundException
@@ -20,24 +19,24 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import java.io.InputStream
 
 object QRCode {
-    private val decodeHint by lazy {
-        hashMapOf<DecodeHintType, Any>().apply {
-            put(DecodeHintType.POSSIBLE_FORMATS, listOf(BarcodeFormat.QR_CODE))
-            put(DecodeHintType.ALSO_INVERTED, true)
-        }
-    }
+    private val hints by lazy {
+        mapOf(
+            EncodeHintType.CHARACTER_SET to "UTF-8",
+            EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.Q,
+            EncodeHintType.MARGIN to 0
 
-    private val encodeHint by lazy {
-        hashMapOf<EncodeHintType, Any>().apply {
-            put(EncodeHintType.CHARACTER_SET, "UTF-8")
-            put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q)
-            put(EncodeHintType.MARGIN, 0)
-        }
+        )
     }
 
     private fun decode(source: LuminanceSource): String {
-        val bitmap = BinaryBitmap(HybridBinarizer(source))
-        return QRCodeReader().decode(bitmap, decodeHint).text.trim()
+        val reader = QRCodeReader()
+        val result = try {
+            reader.decode(BinaryBitmap(HybridBinarizer(source)))
+        } catch (_: NotFoundException) {
+            val inverted = source.invert()
+            reader.decode(BinaryBitmap(HybridBinarizer(inverted)))
+        }
+        return result.text.trim()
     }
 
     fun decodeFromYuv(
@@ -78,20 +77,15 @@ object QRCode {
         return Bitmap.createScaledBitmap(this, width, height, true)
     }
 
-    fun decodeFromStream(stream: InputStream): String {
+    fun decodeFromStream(stream: InputStream): String? {
         var bitmap = requireNotNull(
-            BitmapFactory.decodeStream(
-                stream,
-                null,
-                BitmapFactory.Options()
-            )
+            BitmapFactory.decodeStream(stream, null, BitmapFactory.Options())
         ) { "Unable to decode stream to bitmap" }
 
         for (i in 0..2) {
             if (i != 0) {
                 bitmap = bitmap.resize(bitmap.width / (i * 2), bitmap.height / (i * 2))
             }
-
             try {
                 val pixels = IntArray(bitmap.width * bitmap.height)
                 bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
@@ -99,8 +93,7 @@ object QRCode {
             } catch (_: NotFoundException) {
             }
         }
-
-        throw IllegalArgumentException(stream.toString())
+        return null
     }
 
     private fun createBitmap(
@@ -117,7 +110,6 @@ object QRCode {
                 pixels[offset + x] = if (bitMatrix[x, y]) foregroundColor else backgroundColor
             }
         }
-
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
         return bitmap
@@ -129,7 +121,7 @@ object QRCode {
         @ColorInt foregroundColor: Int = Color.WHITE,
         @ColorInt backgroundColor: Int = Color.BLACK,
     ) = createBitmap(
-        bitMatrix = QRCodeWriter().encode(contents, BarcodeFormat.QR_CODE, size, size, encodeHint),
+        bitMatrix = QRCodeWriter().encode(contents, BarcodeFormat.QR_CODE, size, size, hints),
         foregroundColor = foregroundColor,
         backgroundColor = backgroundColor
     )
