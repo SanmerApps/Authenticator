@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.encoding.decodeBase32
 import dev.sanmer.encoding.decodeBase64
-import dev.sanmer.encoding.encodeBase32Default
+import dev.sanmer.encoding.encodeBase32
 import dev.sanmer.encoding.encodeBase64
 
 class EncodeViewModel : ViewModel() {
@@ -71,7 +71,7 @@ class EncodeViewModel : ViewModel() {
         val decode: (String) -> String
     ) {
         Base32(
-            encode = String::encodeBase32Default,
+            encode = String::encodeBase32,
             decode = String::decodeBase32
         ),
         Base64(
