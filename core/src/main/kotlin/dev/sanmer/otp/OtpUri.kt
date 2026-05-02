@@ -49,25 +49,20 @@ class OtpUri private constructor() {
 
     private fun fromUri(uri: Uri): OtpUri {
         require(uri.isOtpUri()) { "Expected scheme = $SCHEME" }
-        type = requireNotNull(uri.host) { "Unknown type" }.uppercase()
-        secret = requireNotNull(uri.getQueryParameter(Query.SECRET)) { "Unknown secret" }.uppercase()
-        algorithm = uri.getQueryParameter(Query.ALGORITHM)?.uppercase()
+        type = requireNotNull(uri.host) { "Expected type" }
+        secret = requireNotNull(uri.getQueryParameter(Query.SECRET)) { "Expected secret" }
+        algorithm = uri.getQueryParameter(Query.ALGORITHM)
         digits = uri.getQueryParameter(Query.DIGITS)?.let(String::toInt)
         counter = uri.getQueryParameter(Query.COUNTER)?.let(String::toLong)
         period = uri.getQueryParameter(Query.PERIOD)?.let(String::toLong)
 
-        val label = uri.path?.substring(1) ?: ""
+        val label = uri.path?.substring(1).orEmpty()
         if (label.contains(":")) {
             val values = label.split(":".toRegex(), limit = 2)
-            if (values.size >= 2) {
-                issuer = values[0]
-                name = values[1]
-            } else {
-                issuer = ""
-                name = label
-            }
+            issuer = values[0]
+            name = values[1]
         } else {
-            issuer = uri.getQueryParameter(Query.ISSUER) ?: ""
+            issuer = uri.getQueryParameter(Query.ISSUER).orEmpty()
             name = label
         }
 
@@ -77,7 +72,7 @@ class OtpUri private constructor() {
     private fun toUri(): Uri {
         val builder = Uri.Builder()
         builder.scheme(SCHEME)
-        builder.authority(type.lowercase())
+        builder.authority(type)
         builder.appendQueryParameter(Query.SECRET, secret)
         algorithm?.let { builder.appendQueryParameter(Query.ALGORITHM, it) }
         digits?.let { builder.appendQueryParameter(Query.DIGITS, it.toString()) }
@@ -86,15 +81,9 @@ class OtpUri private constructor() {
 
         if (issuer.isNotBlank()) {
             builder.appendQueryParameter(Query.ISSUER, issuer)
-            if (name.isNotBlank()) {
-                builder.path("${issuer}:${name}")
-            } else {
-                builder.path(issuer)
-            }
-        } else {
-            if (name.isNotBlank()) {
-                builder.path(name)
-            }
+            builder.path(if (name.isNotBlank()) "${issuer}:${name}" else issuer)
+        } else if (name.isNotBlank()) {
+            builder.path(name)
         }
 
         return builder.build()

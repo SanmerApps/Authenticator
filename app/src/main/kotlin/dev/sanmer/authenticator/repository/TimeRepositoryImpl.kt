@@ -4,7 +4,6 @@ import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.datastore.model.Preference
 import dev.sanmer.ntp.NtpServer
-import dev.sanmer.otp.TOTP
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +26,7 @@ class TimeRepositoryImpl(
     private val _ntpTime = MutableStateFlow(NtpServer.NtpTime())
     override val ntpTime get() = _ntpTime.asStateFlow()
 
-    private val _epochSeconds = MutableStateFlow(TOTP.epochSeconds)
+    private val _epochSeconds = MutableStateFlow( System.currentTimeMillis() / 1000)
     override val epochSeconds get() = _epochSeconds.asStateFlow()
 
     private val logger = Logger.Android("TimeRepositoryImpl")
