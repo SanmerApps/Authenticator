@@ -8,25 +8,25 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.authenticator.Logger
+import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.model.serializer.AuthJson
-import dev.sanmer.authenticator.model.serializer.AuthTxt
-import dev.sanmer.authenticator.model.serializer.TotpAuth
+import dev.sanmer.authenticator.model.serializer.AuthUri
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.ui.CryptoActivity
 import dev.sanmer.encoding.isBase32
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
 
 class SettingsViewModel(
     private val dbRepository: DbRepository
 ) : ViewModel() {
-    private var output = emptyList<TotpAuth>()
-    private var input = emptyList<TotpAuth>()
+    private var entities by mutableStateOf(emptyList<TotpEntity>())
+    val isEmpty get() = entities.isEmpty()
 
-    private var totp by mutableStateOf(emptyList<TotpAuth>())
-    val isEmpty get() = totp.isEmpty()
+    private var tmp = emptyList<TotpEntity>()
 
     var bottomSheet by mutableStateOf(BottomSheet.Closed)
         private set
@@ -41,8 +41,8 @@ class SettingsViewModel(
     private fun dataObserver() {
         viewModelScope.launch {
             dbRepository.getTotpAllDecryptedAsFlow()
-                .collect { entries ->
-                    totp = entries.map { it.totp }
+                .collect { list ->
+                    entities = list
                 }
         }
     }
@@ -55,153 +55,192 @@ class SettingsViewModel(
         bottomSheet = BottomSheet.Closed
     }
 
-    fun prepare(
-        fileType: FileType,
-        context: Context,
-        callback: () -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (fileType.bypass) {
-                output = totp
-                callback()
-            } else {
-                CryptoActivity.encrypt(
-                    context = context,
-                    input = totp.map { it.secret }
-                ) { encryptedSecrets ->
-                    output = totp.mapIndexed { index, auth ->
-                        auth.copy(secret = encryptedSecrets[index])
-                    }
-                    callback()
-                }
-            }
-        }
-    }
-
-    private fun importFrom(
+    private suspend fun import(
         fileType: FileType,
         context: Context,
         uri: Uri,
-        bypass: Boolean = true,
-        callback: () -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val cr = context.contentResolver
-                checkNotNull(cr.openInputStream(uri)).use(fileType::decodeFrom)
-            }.onSuccess { auths ->
-                if (fileType.bypass) {
-                    input = auths
-                    callback()
-                } else {
-                    CryptoActivity.decrypt(
+        bypass: Boolean,
+    ) = withContext(Dispatchers.IO) {
+        runCatching {
+            val cr = context.contentResolver
+            val entities = checkNotNull(cr.openInputStream(uri)).use(fileType::decodeFrom)
+            when (fileType) {
+                FileType.Json -> {
+                    val secrets = CryptoActivity.decrypt(
                         context = context,
-                        input = auths.map { it.secret },
+                        input = entities.map { it.secret },
                         bypass = bypass
-                    ) { decryptedSecrets ->
-                        input = auths.mapIndexed { index, auth ->
-                            auth.copy(secret = decryptedSecrets[index])
-                        }
-                        callback()
+                    )
+                    entities.mapIndexed { index, it ->
+                        it.copy(secret = secrets[index])
                     }
                 }
-            }.onFailure {
-                logger.e(it)
+
+                FileType.Uri -> entities
             }
+        }.onFailure {
+            logger.e(it)
         }
     }
 
-    fun importFrom(
+    private fun import(
         fileType: FileType,
         context: Context,
         uri: Uri
-    ) = importFrom(
-        fileType = fileType,
-        context = context,
-        uri = uri
     ) {
         viewModelScope.launch {
-            dbRepository.insertTotp(
-                input.filter { it.secret.isBase32() }
-            )
-        }
-    }
-
-    private fun exportTo(
-        fileType: FileType,
-        context: Context,
-        uri: Uri,
-        auths: List<TotpAuth>
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            runCatching {
-                val cr = context.contentResolver
-                checkNotNull(cr.openOutputStream(uri)).use { fileType.decodeTo(auths, it) }
-            }.onFailure {
-                logger.e(it)
+            import(
+                fileType = fileType,
+                context = context,
+                uri = uri,
+                bypass = true
+            ).onSuccess { entities ->
+                dbRepository.insertTotp(
+                    entities.filter { it.secret.isBase32() }
+                )
             }
         }
     }
 
-    fun exportTo(
+    fun importJson(
+        context: Context,
+        uri: Uri
+    ) = import(
+        fileType = FileType.Json,
+        context = context,
+        uri
+    )
+
+    fun importUri(
+        context: Context,
+        uri: Uri
+    ) = import(
+        fileType = FileType.Uri,
+        context = context,
+        uri
+    )
+
+    private suspend fun export(
+        entities: List<TotpEntity>,
+        fileType: FileType,
+        context: Context,
+        uri: Uri,
+    ) = withContext(Dispatchers.IO) {
+        runCatching {
+            val cr = context.contentResolver
+            checkNotNull(cr.openOutputStream(uri)).use { fileType.decodeTo(entities, it) }
+        }.onFailure {
+            logger.e(it)
+        }
+    }
+
+    fun encrypt(
+        context: Context,
+        onReady: () -> Unit
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                val secrets = CryptoActivity.encrypt(
+                    context = context,
+                    input = entities.map { it.secret }
+                )
+                tmp = entities.mapIndexed { index, it ->
+                    it.copy(secret = secrets[index])
+                }
+            }.onSuccess {
+                onReady()
+            }
+        }
+    }
+
+    private fun export(
         fileType: FileType,
         context: Context,
         uri: Uri
-    ) = exportTo(
-        fileType = fileType,
+    ) {
+        viewModelScope.launch {
+            export(
+                entities = tmp,
+                fileType = fileType,
+                context = context,
+                uri = uri,
+            )
+            tmp = emptyList()
+        }
+    }
+
+    fun exportJson(
+        context: Context,
+        uri: Uri
+    ) = export(
+        fileType = FileType.Json,
         context = context,
-        uri = uri,
-        auths = output
+        uri = uri
+    )
+
+    fun exportUri(
+        context: Context,
+        uri: Uri
+    ) = export(
+        fileType = FileType.Uri,
+        context = context,
+        uri = uri
     )
 
     fun decryptFromJson(
         context: Context,
         uri: Uri,
-        callback: () -> Unit
-    ) = importFrom(
-        fileType = FileType.Json,
-        context = context,
-        uri = uri,
-        bypass = false,
-        callback = callback
-    )
+        onReady: () -> Unit
+    ) {
+        viewModelScope.launch {
+            import(
+                fileType = FileType.Json,
+                context = context,
+                uri = uri,
+                bypass = false,
+            ).onSuccess { entities ->
+                tmp = entities
+                onReady()
+            }
+        }
+    }
 
     fun decryptedToJson(
         context: Context,
-        uri: Uri
-    ) = exportTo(
-        fileType = FileType.Json,
-        context = context,
-        uri = uri,
-        auths = input
-    )
+        uri: Uri,
+    ) {
+        viewModelScope.launch {
+            export(
+                entities = tmp,
+                fileType = FileType.Json,
+                context = context,
+                uri = uri,
+            )
+            tmp = emptyList()
+        }
+    }
 
-    sealed class FileType {
-        abstract val bypass: Boolean
-        abstract fun decodeFrom(input: InputStream): List<TotpAuth>
-        abstract fun decodeTo(auths: List<TotpAuth>, output: OutputStream)
+    private sealed interface FileType {
+        fun decodeFrom(input: InputStream): List<TotpEntity>
+        fun decodeTo(auths: List<TotpEntity>, output: OutputStream)
 
-        data object Txt : FileType() {
-            override val bypass = true
-
-            override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthTxt.decodeFrom(input).totp
+        data object Uri : FileType {
+            override fun decodeFrom(input: InputStream): List<TotpEntity> {
+                return AuthUri.decodeFrom(input).totp
             }
 
-            override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
-                AuthTxt(auths).encodeTo(output)
+            override fun decodeTo(auths: List<TotpEntity>, output: OutputStream) {
+                AuthUri(auths).encodeTo(output)
             }
         }
 
-        data object Json : FileType() {
-            override val bypass = false
-
-            override fun decodeFrom(input: InputStream): List<TotpAuth> {
-                return AuthJson.decodeFrom(input).totp
+        data object Json : FileType {
+            override fun decodeFrom(input: InputStream): List<TotpEntity> {
+                return AuthJson.decodeFrom(input).entities()
             }
 
-            override fun decodeTo(auths: List<TotpAuth>, output: OutputStream) {
-                AuthJson(auths).encodeTo(output)
+            override fun decodeTo(auths: List<TotpEntity>, output: OutputStream) {
+                AuthJson.entities(auths).encodeTo(output)
             }
         }
     }

@@ -59,16 +59,18 @@ fun SettingsScreen(
         BottomSheet.Database -> DatabaseItem(
             onDismiss = viewModel::closeBottomSheet,
             isEmpty = viewModel.isEmpty,
-            prepare = viewModel::prepare,
-            importFrom = viewModel::importFrom,
-            exportTo = viewModel::exportTo
+            importJson = viewModel::importJson,
+            importUri = viewModel::importUri,
+            encrypt = viewModel::encrypt,
+            exportJson = viewModel::exportJson,
+            exportUri = viewModel::exportUri,
         )
 
         BottomSheet.Tool -> ToolItem(
             onDismiss = viewModel::closeBottomSheet,
             navController = navController,
+            decryptFromJson = viewModel::decryptFromJson,
             decryptedToJson = viewModel::decryptedToJson,
-            decryptFromJson = viewModel::decryptFromJson
         )
 
         BottomSheet.Preference -> PreferenceItem(

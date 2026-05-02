@@ -39,14 +39,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.impl.TotpImpl
+import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.ui.component.SwipeContent
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.logo.Logo
 
 @Composable
 fun AuthItem(
-    auth: TotpImpl,
+    auth: TotpAuth,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     enabled: Boolean = true,
@@ -108,7 +108,7 @@ private fun AuthItemButtons(
 
 @Composable
 private fun AuthItemContent(
-    auth: TotpImpl,
+    auth: TotpAuth,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
 ) = Row(
@@ -132,7 +132,7 @@ private fun AuthItemContent(
         derivedStateOf { Logo.getOrDefault(auth.entity.issuer) }
     }
 
-    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.now())
+    val otp by auth.otp.collectAsStateWithLifecycle(initialValue = auth.otp())
 
     Image(
         painter = painterResource(id = logo.res),

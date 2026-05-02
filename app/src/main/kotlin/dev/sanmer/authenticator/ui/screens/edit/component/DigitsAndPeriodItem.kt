@@ -10,7 +10,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.AuthType
+import dev.sanmer.authenticator.model.auth.AuthType
 
 @Composable
 fun DigitsAndPeriodItem(

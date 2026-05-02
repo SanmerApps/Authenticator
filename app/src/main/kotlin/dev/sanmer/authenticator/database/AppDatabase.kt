@@ -9,7 +9,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import dev.sanmer.authenticator.database.dao.TotpDao
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.otp.HOTP
+import dev.sanmer.otp.Otp
 
 @Database(version = 2, entities = [TotpEntity::class])
 @TypeConverters(AppDatabase.Default::class)
@@ -18,10 +18,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object Default {
         @TypeConverter
-        fun hash(value: String) = HOTP.Hash.valueOf(value)
+        fun nameToHash(value: String) = Otp.Hash.valueOf(value)
 
         @TypeConverter
-        fun string(value: HOTP.Hash) = value.name
+        fun hashToName(value: Otp.Hash) = value.name
 
         fun build(context: Context) =
             Room.databaseBuilder<AppDatabase>(

@@ -21,15 +21,15 @@ fun ToolItem(
     decryptedToJson: (Context, Uri) -> Unit
 ) {
     val context = LocalContext.current
-    val jsonDecrypt = rememberLauncherForActivityResult(
+    val jsonExporter = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE),
         onResult = { if (it != null) decryptedToJson(context, it) }
     )
-    val jsonEncrypt = rememberLauncherForActivityResult(
+    val jsonImporter = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
             if (it != null) decryptFromJson(context, it) {
-                jsonDecrypt.launch(AuthJson.FILE_NAME)
+                jsonExporter.launch(AuthJson.FILE_NAME)
             }
         }
     )
@@ -41,7 +41,7 @@ fun ToolItem(
         SettingItem(
             icon = R.drawable.lock_open,
             title = stringResource(id = R.string.settings_decrypt),
-            onClick = { jsonEncrypt.launch(AuthJson.MIME_TYPE) }
+            onClick = { jsonImporter.launch(AuthJson.MIME_TYPE) }
         )
 
         SettingItem(

@@ -7,15 +7,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.model.AuthType
-import dev.sanmer.otp.HOTP
+import dev.sanmer.authenticator.model.auth.AuthType
+import dev.sanmer.otp.Otp
 
 @Composable
 fun TypeAndHashItem(
     type: AuthType,
     onTypeChange: (AuthType) -> Unit,
-    hash: HOTP.Hash,
-    onHashChange: (HOTP.Hash) -> Unit,
+    hash: Otp.Hash,
+    onHashChange: (Otp.Hash) -> Unit,
     readOnly: Boolean
 ) = TextFieldContent(
     leading = { TextFieldContentIcon(icon = R.drawable.math_function) }
@@ -33,7 +33,7 @@ fun TypeAndHashItem(
 
     TextFieldDropdownMenu(
         value = hash,
-        values = HOTP.Hash.entries,
+        values = Otp.Hash.entries,
         onValueChange = onHashChange,
         label = stringResource(id = R.string.edit_hash),
         readOnly = readOnly,

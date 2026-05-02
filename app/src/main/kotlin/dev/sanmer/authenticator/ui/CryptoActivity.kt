@@ -11,8 +11,11 @@ import androidx.activity.result.contract.ActivityResultContract
 import dev.sanmer.authenticator.ui.screens.crypto.CryptoScreen
 import dev.sanmer.authenticator.ui.screens.crypto.CryptoViewModel
 import dev.sanmer.authenticator.ui.theme.AppTheme
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class CryptoActivity : ComponentActivity() {
     private val viewModel by viewModel<CryptoViewModel>()
@@ -67,6 +70,25 @@ class CryptoActivity : ComponentActivity() {
         val Intent.output: Array<String>
             inline get() = checkNotNull(getStringArrayExtra(EXTRA_OUTPUT))
 
+        private class Crypto(
+            private val action: Action,
+            private val bypass: Boolean
+        ) : ActivityResultContract<List<String>, List<String>>() {
+            override fun createIntent(context: Context, input: List<String>): Intent {
+                return Intent(context, CryptoActivity::class.java).also {
+                    it.action = action.original
+                    it.putExtra(EXTRA_BYPASS, bypass)
+                    it.putExtra(EXTRA_INPUT, input.toTypedArray())
+                }
+            }
+
+            override fun parseResult(resultCode: Int, intent: Intent?): List<String> {
+                if (resultCode != RESULT_OK) return emptyList()
+                if (intent == null) return emptyList()
+                return intent.output.toList()
+            }
+        }
+
         private fun start(
             context: Context,
             input: List<String>,
@@ -74,13 +96,13 @@ class CryptoActivity : ComponentActivity() {
             bypass: Boolean,
             callback: (List<String>) -> Unit
         ) {
-            if (context !is ActivityResultRegistryOwner) return
+            require(context is ActivityResultRegistryOwner) { "Expected ActivityResultRegistryOwner" }
 
             val activityResultRegistry = context.activityResultRegistry
             val launcher = activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = input.toString(),
                 contract = Crypto(action, bypass),
-                callback = { if (it.isNotEmpty()) callback(it) }
+                callback = { callback(it) }
             )
 
             launcher.launch(input)
@@ -99,6 +121,24 @@ class CryptoActivity : ComponentActivity() {
             callback = callback
         )
 
+        suspend fun encrypt(
+            context: Context,
+            input: List<String>,
+            bypass: Boolean = true,
+        ) = suspendCancellableCoroutine { continuation ->
+            encrypt(
+                context = context,
+                input = input,
+                bypass = bypass
+            ) { output ->
+                if (output.isNotEmpty()) {
+                    continuation.resume(output)
+                } else {
+                    continuation.resumeWithException(CancellationException())
+                }
+            }
+        }
+
         fun decrypt(
             context: Context,
             input: List<String>,
@@ -111,24 +151,23 @@ class CryptoActivity : ComponentActivity() {
             bypass = bypass,
             callback = callback
         )
-    }
 
-    private class Crypto(
-        private val action: Action,
-        private val bypass: Boolean
-    ) : ActivityResultContract<List<String>, List<String>>() {
-        override fun createIntent(context: Context, input: List<String>): Intent {
-            return Intent(context, CryptoActivity::class.java).also {
-                it.action = action.original
-                it.putExtra(EXTRA_BYPASS, bypass)
-                it.putExtra(EXTRA_INPUT, input.toTypedArray())
+        suspend fun decrypt(
+            context: Context,
+            input: List<String>,
+            bypass: Boolean = true,
+        ) = suspendCancellableCoroutine { continuation ->
+            decrypt(
+                context = context,
+                input = input,
+                bypass = bypass
+            ) { output ->
+                if (output.isNotEmpty()) {
+                    continuation.resume(output)
+                } else {
+                    continuation.resumeWithException(CancellationException())
+                }
             }
-        }
-
-        override fun parseResult(resultCode: Int, intent: Intent?): List<String> {
-            if (resultCode != RESULT_OK) return emptyList()
-            if (intent == null) return emptyList()
-            return intent.output.toList()
         }
     }
 }

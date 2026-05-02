@@ -2,7 +2,6 @@ package dev.sanmer.authenticator.repository
 
 import dev.sanmer.authenticator.database.dao.TotpDao
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.model.serializer.TotpAuth
 import dev.sanmer.crypto.Crypto
 import dev.sanmer.encoding.decodeBase64
 import dev.sanmer.encoding.encodeBase64
@@ -66,21 +65,15 @@ class DbRepositoryImpl(
         totp.getAllTrashed().filter { if (dead) it.lifetime > TotpEntity.LIFETIME_MAX else true }
     }
 
-    override suspend fun insertTotp(auth: TotpAuth) = withContext(Dispatchers.IO) {
+    override suspend fun insertTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
         totp.insert(
-            TotpEntity(auth).copy(secret = auth.secret.toEncrypted())
+            entity.copy(secret = entity.secret.toEncrypted())
         )
     }
 
-    override suspend fun insertTotp(auths: List<TotpAuth>) = withContext(Dispatchers.IO) {
+    override suspend fun insertTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
         totp.insert(
-            auths.map { TotpEntity(it).copy(secret = it.secret.toEncrypted()) }
-        )
-    }
-
-    override suspend fun updateTotp(id: Long, auth: TotpAuth) = withContext(Dispatchers.IO) {
-        totp.update(
-            TotpEntity(auth).copy(id = id, secret = auth.secret.toEncrypted())
+            entities.map { it.copy(secret = it.secret.toEncrypted()) }
         )
     }
 

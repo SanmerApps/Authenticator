@@ -85,7 +85,7 @@ fun HomeScreen(
                 state = listState,
                 navController = navController,
                 totp = viewModel.totp,
-                recycle = viewModel::recycle,
+                delete = viewModel::moveToTrash,
                 contentPadding = contentPadding
             )
         }

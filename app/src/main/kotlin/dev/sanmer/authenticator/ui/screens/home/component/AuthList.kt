@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.model.impl.TotpImpl
+import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
 import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.main.Screen
@@ -22,8 +22,8 @@ import dev.sanmer.authenticator.ui.main.Screen
 fun AuthList(
     state: LazyListState,
     navController: NavController,
-    totp: List<TotpImpl>,
-    recycle: (TotpEntity) -> Unit,
+    totp: List<TotpAuth>,
+    delete: (TotpEntity) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyColumn(
@@ -40,7 +40,7 @@ fun AuthList(
                 auth = it,
                 enabled = false,
                 onEdit = { navController.navigateSingleTopTo(Screen.Edit(it.entity.id, "")) },
-                onDelete = { recycle(it.entity) }
+                onDelete = { delete(it.entity) }
             )
         }
     }

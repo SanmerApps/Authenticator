@@ -9,33 +9,34 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.model.serializer.AuthJson
-import dev.sanmer.authenticator.model.serializer.AuthTxt
-import dev.sanmer.authenticator.ui.screens.settings.SettingsViewModel.FileType
+import dev.sanmer.authenticator.model.serializer.AuthUri
 
 @Composable
 fun DatabaseItem(
     onDismiss: () -> Unit,
     isEmpty: Boolean,
-    prepare: (FileType, Context, () -> Unit) -> Unit,
-    importFrom: (FileType, Context, Uri) -> Unit,
-    exportTo: (FileType, Context, Uri) -> Unit,
+    importJson: (Context, Uri) -> Unit,
+    importUri: (Context, Uri) -> Unit,
+    encrypt: (Context, () -> Unit) -> Unit,
+    exportJson: (Context, Uri) -> Unit,
+    exportUri: (Context, Uri) -> Unit,
 ) {
     val context = LocalContext.current
-    val jsonImport = rememberLauncherForActivityResult(
+    val jsonImporter = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { if (it != null) importFrom(FileType.Json, context, it) }
+        onResult = { if (it != null) importJson(context, it) }
     )
-    val jsonExport = rememberLauncherForActivityResult(
+    val jsonExporter = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(AuthJson.MIME_TYPE),
-        onResult = { if (it != null) exportTo(FileType.Json, context, it) }
+        onResult = { if (it != null) exportJson(context, it) }
     )
-    val txtImport = rememberLauncherForActivityResult(
+    val uriImporter = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { if (it != null) importFrom(FileType.Txt, context, it) }
+        onResult = { if (it != null) importUri(context, it) }
     )
-    val txtExport = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(AuthTxt.MIME_TYPE),
-        onResult = { if (it != null) exportTo(FileType.Txt, context, it) }
+    val uriExporter = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(AuthUri.MIME_TYPE),
+        onResult = { if (it != null) exportUri(context, it) }
     )
 
     SettingBottomSheet(
@@ -45,25 +46,25 @@ fun DatabaseItem(
         SettingItem(
             icon = R.drawable.database_import,
             title = stringResource(id = R.string.settings_import_json),
-            onClick = { jsonImport.launch(AuthJson.MIME_TYPE) }
+            onClick = { jsonImporter.launch(AuthJson.MIME_TYPE) }
         )
 
         if (!isEmpty) SettingItem(
             icon = R.drawable.database_export,
             title = stringResource(id = R.string.settings_export_json),
-            onClick = { prepare(FileType.Json, context) { jsonExport.launch(AuthJson.FILE_NAME) } }
+            onClick = { encrypt(context) { jsonExporter.launch(AuthJson.FILE_NAME) } }
         )
 
         SettingItem(
             icon = R.drawable.file_export,
             title = stringResource(id = R.string.settings_import_txt),
-            onClick = { txtImport.launch(AuthTxt.MIME_TYPE) }
+            onClick = { uriImporter.launch(AuthUri.MIME_TYPE) }
         )
 
         if (!isEmpty) SettingItem(
             icon = R.drawable.file_import,
             title = stringResource(id = R.string.settings_export_txt),
-            onClick = { prepare(FileType.Txt, context) { txtExport.launch(AuthTxt.FILE_NAME) } }
+            onClick = { uriExporter.launch(AuthUri.FILE_NAME) }
         )
     }
 }

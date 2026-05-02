@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.authenticator.model.impl.TotpImpl
+import dev.sanmer.authenticator.model.auth.TotpAuth
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.TimeRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,7 +33,7 @@ class HomeViewModel(
             .toLocalTime()
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.Eagerly,
+        started = SharingStarted.Eagerly,
         initialValue = LocalTime.now()
     )
 
@@ -51,7 +51,7 @@ class HomeViewModel(
                 .collect { totp ->
                     loadState = LoadState.Ready(
                         totp = totp.map {
-                            TotpImpl(
+                            TotpAuth(
                                 entity = it,
                                 epochSeconds = timeRepository.epochSeconds
                             )
@@ -69,21 +69,21 @@ class HomeViewModel(
         }
     }
 
-    fun recycle(entity: TotpEntity) {
+    fun moveToTrash(entity: TotpEntity) {
         viewModelScope.launch {
-            dbRepository.updateTotp(entity.copy(deletedAt = System.currentTimeMillis()))
+            dbRepository.updateTotp(entity.toTrash())
         }
     }
 
     sealed class LoadState {
-        abstract val totp: List<TotpImpl>
+        abstract val totp: List<TotpAuth>
 
         data object Pending : LoadState() {
-            override val totp = emptyList<TotpImpl>()
+            override val totp = emptyList<TotpAuth>()
         }
 
         data class Ready(
-            override val totp: List<TotpImpl>
+            override val totp: List<TotpAuth>
         ) : LoadState()
 
         val isPending inline get() = this is Pending
