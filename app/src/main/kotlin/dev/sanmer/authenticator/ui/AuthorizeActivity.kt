@@ -12,8 +12,10 @@ import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeScreen
 import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeViewModel
 import dev.sanmer.authenticator.ui.theme.AppTheme
 import dev.sanmer.crypto.BiometricKey
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
+import kotlin.coroutines.resume
 
 class AuthorizeActivity : FragmentActivity() {
     private val viewModel by viewModel<AuthorizeViewModel>()
@@ -73,12 +75,29 @@ class AuthorizeActivity : FragmentActivity() {
         val Intent.isSucceed: Boolean
             inline get() = getBooleanExtra(EXTRA_SUCCEED, false)
 
+        private class Authorize(
+            val action: Action
+        ) : ActivityResultContract<Unit, Boolean>() {
+            override fun createIntent(context: Context, input: Unit): Intent {
+                return Intent(context, AuthorizeActivity::class.java).also {
+                    it.action = action.original
+                }
+            }
+
+            override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+                if (resultCode != RESULT_OK) return false
+                if (intent == null) return false
+                return intent.isSucceed
+            }
+
+        }
+
         fun start(
             context: Context,
             action: Action,
             callback: (Boolean) -> Unit
         ) {
-            if (context !is ActivityResultRegistryOwner) return
+            require(context is ActivityResultRegistryOwner) { "Expected ActivityResultRegistryOwner" }
 
             val activityResultRegistry = context.activityResultRegistry
             val launcher = activityResultRegistry.register(
@@ -99,21 +118,8 @@ class AuthorizeActivity : FragmentActivity() {
             callback = callback
         )
 
-        private class Authorize(
-            val action: Action
-        ) : ActivityResultContract<Unit, Boolean>() {
-            override fun createIntent(context: Context, input: Unit): Intent {
-                return Intent(context, AuthorizeActivity::class.java).also {
-                    it.action = action.original
-                }
-            }
-
-            override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
-                if (resultCode != RESULT_OK) return false
-                if (intent == null) return false
-                return intent.isSucceed
-            }
-
+        suspend fun auth(context: Context) = suspendCancellableCoroutine { continuation ->
+            auth(context) { continuation.resume(it) }
         }
     }
 }
