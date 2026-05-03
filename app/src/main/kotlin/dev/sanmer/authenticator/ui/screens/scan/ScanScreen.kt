@@ -5,11 +5,15 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.view.CameraController
-import androidx.camera.view.PreviewView
+import androidx.camera.compose.CameraXViewfinder
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import androidx.camera.viewfinder.compose.MutableCoordinateTransformer
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,14 +33,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -51,34 +56,29 @@ fun ScanScreen(
     viewModel: ScanViewModel = koinViewModel(),
     navController: NavController
 ) {
-    val uri by viewModel.uri.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val text by viewModel.text.collectAsStateWithLifecycle()
 
-    DisposableEffect(uri) {
-        if (uri.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(-1, uri))
+    DisposableEffect(text) {
+        if (text.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(-1, text))
         onDispose { viewModel.rewind() }
-    }
-
-    DisposableEffect(true) {
-        viewModel.bindToLifecycle(context, lifecycleOwner)
-        onDispose { viewModel.unbind() }
     }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        CameraXPreview(
-            controller = viewModel.cameraController,
-            modifier = Modifier.fillMaxSize()
-        )
-
         Crossfade(
-            targetState = !viewModel.isAllowed,
+            targetState = viewModel.isAllowed,
             animationSpec = tween(600)
-        ) { show ->
-            if (show) {
+        ) { isAllowed ->
+            if (isAllowed) {
+                CameraXPreview(
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
                 CameraOff(
+                    onClick = { viewModel.requestPermission(context) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -96,11 +96,16 @@ fun ScanScreen(
 
 @Composable
 private fun CameraOff(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) = Box(
     modifier = modifier
         .background(
             color = MaterialTheme.colorScheme.surfaceContainer
+        )
+        .clickable(
+            enabled = true,
+            onClick = onClick
         ),
     contentAlignment = Alignment.Center
 ) {
@@ -113,19 +118,47 @@ private fun CameraOff(
 }
 
 @Composable
-fun CameraXPreview(
-    controller: CameraController,
+private fun CameraXPreview(
+    viewModel: ScanViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val previewView = remember { PreviewView(context) }
-    LaunchedEffect(true) {
-        previewView.controller = controller
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val coordinateTransformer = remember { MutableCoordinateTransformer() }
+    val surfaceRequest by viewModel.surfaceRequest.collectAsStateWithLifecycle()
+
+    LaunchedEffect(lifecycleOwner) {
+        viewModel.bindToCamera(lifecycleOwner)
     }
 
-    AndroidView(
-        factory = { previewView },
+    val request = surfaceRequest ?: return
+    val meteringFactory by remember(request) {
+        derivedStateOf {
+            with(request.resolution) {
+                SurfaceOrientedMeteringPointFactory(width.toFloat(), height.toFloat())
+            }
+        }
+    }
+    CameraXViewfinder(
+        surfaceRequest = request,
+        coordinateTransformer = coordinateTransformer,
         modifier = modifier
+            .pointerInput(true) {
+                detectTapGestures { offset ->
+                    val surfacePoint = with(coordinateTransformer) {
+                        offset.transform()
+                    }
+                    val focusPoint = meteringFactory.createPoint(
+                        surfacePoint.x,
+                        surfacePoint.y
+                    )
+                    viewModel.startFocusAndMetering(focusPoint)
+                }
+            }
+            .pointerInput(true) {
+                detectTransformGestures { _, _, zoom, _ ->
+                    viewModel.setZoomRatio(zoom)
+                }
+            }
     )
 }
 
