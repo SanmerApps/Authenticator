@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.sanmer.authenticator.datastore.compose.LocalPreference
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.ui.ktx.plus
-import dev.sanmer.authenticator.ui.provider.LocalPreference
 import dev.sanmer.authenticator.ui.screens.ntp.NtpViewModel
 
 @Composable

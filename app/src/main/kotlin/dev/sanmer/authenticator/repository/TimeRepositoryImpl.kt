@@ -26,7 +26,7 @@ class TimeRepositoryImpl(
     private val _ntpTime = MutableStateFlow(NtpServer.NtpTime())
     override val ntpTime get() = _ntpTime.asStateFlow()
 
-    private val _epochSeconds = MutableStateFlow( System.currentTimeMillis() / 1000)
+    private val _epochSeconds = MutableStateFlow(System.currentTimeMillis() / 1000)
     override val epochSeconds get() = _epochSeconds.asStateFlow()
 
     private val logger = Logger.Android("TimeRepositoryImpl")

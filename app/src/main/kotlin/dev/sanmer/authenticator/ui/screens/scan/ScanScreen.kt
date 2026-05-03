@@ -44,23 +44,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
-import dev.sanmer.authenticator.ui.main.Screen
+import dev.sanmer.authenticator.ui.screens.Screen
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ScanScreen(
-    viewModel: ScanViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: ScanViewModel,
+    goTo: (Screen) -> Unit,
+    goBack: () -> Unit
 ) {
     val context = LocalContext.current
     val text by viewModel.text.collectAsStateWithLifecycle()
 
     DisposableEffect(text) {
-        if (text.isOtpUri()) navController.navigateSingleTopTo(Screen.Edit(-1, text))
+        if (text.isOtpUri()) goTo(Screen.Edit(uri = text))
         onDispose { viewModel.rewind() }
     }
 
@@ -87,7 +85,7 @@ fun ScanScreen(
         ActionButtons(
             modifier = Modifier.align(Alignment.BottomEnd),
             scanImage = viewModel::scanImage,
-            onBack = navController::navigateUp,
+            onBack = goBack,
             torchEnabled = viewModel.torchEnabled,
             enableTorch = viewModel::enableTorch
         )

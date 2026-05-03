@@ -15,7 +15,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,21 +36,21 @@ import dev.sanmer.qrcode.QRCode
 @Composable
 fun SecretItem(
     secret: String,
-    uriString: String,
+    uri: String,
     onSecretChange: (String) -> Unit,
     isError: Boolean,
     readOnly: Boolean
 ) {
-    var show by rememberSaveable { mutableStateOf(false) }
+    var show by remember { mutableStateOf(false) }
     if (show) QRCodeBottomSheet(
-        uri = uriString,
-        onDismiss = { show = false }
+        onDismiss = { show = false },
+        uri = uri
     )
 
     TextFieldContent(
         leading = { TextFieldContentIcon(icon = R.drawable.key) },
         trailing = {
-            if (readOnly && uriString.isNotEmpty()) {
+            if (readOnly && uri.isNotEmpty()) {
                 IconButton(
                     onClick = { show = true }
                 ) {
@@ -89,8 +88,8 @@ fun SecretItem(
 
 @Composable
 private fun QRCodeBottomSheet(
-    uri: String,
     onDismiss: () -> Unit,
+    uri: String,
 ) = ModalBottomSheet(
     onDismissRequest = onDismiss,
     shape = MaterialTheme.shapes.large.bottom(0.dp),

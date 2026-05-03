@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.ui.main
+package dev.sanmer.authenticator.ui.screens.main
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -32,9 +32,7 @@ fun LockScreen(
         }
     }
 
-    BackHandler {
-        context.finishActivity()
-    }
+    BackHandler(onBack = context::finishActivity)
 
     Box(
         modifier = Modifier

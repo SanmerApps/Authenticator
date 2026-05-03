@@ -27,12 +27,10 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.Const
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ktx.viewUrl
-import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
-import dev.sanmer.authenticator.ui.main.Screen
+import dev.sanmer.authenticator.ui.screens.Screen
 import dev.sanmer.authenticator.ui.screens.settings.SettingsViewModel.BottomSheet
 import dev.sanmer.authenticator.ui.screens.settings.component.DatabaseItem
 import dev.sanmer.authenticator.ui.screens.settings.component.PreferenceItem
@@ -40,12 +38,12 @@ import dev.sanmer.authenticator.ui.screens.settings.component.SettingIcon
 import dev.sanmer.authenticator.ui.screens.settings.component.SettingItem
 import dev.sanmer.authenticator.ui.screens.settings.component.TokenItem
 import dev.sanmer.authenticator.ui.screens.settings.component.ToolItem
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: SettingsViewModel,
+    goTo: (Screen) -> Unit,
+    goBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -53,7 +51,8 @@ fun SettingsScreen(
         BottomSheet.Closed -> Unit
         BottomSheet.Token -> TokenItem(
             onDismiss = viewModel::closeBottomSheet,
-            navController = navController,
+            onEdit = { goTo(Screen.Edit()) },
+            onScan = { goTo(Screen.Scan) }
         )
 
         BottomSheet.Database -> DatabaseItem(
@@ -68,21 +67,22 @@ fun SettingsScreen(
 
         BottomSheet.Tool -> ToolItem(
             onDismiss = viewModel::closeBottomSheet,
-            navController = navController,
+            onEncode = { goTo(Screen.Encode) },
             decryptFromJson = viewModel::decryptFromJson,
             decryptedToJson = viewModel::decryptedToJson,
         )
 
         BottomSheet.Preference -> PreferenceItem(
             onDismiss = viewModel::closeBottomSheet,
-            navController = navController,
+            onSecurity = { goTo(Screen.Security) },
+            onNtp = { goTo(Screen.Ntp) }
         )
     }
 
     Scaffold(
         topBar = {
             TopBar(
-                navController = navController,
+                onBack = goBack,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -92,7 +92,9 @@ fun SettingsScreen(
                 enter = fadeIn() + scaleIn(),
                 exit = scaleOut() + fadeOut()
             ) {
-                ActionButton(navController = navController)
+                ActionButton(
+                    gotToTrash = { goTo(Screen.Trash) }
+                )
             }
         }
     ) { contentPadding ->
@@ -173,10 +175,10 @@ fun SettingsScreen(
 
 @Composable
 private fun ActionButton(
-    navController: NavController
+    gotToTrash: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { navController.navigateSingleTopTo(Screen.Trash) }
+        onClick = gotToTrash
     ) {
         Icon(
             painter = painterResource(id = R.drawable.trash),
@@ -187,13 +189,13 @@ private fun ActionButton(
 
 @Composable
 private fun TopBar(
-    navController: NavController,
+    onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = { Text(text = stringResource(id = R.string.settings_title)) },
     navigationIcon = {
         IconButton(
-            onClick = { navController.navigateUp() }
+            onClick = onBack
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),

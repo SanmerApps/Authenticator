@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.setSensitiveText
 import dev.sanmer.authenticator.ui.screens.edit.EditViewModel.Value
@@ -31,12 +30,11 @@ import dev.sanmer.authenticator.ui.screens.edit.component.SecretItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TextFieldItem
 import dev.sanmer.authenticator.ui.screens.edit.component.TypeAndHashItem
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditScreen(
-    viewModel: EditViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: EditViewModel,
+    goBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -44,11 +42,9 @@ fun EditScreen(
         topBar = {
             TopBar(
                 isEdit = viewModel.isEdit,
-                uri = viewModel.uriString,
-                onSave = {
-                    viewModel.save { if (!viewModel.isEdit) navController.navigateUp() }
-                },
-                navController = navController,
+                uri = viewModel.uri,
+                onClose = goBack,
+                onSave = { viewModel.save { if (!viewModel.isEdit) goBack() } },
                 scrollBehavior = scrollBehavior
             )
         }
@@ -84,7 +80,7 @@ fun EditScreen(
 
             SecretItem(
                 secret = viewModel.input.secret,
-                uriString = viewModel.uriString,
+                uri = viewModel.uri,
                 onSecretChange = { secret ->
                     viewModel.update { it.copy(secret = secret) }
                 },
@@ -124,8 +120,8 @@ fun EditScreen(
 private fun TopBar(
     isEdit: Boolean,
     uri: String,
+    onClose: () -> Unit,
     onSave: () -> Unit,
-    navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = {
@@ -137,7 +133,7 @@ private fun TopBar(
     },
     navigationIcon = {
         IconButton(
-            onClick = { navController.navigateUp() }
+            onClick = onClose
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.x),

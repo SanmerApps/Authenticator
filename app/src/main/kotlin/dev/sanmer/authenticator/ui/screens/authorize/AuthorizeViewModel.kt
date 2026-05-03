@@ -11,7 +11,7 @@ import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.PreferenceRepository
 import dev.sanmer.authenticator.ui.AuthorizeActivity
-import dev.sanmer.authenticator.ui.main.MainViewModel
+import dev.sanmer.authenticator.ui.screens.main.MainViewModel.LoadState
 import dev.sanmer.crypto.BiometricKey
 import dev.sanmer.crypto.BiometricKey.Default.decryptKeyByBiometric
 import dev.sanmer.crypto.BiometricKey.Default.getKeyEncryptedByBiometric
@@ -32,7 +32,7 @@ class AuthorizeViewModel(
     var type by mutableStateOf<Type>(Type.PasswordPending)
         private set
 
-    var loadState by mutableStateOf<MainViewModel.LoadState>(MainViewModel.LoadState.Pending)
+    var loadState by mutableStateOf<LoadState>(LoadState.Pending)
         private set
     private val preference inline get() = loadState.preference
 
@@ -49,7 +49,7 @@ class AuthorizeViewModel(
     private fun preferenceObserver() {
         viewModelScope.launch {
             preferenceRepository.data.collect {
-                loadState = MainViewModel.LoadState.Ready(it)
+                loadState = LoadState.Ready(it)
                 if (it.isBiometric) {
                     type = Type.BiometricPending
                     isSupportedBiometric = true

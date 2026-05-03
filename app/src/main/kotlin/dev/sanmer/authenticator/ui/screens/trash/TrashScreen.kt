@@ -17,16 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.screens.trash.component.AuthList
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun TrashScreen(
-    viewModel: TrashViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: TrashViewModel,
+    goBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val listState = rememberLazyListState()
@@ -34,8 +32,8 @@ fun TrashScreen(
     Scaffold(
         topBar = {
             TopBar(
+                onBack = goBack,
                 onRestore = viewModel::restoreAll,
-                navController = navController,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -67,14 +65,14 @@ fun TrashScreen(
 
 @Composable
 private fun TopBar(
+    onBack: () -> Unit,
     onRestore: () -> Unit,
-    navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = { Text(text = stringResource(id = R.string.trash_title)) },
     navigationIcon = {
         IconButton(
-            onClick = { navController.navigateUp() }
+            onClick = onBack
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),

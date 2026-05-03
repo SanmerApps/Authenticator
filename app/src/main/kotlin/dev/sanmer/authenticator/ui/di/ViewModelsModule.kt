@@ -1,11 +1,11 @@
-package dev.sanmer.authenticator.di
+package dev.sanmer.authenticator.ui.di
 
-import dev.sanmer.authenticator.ui.main.MainViewModel
 import dev.sanmer.authenticator.ui.screens.authorize.AuthorizeViewModel
 import dev.sanmer.authenticator.ui.screens.crypto.CryptoViewModel
 import dev.sanmer.authenticator.ui.screens.edit.EditViewModel
 import dev.sanmer.authenticator.ui.screens.encode.EncodeViewModel
 import dev.sanmer.authenticator.ui.screens.home.HomeViewModel
+import dev.sanmer.authenticator.ui.screens.main.MainViewModel
 import dev.sanmer.authenticator.ui.screens.ntp.NtpViewModel
 import dev.sanmer.authenticator.ui.screens.scan.ScanViewModel
 import dev.sanmer.authenticator.ui.screens.settings.SettingsViewModel

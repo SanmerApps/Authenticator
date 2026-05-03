@@ -7,7 +7,7 @@ import androidx.camera.core.CameraXConfig
 import dev.sanmer.authenticator.di.DataStore
 import dev.sanmer.authenticator.di.Database
 import dev.sanmer.authenticator.di.Repositories
-import dev.sanmer.authenticator.di.ViewModels
+import dev.sanmer.authenticator.ui.di.Navigation
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -18,7 +18,7 @@ class App : Application(), CameraXConfig.Provider {
         startKoin {
             androidLogger()
             androidContext(this@App)
-            modules(DataStore, Database, Repositories, ViewModels)
+            modules(DataStore, Database, Repositories, Navigation)
         }
     }
 
