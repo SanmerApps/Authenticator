@@ -83,8 +83,8 @@ fun HomeScreen(
             AuthList(
                 state = listState,
                 totp = viewModel.totp,
-                edit = { goTo(Screen.Edit(id = it.id)) },
-                delete = viewModel::moveToTrash,
+                onEdit = { goTo(Screen.Edit(id = it.id)) },
+                onDelete = viewModel::moveToTrash,
                 contentPadding = contentPadding
             )
         }

@@ -93,7 +93,7 @@ fun SettingsScreen(
                 exit = scaleOut() + fadeOut()
             ) {
                 ActionButton(
-                    gotToTrash = { goTo(Screen.Trash) }
+                    onClick = { goTo(Screen.Trash) }
                 )
             }
         }
@@ -175,10 +175,10 @@ fun SettingsScreen(
 
 @Composable
 private fun ActionButton(
-    gotToTrash: () -> Unit
+    onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = gotToTrash
+        onClick = onClick
     ) {
         Icon(
             painter = painterResource(id = R.drawable.trash),

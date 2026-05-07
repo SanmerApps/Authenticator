@@ -19,8 +19,8 @@ import dev.sanmer.authenticator.ui.ktx.plus
 fun AuthList(
     state: LazyListState,
     totp: List<TotpAuth>,
-    edit: (TotpEntity) -> Unit,
-    delete: (TotpEntity) -> Unit,
+    onEdit: (TotpEntity) -> Unit,
+    onDelete: (TotpEntity) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyColumn(
@@ -36,8 +36,8 @@ fun AuthList(
             AuthItem(
                 auth = it,
                 enabled = false,
-                onEdit = { edit(it.entity) },
-                onDelete = { delete(it.entity) }
+                onEdit = { onEdit(it.entity) },
+                onDelete = { onDelete(it.entity) }
             )
         }
     }
