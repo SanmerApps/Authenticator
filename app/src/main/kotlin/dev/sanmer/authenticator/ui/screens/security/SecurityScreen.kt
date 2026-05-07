@@ -18,16 +18,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.datastore.compose.LocalPreference
 import dev.sanmer.authenticator.ui.AuthorizeActivity
-import dev.sanmer.authenticator.ui.provider.LocalPreference
 import dev.sanmer.authenticator.ui.screens.security.component.SecurityItem
 import dev.sanmer.crypto.BiometricKey
 
 @Composable
 fun SecurityScreen(
-    navController: NavController
+    goBack: () -> Unit
 ) {
     val context = LocalContext.current
     val preference = LocalPreference.current
@@ -37,7 +36,7 @@ fun SecurityScreen(
     Scaffold(
         topBar = {
             TopBar(
-                navController = navController,
+                onBack = goBack,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -51,11 +50,13 @@ fun SecurityScreen(
             SecurityItem(
                 icon = R.drawable.shield,
                 title = stringResource(id = R.string.security_password),
-                desc = stringResource(id = if (preference.isEncrypted) {
-                    R.string.security_password_mask
-                } else {
-                    R.string.security_password_empty
-                }),
+                desc = stringResource(
+                    id = if (preference.isEncrypted) {
+                        R.string.security_password_mask
+                    } else {
+                        R.string.security_password_empty
+                    }
+                ),
                 onClick = {
                     val action = if (preference.isEncrypted) {
                         AuthorizeActivity.Action.ChangePassword
@@ -103,13 +104,13 @@ fun SecurityScreen(
 
 @Composable
 private fun TopBar(
-    navController: NavController,
+    onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = { Text(text = stringResource(id = R.string.settings_security)) },
     navigationIcon = {
         IconButton(
-            onClick = { navController.navigateUp() }
+            onClick = onBack
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),

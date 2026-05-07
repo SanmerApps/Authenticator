@@ -4,17 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.entity.TotpEntity
 import dev.sanmer.authenticator.model.auth.AuthType
 import dev.sanmer.authenticator.model.serializer.AuthUri.Default.toTotpEntity
 import dev.sanmer.authenticator.model.serializer.AuthUri.Default.uri
 import dev.sanmer.authenticator.repository.DbRepository
-import dev.sanmer.authenticator.ui.main.Screen
 import dev.sanmer.encoding.isBase32
 import dev.sanmer.otp.Otp
 import dev.sanmer.otp.OtpUri.Default.isOtpUri
@@ -23,15 +20,15 @@ import kotlinx.coroutines.launch
 
 class EditViewModel(
     private val dbRepository: DbRepository,
-    savedStateHandle: SavedStateHandle
+    private val id: Long,
+    uri: String
 ) : ViewModel() {
-    private val edit = savedStateHandle.toRoute<Screen.Edit>()
-    val isEdit = edit.id != -1L
+    val isEdit = id != Long.MAX_VALUE
 
     var input by mutableStateOf(Input())
         private set
 
-    var uriString by mutableStateOf("")
+    var uri by mutableStateOf(uri)
         private set
 
     private val result = mutableStateMapOf<Value, Boolean>()
@@ -40,16 +37,16 @@ class EditViewModel(
 
     init {
         logger.d("init")
-        updateFromUri(edit.uri)
+        updateFromUri(uri)
         dataObserver()
     }
 
     private fun dataObserver() {
         viewModelScope.launch {
-            dbRepository.getTotpDecryptedByIdAsFlow(edit.id)
+            dbRepository.getTotpDecryptedByIdAsFlow(id)
                 .collect { entity ->
                     update { Input(entity) }
-                    uriString = entity.uri().toString()
+                    uri = entity.uri().toString()
                 }
         }
     }
@@ -82,7 +79,7 @@ class EditViewModel(
         if (isAllOk()) {
             viewModelScope.launch {
                 when {
-                    isEdit -> dbRepository.updateTotp(input.entity(edit.id))
+                    isEdit -> dbRepository.updateTotp(input.entity(id))
                     else -> dbRepository.insertTotp(input.entity())
                 }
                 block()

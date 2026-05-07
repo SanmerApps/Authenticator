@@ -7,16 +7,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.model.serializer.AuthJson
-import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
-import dev.sanmer.authenticator.ui.main.Screen
 
 @Composable
 fun ToolItem(
     onDismiss: () -> Unit,
-    navController: NavController,
+    onEncode: () -> Unit,
     decryptFromJson: (Context, Uri, () -> Unit) -> Unit,
     decryptedToJson: (Context, Uri) -> Unit
 ) {
@@ -48,7 +45,7 @@ fun ToolItem(
             icon = R.drawable.a_b,
             title = stringResource(id = R.string.settings_encode_decode),
             onClick = {
-                navController.navigateSingleTopTo(Screen.Encode)
+                onEncode()
                 onDismiss()
             }
         )

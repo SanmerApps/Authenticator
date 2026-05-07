@@ -35,14 +35,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EncodeScreen(
-    viewModel: EncodeViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: EncodeViewModel,
+    goBack: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -54,7 +52,7 @@ fun EncodeScreen(
     Scaffold(
         topBar = {
             TopBar(
-                navController = navController,
+                onBack = goBack,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -156,13 +154,13 @@ private fun ButtonItem(
 
 @Composable
 private fun TopBar(
-    navController: NavController,
+    onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = { Text(text = stringResource(id = R.string.settings_encode_decode)) },
     navigationIcon = {
         IconButton(
-            onClick = { navController.navigateUp() }
+            onClick = onBack
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),

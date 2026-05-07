@@ -27,21 +27,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.component.LabelText
 import dev.sanmer.authenticator.ui.component.PageIndicator
 import dev.sanmer.authenticator.ui.ktx.isScrollingUp
-import dev.sanmer.authenticator.ui.ktx.navigateSingleTopTo
-import dev.sanmer.authenticator.ui.main.Screen
+import dev.sanmer.authenticator.ui.screens.Screen
 import dev.sanmer.authenticator.ui.screens.home.component.AuthList
-import org.koin.androidx.compose.koinViewModel
 import java.time.LocalTime
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: HomeViewModel,
+    goTo: (Screen) -> Unit,
 ) {
     val time by viewModel.time.collectAsStateWithLifecycle()
 
@@ -62,7 +59,9 @@ fun HomeScreen(
                 enter = fadeIn() + scaleIn(),
                 exit = scaleOut() + fadeOut()
             ) {
-                ActionButton(navController = navController)
+                ActionButton(
+                    onClick = { goTo(Screen.Settings) }
+                )
             }
         }
     ) { contentPadding ->
@@ -83,9 +82,9 @@ fun HomeScreen(
 
             AuthList(
                 state = listState,
-                navController = navController,
                 totp = viewModel.totp,
-                delete = viewModel::moveToTrash,
+                onEdit = { goTo(Screen.Edit(id = it.id)) },
+                onDelete = viewModel::moveToTrash,
                 contentPadding = contentPadding
             )
         }
@@ -94,10 +93,10 @@ fun HomeScreen(
 
 @Composable
 private fun ActionButton(
-    navController: NavController
+    onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = { navController.navigateSingleTopTo(Screen.Settings) }
+        onClick = onClick
     ) {
         Icon(
             painter = painterResource(id = R.drawable.settings_2),

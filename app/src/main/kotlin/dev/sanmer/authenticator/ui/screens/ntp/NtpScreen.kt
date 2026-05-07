@@ -31,15 +31,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.screens.ntp.component.NtpList
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NtpScreen(
-    viewModel: NtpViewModel = koinViewModel(),
-    navController: NavController
+    viewModel: NtpViewModel,
+    goBack: () -> Unit
 ) {
     val ntps by viewModel.ntps.collectAsStateWithLifecycle(initialValue = emptyList())
     val syncState by viewModel.syncState.collectAsStateWithLifecycle()
@@ -51,8 +49,8 @@ fun NtpScreen(
         topBar = {
             TopBar(
                 syncState = syncState,
+                onBack = goBack,
                 onSync = viewModel::syncAll,
-                navController = navController,
                 scrollBehavior = scrollBehavior
             )
         }
@@ -77,11 +75,21 @@ fun NtpScreen(
 @Composable
 private fun TopBar(
     syncState: NtpViewModel.SyncState,
+    onBack: () -> Unit,
     onSync: () -> Unit,
-    navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior
 ) = TopAppBar(
     title = { Text(text = stringResource(id = R.string.settings_ntp_server)) },
+    navigationIcon = {
+        IconButton(
+            onClick = onBack
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = null
+            )
+        }
+    },
     actions = {
         IconButton(
             onClick = onSync,
@@ -107,16 +115,6 @@ private fun TopBar(
                 painter = painterResource(id = R.drawable.refresh),
                 contentDescription = null,
                 modifier = Modifier.scale(animatedScale)
-            )
-        }
-    },
-    navigationIcon = {
-        IconButton(
-            onClick = { navController.navigateUp() }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_left),
-                contentDescription = null
             )
         }
     },

@@ -1,4 +1,4 @@
-package dev.sanmer.authenticator.ui.main
+package dev.sanmer.authenticator.ui.screens.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
