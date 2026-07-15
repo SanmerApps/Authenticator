@@ -32,7 +32,7 @@ class ApplicationConventionPlugin : Plugin<Project> {
 
         extensions.configure<KotlinAndroidProjectExtension> {
             compilerOptions {
-                languageVersion.set(KotlinVersion.KOTLIN_2_3)
+                languageVersion.set(KotlinVersion.KOTLIN_2_4)
                 optIn.add("kotlinx.serialization.ExperimentalSerializationApi")
             }
         }
