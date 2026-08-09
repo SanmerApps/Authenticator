@@ -21,7 +21,10 @@ class ComposeConventionPlugin : Plugin<Project> {
 
         extensions.configure<KotlinAndroidProjectExtension> {
             compilerOptions {
-                optIn.add("androidx.compose.material3.ExperimentalMaterial3Api")
+                optIn.addAll(
+                    "androidx.compose.material3.ExperimentalMaterial3Api",
+                    "androidx.compose.foundation.layout.ExperimentalLayoutApi"
+                )
             }
         }
 

@@ -1,70 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Crypto -->
-    <string name="crypto_encrypt">Encrypt</string>
-    <string name="crypto_decrypt">Decrypt</string>
-
-    <!-- Home -->
-    <string name="home_empty">No tokens</string>
-
     <!-- Edit -->
-    <string name="edit_add_title">Add token</string>
-    <string name="edit_edit_title">Edit token</string>
-    <string name="edit_name">Name</string>
-    <string name="edit_issuer">Issuer</string>
-    <string name="edit_secret">Secret</string>
-    <string name="edit_type">Type</string>
-    <string name="edit_hash">Hash</string>
-    <string name="edit_digits">Digits</string>
-    <string name="edit_period">Period</string>
-    <string name="edit_qrcode">QR Code</string>
+    <string name="token_add_title">Add token</string>
+    <string name="token_edit_title">Edit token</string>
+    <string name="token_name">Name</string>
+    <string name="token_issuer">Issuer</string>
+    <string name="token_secret">Secret</string>
+    <string name="token_type">Type</string>
+    <string name="token_hash">Hash</string>
+    <string name="token_digits">Digits</string>
+    <string name="token_period">Period</string>
+    <string name="token_preview">Preview</string>
+    <string name="token_save">Save</string>
+    <string name="token_copy">Copy</string>
+    <string name="token_close">Close</string>
 
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
-    <string name="settings_token">Token</string>
-    <string name="settings_token_desc">Add new token</string>
-    <string name="settings_enter">Enter manually</string>
-    <string name="settings_scan">Scan QR Code</string>
-    <string name="settings_import_export">Import &amp; Export</string>
-    <string name="settings_import_export_desc">Import and export database</string>
-    <string name="settings_import_json">Import from JSON</string>
-    <string name="settings_export_json">Export to JSON</string>
-    <string name="settings_import_txt">Import from URI</string>
-    <string name="settings_export_txt">Export to URI</string>
-    <string name="settings_tools">Tools</string>
-    <string name="settings_tools_desc">Decrypt, encode and decode</string>
-    <string name="settings_decrypt">Decrypt a JSON</string>
-    <string name="settings_encode_decode">Encode &amp; Decode</string>
-    <string name="settings_preference">Preference</string>
-    <string name="settings_preference_desc">Security, time server</string>
-    <string name="settings_security">Security</string>
-    <string name="settings_ntp_server">Time server</string>
+    <!-- Setting -->
+    <string name="setting_title">Settings</string>
+    <string name="setting_security">Security</string>
+    <string name="setting_password">Password</string>
+    <string name="setting_password_not_set">Not set</string>
+    <string name="setting_password_set">Set</string>
+    <string name="setting_password_remove">Remove</string>
+    <string name="setting_password_change">Change</string>
+    <string name="setting_biometric">Biometric</string>
+    <string name="setting_biometric_desc">Use biometric authentication to unlock app</string>
+    <string name="setting_biometric_verify">Verify it\'s you</string>
+    <string name="setting_prevent_screenshot">Prevent screenshots</string>
+    <string name="setting_prevent_screenshot_desc">Prevent app from appearing in screenshots</string>
+    <string name="setting_database">Database</string>
+    <string name="setting_import_export">Import and export</string>
+    <string name="setting_import_export_desc">Import and export tokens</string>
+    <string name="setting_other">Other</string>
+    <string name="setting_brand">Brands</string>
 
     <!-- Trash -->
     <string name="trash_title">Trash</string>
-    <string name="trash_empty">No items</string>
-
-    <!-- Encode -->
-    <string name="encode_encoded">Encoded</string>
-    <string name="encode_decoded">Decoded</string>
-
-    <!-- Security -->
-    <string name="biometric_title">Verify it\'s you</string>
-    <string name="security_password">Password</string>
-    <string name="security_password_empty">No password set</string>
-    <string name="security_biometric">Biometric</string>
-    <string name="security_biometric_desc">Use biometric authentication to unlock app</string>
-    <string name="security_remove_password">Remove password</string>
-    <string name="security_remove_password_desc">Delete the current password and biometric authentication will be disabled</string>
-    <string name="security_set_password">Set password</string>
-    <string name="security_change_password">Change password</string>
-    <string name="security_enter_password">Enter password</string>
-    <string name="security_new_password">New password</string>
-    <string name="security_current_password">Current password</string>
+    <string name="trash_empty">Empty</string>
+    <string name="trashed_at">Trashed at %1$s</string>
 
     <!-- Ntp -->
-    <string name="ntp_rtt">RTT: %1$s</string>
-    <string name="ntp_offset">Offset: %1$s</string>
+    <string name="ntp_title">Time server</string>
+    <string name="ntp_custom">Custom</string>
     <string name="ntp_timeout">Timeout</string>
 
 </resources>

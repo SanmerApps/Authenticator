@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "dev.sanmer.core"
+    namespace = "dev.sanmer.auth"
 }
 
 dependencies {

@@ -16,7 +16,7 @@ class ApplicationConventionPlugin : Plugin<Project> {
             buildToolsVersion = "37.0.0"
 
             defaultConfig {
-                minSdk = 33
+                minSdk = 30
                 targetSdk = compileSdk
             }
 
@@ -33,7 +33,10 @@ class ApplicationConventionPlugin : Plugin<Project> {
         extensions.configure<KotlinAndroidProjectExtension> {
             compilerOptions {
                 languageVersion.set(KotlinVersion.KOTLIN_2_4)
-                optIn.add("kotlinx.serialization.ExperimentalSerializationApi")
+                optIn.addAll(
+                    "kotlinx.coroutines.FlowPreview",
+                    "kotlinx.serialization.ExperimentalSerializationApi",
+                )
             }
         }
     }

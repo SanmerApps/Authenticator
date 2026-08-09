@@ -28,4 +28,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Authenticator"
-include(":core", ":logo", ":app")
+include(":brand", ":core", ":app")

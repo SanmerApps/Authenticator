@@ -1,11 +1,15 @@
 package dev.sanmer.authenticator.repository
 
-import dev.sanmer.authenticator.datastore.model.Preference
-import dev.sanmer.ntp.NtpServer
+import dev.sanmer.auth.ntp.NtpClock
+import dev.sanmer.auth.ntp.NtpServer
+import dev.sanmer.authenticator.model.LoadData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.time.Clock
+import kotlin.time.Instant
 
-interface TimeRepository {
-    val ntpTime: StateFlow<NtpServer.NtpTime>
-    val epochSeconds: StateFlow<Long>
-    suspend fun sync(preference: Preference, times: Int = 3): Result<NtpServer.NtpTime>
+interface TimeRepository : Clock {
+    val clock: StateFlow<LoadData<NtpClock>>
+    val now: Flow<Instant>
+    suspend fun sync(server: NtpServer)
 }

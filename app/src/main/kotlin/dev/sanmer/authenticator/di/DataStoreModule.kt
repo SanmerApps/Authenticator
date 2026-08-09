@@ -7,7 +7,6 @@ import androidx.datastore.core.Serializer
 import androidx.datastore.dataStoreFile
 import dev.sanmer.authenticator.datastore.PreferenceSerializer
 import dev.sanmer.authenticator.datastore.model.Preference
-import dev.sanmer.authenticator.ktx.deviceProtectedContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -19,7 +18,7 @@ val DataStore = module {
         DataStoreFactory.create(
             serializer = get()
         ) {
-            get<Context>().deviceProtectedContext.dataStoreFile("preference.pb")
+            get<Context>().createDeviceProtectedStorageContext().dataStoreFile("preference.pb")
         }
     }
 }

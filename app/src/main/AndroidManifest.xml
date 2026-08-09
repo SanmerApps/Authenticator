@@ -20,39 +20,29 @@
 
     <application
         android:name=".App"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="36">
 
         <activity
             android:name=".ui.MainActivity"
-            android:launchMode="singleTask"
             android:exported="true"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-        <activity
-            android:name=".ui.AuthorizeActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:exported="false"
-            android:noHistory="true"
-            android:excludeFromRecents="true"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-        <activity
-            android:name=".ui.CryptoActivity"
-            android:theme="@style/AppTheme.Transparent"
-            android:exported="false"
-            android:noHistory="true"
-            android:excludeFromRecents="true"
-            android:windowSoftInputMode="adjustResize">
+                <data android:scheme="otpauth" />
+            </intent-filter>
         </activity>
 
     </application>

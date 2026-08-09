@@ -7,6 +7,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import dev.sanmer.authenticator.compat.BuildCompat
 
 @Composable
 fun AppTheme(
@@ -21,9 +22,16 @@ fun AppTheme(
 
 @Composable
 private fun colorScheme(
-    darkMode: Boolean,
+    darkMode: Boolean = isSystemInDarkTheme(),
     context: Context = LocalContext.current
-) = when {
-    darkMode -> dynamicDarkColorScheme(context)
-    else -> dynamicLightColorScheme(context)
+) = if (BuildCompat.atLeastS) {
+    when {
+        darkMode -> dynamicDarkColorScheme(context)
+        else -> dynamicLightColorScheme(context)
+    }
+} else {
+    when {
+        darkMode -> DarkColorScheme
+        else -> LightColorScheme
+    }
 }

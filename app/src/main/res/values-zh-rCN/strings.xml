@@ -1,70 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Crypto -->
-    <string name="crypto_encrypt">加密</string>
-    <string name="crypto_decrypt">解密</string>
-
-    <!-- Home -->
-    <string name="home_empty">没有令牌</string>
-
     <!-- Edit -->
-    <string name="edit_add_title">添加令牌</string>
-    <string name="edit_edit_title">编辑令牌</string>
-    <string name="edit_name">名称</string>
-    <string name="edit_issuer">发行方</string>
-    <string name="edit_secret">密钥</string>
-    <string name="edit_type">类型</string>
-    <string name="edit_hash">哈希算法</string>
-    <string name="edit_digits">位数</string>
-    <string name="edit_period">周期</string>
-    <string name="edit_qrcode">二维码</string>
+    <string name="token_add_title">添加令牌</string>
+    <string name="token_edit_title">编辑令牌</string>
+    <string name="token_name">名称</string>
+    <string name="token_issuer">发行方</string>
+    <string name="token_secret">密钥</string>
+    <string name="token_type">类型</string>
+    <string name="token_hash">哈希算法</string>
+    <string name="token_digits">位数</string>
+    <string name="token_period">周期</string>
+    <string name="token_preview">预览</string>
+    <string name="token_save">保存</string>
+    <string name="token_copy">复制</string>
+    <string name="token_close">关闭</string>
 
-    <!-- Settings -->
-    <string name="settings_title">设置</string>
-    <string name="settings_token">令牌</string>
-    <string name="settings_token_desc">添加新令牌</string>
-    <string name="settings_enter">手动输入</string>
-    <string name="settings_scan">扫描二维码</string>
-    <string name="settings_import_export">导入与导出</string>
-    <string name="settings_import_export_desc">导入与导出数据库</string>
-    <string name="settings_import_json">从 JSON 导入</string>
-    <string name="settings_export_json">导出为 JSON</string>
-    <string name="settings_import_txt">从 URI 导入</string>
-    <string name="settings_export_txt">导出为 URI</string>
-    <string name="settings_tools">工具</string>
-    <string name="settings_tools_desc">解密、编码与解码</string>
-    <string name="settings_decrypt">解密 JSON</string>
-    <string name="settings_encode_decode">编码与解码</string>
-    <string name="settings_preference">偏好</string>
-    <string name="settings_preference_desc">安全性、时间服务器</string>
-    <string name="settings_security">安全性</string>
-    <string name="settings_ntp_server">时间服务器</string>
+    <!-- Setting -->
+    <string name="setting_title">设置</string>
+    <string name="setting_security">安全</string>
+    <string name="setting_password">密码</string>
+    <string name="setting_password_not_set">未设置</string>
+    <string name="setting_password_set">已设置</string>
+    <string name="setting_password_remove">移除</string>
+    <string name="setting_password_change">修改</string>
+    <string name="setting_biometric">生物特征</string>
+    <string name="setting_biometric_desc">使用生物认证解锁应用</string>
+    <string name="setting_biometric_verify">验证身份</string>
+    <string name="setting_prevent_screenshot">禁止截图</string>
+    <string name="setting_prevent_screenshot_desc">防止应用出现在屏幕截图</string>
+    <string name="setting_database">数据库</string>
+    <string name="setting_import_export">导入与导出</string>
+    <string name="setting_import_export_desc">导入与导出令牌</string>
+    <string name="setting_other">其他</string>
+    <string name="setting_brand">商标</string>
 
     <!-- Trash -->
     <string name="trash_title">回收站</string>
-    <string name="trash_empty">没有项目</string>
-
-    <!-- Encode -->
-    <string name="encode_encoded">已编码</string>
-    <string name="encode_decoded">已解码</string>
-
-    <!-- Security -->
-    <string name="biometric_title">验证身份</string>
-    <string name="security_password">密码</string>
-    <string name="security_password_empty">未设置密码</string>
-    <string name="security_biometric">生物识别</string>
-    <string name="security_biometric_desc">使用生物认证解锁应用</string>
-    <string name="security_remove_password">删除密码</string>
-    <string name="security_remove_password_desc">删除当前的密码，同时生物认证也将禁用</string>
-    <string name="security_set_password">设置密码</string>
-    <string name="security_change_password">修改密码</string>
-    <string name="security_enter_password">输入密码</string>
-    <string name="security_new_password">新密码</string>
-    <string name="security_current_password">当前密码</string>
+    <string name="trash_empty">空的</string>
+    <string name="trashed_at">丢弃于 %1$s</string>
 
     <!-- Ntp -->
-    <string name="ntp_rtt">延迟: %1$s</string>
-    <string name="ntp_offset">偏移: %1$s</string>
+    <string name="ntp_title">时间服务器</string>
+    <string name="ntp_custom">自定义</string>
     <string name="ntp_timeout">超时</string>
 
 </resources>
