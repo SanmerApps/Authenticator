@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.auth.encodeBase32
 import dev.sanmer.authenticator.BuildConfig
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.component.FixedBox
 import dev.sanmer.authenticator.ui.component.FixedIcon
 import dev.sanmer.authenticator.ui.component.IconRow
 import kotlin.random.Random
@@ -35,7 +34,17 @@ fun SecretItem(
 ) = IconRow(
     leadingIcon = { FixedIcon(painter = painterResource(R.drawable.key)) },
     trailingIcon = {
-        if (isEdit) IconButton(
+        if (BuildConfig.DEBUG && !isEdit) IconButton(
+            onClick = {
+                val value = ByteArray(16).let(Random::nextBytes)
+                secret.setTextAndPlaceCursorAtEnd(value.encodeBase32())
+            }
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.arrows_shuffle),
+                contentDescription = null
+            )
+        } else IconButton(
             onClick = { hidden.value = !hidden.value },
             enabled = enabled
         ) {
@@ -46,17 +55,7 @@ fun SecretItem(
                 ),
                 contentDescription = null
             )
-        } else if (BuildConfig.DEBUG) IconButton(
-            onClick = {
-                val value = ByteArray(16).let(Random::nextBytes)
-                secret.setTextAndPlaceCursorAtEnd(value.encodeBase32())
-            }
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.arrows_shuffle),
-                contentDescription = null
-            )
-        } else FixedBox()
+        }
     }
 ) {
     OutlinedSecureTextField(

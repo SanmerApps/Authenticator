@@ -45,10 +45,10 @@ class EditViewModel(
     private val timeRepository: TimeRepository
 ) : ViewModel() {
     val isEdit = authId > 0
+
+    val input = Input()
     var isTrashed by mutableStateOf(false)
         private set
-
-    val input = Input(hidden = isEdit)
 
     var brand by mutableStateOf<Brand?>(null)
         private set
@@ -197,10 +197,10 @@ class EditViewModel(
         val period: TextFieldState
     ) {
         constructor(
-            hidden: Boolean,
             name: String = "",
             issuer: String = "",
             secret: String = "",
+            hidden: Boolean = true,
             type: Auth.Type = Auth.Type.TOTP,
             hash: Otp.Hash = Otp.Hash.SHA1,
             digits: Int = 6,
