@@ -23,6 +23,7 @@ import dev.sanmer.authenticator.model.serializable.AuthSet
 import dev.sanmer.authenticator.model.serializable.AuthSet.Default.toAuthSet
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.OtpRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ class ExportViewModel(
     }
 
     fun import(context: Context, uri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cr = context.contentResolver
             val stream = cr.openInputStream(uri) ?: return@launch
             data = loadData {
@@ -110,7 +111,7 @@ class ExportViewModel(
     }
 
     fun export(context: Context, uri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cr = context.contentResolver
             val stream = cr.openOutputStream(uri) ?: return@launch
             runCatching {
