@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.ui
 
-import android.app.ComponentCaller
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -42,12 +41,6 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
     private val viewModel by viewModel<MainViewModel>()
     private val backStack by inject<NavBackStack<Screen>>()
 
-    private fun fromIntent(intent: Intent) {
-        intent.data?.let {
-            backStack.add(Screen.Edit(otpUri = it))
-        }
-    }
-
     private fun setSecureWindow(secure: Boolean) {
         if (secure) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -56,8 +49,9 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         }
     }
 
-    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-        fromIntent(intent)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let { backStack.add(Screen.Edit(otpUri = it)) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +63,7 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
         BiometricKey.init(this)
         splashScreen.setKeepOnScreenCondition { viewModel.preference.isPending }
-        fromIntent(intent)
+        intent.data?.let { backStack.add(Screen.Edit(otpUri = it)) }
 
         setContent {
             viewModel.preference.onSuccess { preference ->
