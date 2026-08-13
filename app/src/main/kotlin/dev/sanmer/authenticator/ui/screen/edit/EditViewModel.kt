@@ -126,6 +126,7 @@ class EditViewModel(
         viewModelScope.launch {
             runCatching {
                 dbRepository.upsert(auth)
+                bottomSheet = BottomSheet.None
                 if (!isEdit) onBack()
             }.onFailure {
                 logger.e(it)
