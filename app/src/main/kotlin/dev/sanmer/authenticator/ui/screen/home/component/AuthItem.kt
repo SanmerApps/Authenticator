@@ -1,13 +1,12 @@
 package dev.sanmer.authenticator.ui.screen.home.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -34,7 +33,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.sanmer.authenticator.R
@@ -144,27 +142,24 @@ private fun AnimatedDigit(
     digit: Char,
     position: Int,
     isOddPosition: Boolean = position % 2 == 0,
-    enterDirection: Int = if (isOddPosition) -1 else 1,
-    exitDirection: Int = if (isOddPosition) 1 else -1
+    towards: SlideDirection = if (isOddPosition) SlideDirection.Up else SlideDirection.Down
 ) = AnimatedContent(
     targetState = digit,
     transitionSpec = {
-        slideIn(
+        slideIntoContainer(
+            towards = towards,
             animationSpec = tween(500)
-        ) {
-            IntOffset(0, enterDirection * it.height)
-        } + scaleIn(
+        ) + scaleIn(
             animationSpec = tween(500)
         ) + fadeIn(
+            animationSpec = tween(200)
+        ) togetherWith slideOutOfContainer(
+            towards = towards,
             animationSpec = tween(500)
-        ) togetherWith slideOut(
-            animationSpec = tween(500)
-        ) {
-            IntOffset(0, exitDirection * it.height)
-        } + scaleOut(
+        ) + scaleOut(
             animationSpec = tween(500)
         ) + fadeOut(
-            animationSpec = tween(500)
+            animationSpec = tween(200)
         )
     }
 ) { digit ->
