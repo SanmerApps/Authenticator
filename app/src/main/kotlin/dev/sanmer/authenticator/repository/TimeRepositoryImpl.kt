@@ -1,98 +1,53 @@
 package dev.sanmer.authenticator.repository
 
+import dev.sanmer.auth.ntp.NtpClock
+import dev.sanmer.auth.ntp.NtpServer
 import dev.sanmer.authenticator.Logger
-import dev.sanmer.authenticator.datastore.model.Ntp
-import dev.sanmer.authenticator.datastore.model.Preference
-import dev.sanmer.ntp.NtpServer
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
+import dev.sanmer.authenticator.model.LoadData
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.updateAndGet
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 
-class TimeRepositoryImpl(
-    private val preferenceRepository: PreferenceRepository
-) : TimeRepository {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private var job: Job = NonCancellable
+class TimeRepositoryImpl : TimeRepository {
+    private val _clock = MutableStateFlow<LoadData<NtpClock>>(LoadData.Pending)
 
-    private val _ntpTime = MutableStateFlow(NtpServer.NtpTime())
-    override val ntpTime get() = _ntpTime.asStateFlow()
+    override val clock = _clock.asStateFlow()
 
-    private val _epochSeconds = MutableStateFlow( System.currentTimeMillis() / 1000)
-    override val epochSeconds get() = _epochSeconds.asStateFlow()
-
-    private val logger = Logger.Android("TimeRepositoryImpl")
-
-    init {
-        preferenceObserver()
-        ntpObserver()
-    }
-
-    private fun preferenceObserver() {
-        coroutineScope.launch {
-            preferenceRepository.data
-                .distinctUntilChanged { old, new ->
-                    old.ntp == new.ntp && old.ntpAddress == new.ntpAddress
-                }
-                .collectLatest {
-                    sync(it)
-                }
+    override val now = flow {
+        while (currentCoroutineContext().isActive) {
+            val now = now()
+            emit(now)
+            delay(1.seconds - now.nanosecondsOfSecond.nanoseconds)
         }
     }
 
-    private fun ntpObserver() {
-        coroutineScope.launch {
-            _ntpTime.collect {
-                start(it)
+    private val logger = Logger.Android("NTP")
+
+    override fun now() = clock.value.getOrElse({ it }) { Clock.System }.now()
+
+    override suspend fun sync(server: NtpServer) {
+        _clock.update { LoadData.Loading }
+        var data: LoadData<NtpClock> = LoadData.Pending
+        for (times in 1..3) {
+            try {
+                data = LoadData.Success(server.sync())
+            } catch (e: SocketTimeoutException) {
+                data = LoadData.Failure(e)
+                delay(200.milliseconds * times)
+            } catch (e: Throwable) {
+                data = LoadData.Failure(e)
+                logger.e(e)
             }
         }
-    }
-
-    private fun start(ntpTime: NtpServer.NtpTime) {
-        if (job.isActive) {
-            job.cancel()
-        }
-        job = coroutineScope.launch {
-            delay(1000 - (ntpTime.currentTimeMillis % 1000))
-            while (isActive) {
-                _epochSeconds.value = ntpTime.currentTimeMillis / 1000
-                delay(1000)
-            }
-        }
-    }
-
-    override suspend fun sync(preference: Preference, times: Int): Result<NtpServer.NtpTime> {
-        val server = when (preference.ntp) {
-            Ntp.Custom -> NtpServer.Custom(preference.ntpAddress)
-            Ntp.Alibaba -> NtpServer.Alibaba
-            Ntp.Apple -> NtpServer.Apple
-            Ntp.Amazon -> NtpServer.Amazon
-            Ntp.Cloudflare -> NtpServer.Cloudflare
-            Ntp.Google -> NtpServer.Google
-            Ntp.Meta -> NtpServer.Meta
-            Ntp.Microsoft -> NtpServer.Microsoft
-            Ntp.Tencent -> NtpServer.Tencent
-        }
-
-        var result = Result.failure<NtpServer.NtpTime>(Throwable())
-        repeat(times) {
-            result = runCatching {
-                _ntpTime.updateAndGet { server.sync() }
-            }.onSuccess {
-                logger.i("NTP(${server.address}): $it")
-                return Result.success(it)
-            }
-        }
-        return result.onFailure {
-            logger.w(it)
-        }
+        _clock.update { data }
     }
 }

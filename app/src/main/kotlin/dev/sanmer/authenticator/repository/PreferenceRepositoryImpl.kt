@@ -42,4 +42,12 @@ class PreferenceRepositoryImpl(
             }
         }
     }
+
+    override suspend fun setSecureWindow(value: Boolean) {
+        withContext(Dispatchers.IO) {
+            dataStore.updateData {
+                it.copy(secureWindow = value)
+            }
+        }
+    }
 }

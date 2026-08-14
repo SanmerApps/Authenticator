@@ -1,99 +1,107 @@
 package dev.sanmer.authenticator.repository
 
-import dev.sanmer.authenticator.database.dao.TotpDao
-import dev.sanmer.authenticator.database.entity.TotpEntity
-import dev.sanmer.crypto.Crypto
-import dev.sanmer.encoding.decodeBase64
-import dev.sanmer.encoding.encodeBase64
+import dev.sanmer.auth.crypto.Crypto
+import dev.sanmer.authenticator.database.dao.AuthDao
+import dev.sanmer.authenticator.database.model.AuthProperties
+import dev.sanmer.authenticator.database.model.AuthProperty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.time.Instant
 
 class DbRepositoryImpl(
-    private val totp: TotpDao
+    private val authDao: AuthDao
 ) : DbRepository {
-    private var key: Crypto = Crypto.None
+    private val mutex = Mutex()
+    private var _key: Crypto = Crypto.Default
 
-    private suspend inline fun String.toEncrypted() = key.encrypt(this)
-
-    private suspend inline fun String.toDecrypted() = key.decrypt(this)
-
-    override fun setSessionKey(key: Crypto) {
-        this.key = key
+    private suspend inline fun <T> withKey(block: (Crypto) -> T) = mutex.withLock {
+        block(_key)
     }
+
+    override suspend fun setSessionKey(key: Crypto) = mutex.withLock {
+        _key = key
+    }
+
+    override suspend fun getSessionKey() = withKey { it }
 
     override suspend fun encrypt(key: Crypto) = withContext(Dispatchers.IO) {
-        totp.update(
-            totp.getAll().map {
-                val encrypted = key.encrypt(it.secret)
-                it.copy(secret = encrypted)
+        val secrets = authDao.getProperties(AuthProperty.Key.Secret)
+        val encrypted = secrets.map {
+            it.copy(value = key.encrypt(it.value))
+        }
+        setSessionKey(key)
+        authDao.upsertProperties(encrypted)
+    }
+
+    override suspend fun decrypt() = withContext(Dispatchers.IO) {
+        val secrets = authDao.getProperties(AuthProperty.Key.Secret)
+        val decrypted = withKey { current ->
+            secrets.map {
+                it.copy(value = current.decrypt(it.value))
             }
-        )
+        }
+        setSessionKey(Crypto.Default)
+        authDao.upsertProperties(decrypted)
     }
 
-    override suspend fun decrypt(key: Crypto) = withContext(Dispatchers.IO) {
-        totp.update(
-            totp.getAll().map {
-                val decrypted = key.decrypt(it.secret)
-                it.copy(secret = decrypted)
+    override suspend fun getAllAuthProperties() = withContext(Dispatchers.IO) {
+        withKey { current ->
+            authDao.getAllAuthProperties().map { auth ->
+                auth.protectValue { current.decrypt(it) }
             }
-        )
+        }
     }
 
-    override suspend fun reEncrypt(old: Crypto, new: Crypto) = withContext(Dispatchers.IO) {
-        totp.update(
-            totp.getAll().map {
-                val decrypted = old.decrypt(it.secret.decodeBase64())
-                val encrypted = new.encrypt(decrypted)
-                it.copy(secret = encrypted.encodeBase64())
+    override suspend fun getUntrashedAuthProperties() = withContext(Dispatchers.IO) {
+        withKey { current ->
+            authDao.getUntrashedAuthProperties().map { auth ->
+                auth.protectValue { current.decrypt(it) }
             }
+        }
+    }
+
+    override suspend fun getUntrashedAuthPropertiesAsFlow() =
+        authDao.getUntrashedAuthPropertiesAsFlow()
+            .map { list ->
+                withKey { current ->
+                    list.map { auth ->
+                        auth.protectValue { current.decrypt(it) }
+                    }
+                }
+            }
+
+    override fun getTrashedAuthAsFlow() = authDao.getTrashedAuthAsFlow()
+
+    override fun getTrashedCountAsFlow() = authDao.getTrashedCountAsFlow()
+
+    override suspend fun getAuthPropertiesAsFlow(id: Long) =
+        authDao.getAuthPropertiesAsFlow(id)
+            .filterNotNull()
+            .map { auth ->
+                withKey { current ->
+                    auth.protectValue { current.decrypt(it) }
+                }
+            }
+
+    override suspend fun upsert(auth: AuthProperties) = withContext(Dispatchers.IO) {
+        val auth = withKey { current ->
+            auth.protectValue { current.encrypt(it) }
+        }
+        authDao.upsert(
+            auth = auth.auth,
+            properties = auth.properties
         )
     }
 
-    override suspend fun getTotpAllDecryptedAsFlow() = totp.getAllEnabledAsFlow()
-        .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }
-
-    override suspend fun getTotpDecryptedByIdAsFlow(id: Long) =
-        totp.getByIdAsFlow(id).filterNotNull()
-            .map { it.copy(secret = it.secret.toDecrypted()) }
-
-    override suspend fun getTotpAllDecryptedTrashedAsFlow() = totp.getAllTrashedAsFlow()
-        .map { entries -> entries.map { it.copy(secret = it.secret.toDecrypted()) } }
-
-    override suspend fun getTotpAllTrashed(dead: Boolean) = withContext(Dispatchers.IO) {
-        totp.getAllTrashed().filter { if (dead) it.lifetime > TotpEntity.LIFETIME_MAX else true }
+    override suspend fun trash(authId: Long, trashedAt: Instant) = withContext(Dispatchers.IO) {
+        authDao.trashAuth(authId, trashedAt)
     }
 
-    override suspend fun insertTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
-        totp.insert(
-            entity.copy(secret = entity.secret.toEncrypted())
-        )
-    }
-
-    override suspend fun insertTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
-        totp.insert(
-            entities.map { it.copy(secret = it.secret.toEncrypted()) }
-        )
-    }
-
-    override suspend fun updateTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
-        totp.update(
-            entity.copy(secret = entity.secret.toEncrypted())
-        )
-    }
-
-    override suspend fun updateTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
-        totp.update(
-            entities.map { it.copy(secret = it.secret.toEncrypted()) }
-        )
-    }
-
-    override suspend fun deleteTotp(entity: TotpEntity) = withContext(Dispatchers.IO) {
-        totp.delete(entity)
-    }
-
-    override suspend fun deleteTotp(entities: List<TotpEntity>) = withContext(Dispatchers.IO) {
-        totp.delete(entities)
+    override suspend fun delete(authId: Long) = withContext(Dispatchers.IO) {
+        authDao.delete(authId)
     }
 }

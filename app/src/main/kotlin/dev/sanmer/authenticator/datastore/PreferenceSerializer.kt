@@ -3,21 +3,33 @@ package dev.sanmer.authenticator.datastore
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import dev.sanmer.authenticator.datastore.model.Preference
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.InputStream
 import java.io.OutputStream
 
 class PreferenceSerializer : Serializer<Preference> {
     override val defaultValue = Preference()
 
-    override suspend fun readFrom(input: InputStream) =
+    override suspend fun readFrom(input: InputStream) = withContext(Dispatchers.IO) {
         try {
-            Preference.decodeFromStream(input)
+            val bytes = input.use { it.readBytes() }
+            ProtoBuf.decodeFromByteArray<Preference>(bytes)
         } catch (e: SerializationException) {
             throw CorruptionException("Failed to read proto", e)
         }
-
-    override suspend fun writeTo(t: Preference, output: OutputStream) {
-        t.encodeToStream(output)
     }
+
+    override suspend fun writeTo(t: Preference, output: OutputStream) =
+        withContext(Dispatchers.IO) {
+            output.use {
+                it.write(
+                    ProtoBuf.encodeToByteArray(t)
+                )
+            }
+        }
 }

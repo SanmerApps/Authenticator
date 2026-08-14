@@ -4,8 +4,9 @@ import java.time.Instant
 plugins {
     alias(libs.plugins.self.application)
     alias(libs.plugins.self.compose)
-    alias(libs.plugins.self.room)
+    alias(libs.plugins.androidx.room)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 val baseVersionName = "0.2.5"
@@ -87,9 +88,13 @@ androidComponents.onVariants { variant ->
     }
 }
 
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
+    implementation(project(":brand"))
     implementation(project(":core"))
-    implementation(project(":logo"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
@@ -106,10 +111,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.navigation3)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.protobuf)
 }

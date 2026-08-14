@@ -10,4 +10,5 @@ interface PreferenceRepository {
     suspend fun setKeyEncryptedByBiometric(value: String)
     suspend fun setNtpAddress(value: String)
     suspend fun setNtp(value: Ntp)
+    suspend fun setSecureWindow(value: Boolean)
 }
