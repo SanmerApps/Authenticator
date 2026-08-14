@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.component.Check
 import dev.sanmer.authenticator.ui.ktx.surface
 import dev.sanmer.authenticator.ui.screen.export.ExportViewModel
 
@@ -104,7 +105,8 @@ fun ButtonsItem(
                         index,
                         ExportViewModel.Input.Type.entries.size
                     ),
-                    label = { Text(text = value.name) }
+                    label = { Text(text = value.name) },
+                    icon = { SegmentedButtonDefaults.Check(type.value == value) }
                 )
             }
         }
