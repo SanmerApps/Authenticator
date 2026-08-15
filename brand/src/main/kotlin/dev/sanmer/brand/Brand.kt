@@ -7,13 +7,25 @@ enum class Brand(
     @DrawableRes val id: Int,
     private val regex: Lazy<Regex>
 ) {
+    Adobe(
+        id = R.drawable.brand_adobe,
+        regex = lazy { "(?i)Adobe(.com)?".toRegex() }
+    ),
     Aliyun(
         id = R.drawable.brand_aliyun,
         regex = lazy { "(?i)Aliyun(.com)?|Alibaba\\s*Cloud".toRegex() }
     ),
+    AMD(
+        id = R.drawable.brand_amd,
+        regex = lazy { "(?i)AMD(.com)?".toRegex() }
+    ),
     Apple(
         id = R.drawable.brand_apple,
         regex = lazy { "(?i)Apple(.com)?".toRegex() }
+    ),
+    Atlassian(
+        id = R.drawable.brand_atlassian,
+        regex = lazy { "(?i)Atlassian(.com)?".toRegex() }
     ),
     AWS(
         id = R.drawable.brand_aws,
@@ -30,6 +42,10 @@ enum class Brand(
     Bybit(
         id = R.drawable.brand_bybit,
         regex = lazy { "(?i)Bybit(.com)?".toRegex() }
+    ),
+    Canva(
+        id = R.drawable.brand_canva,
+        regex = lazy { "(?i)Canva(.com)?".toRegex() }
     ),
     Cloudflare(
         id = R.drawable.brand_cloudflare,
@@ -55,6 +71,10 @@ enum class Brand(
         id = R.drawable.brand_docker,
         regex = lazy { "(?i).*Docker.*".toRegex() }
     ),
+    Dynatrace(
+        id = R.drawable.brand_dynatrace,
+        regex = lazy { "(?i)Dynatrace(.com)?".toRegex() }
+    ),
     Facebook(
         id = R.drawable.brand_facebook,
         regex = lazy { "(?i)Facebook(.com)?".toRegex() }
@@ -62,6 +82,10 @@ enum class Brand(
     Fansly(
         id = R.drawable.brand_fansly,
         regex = lazy { "(?i)Fansly(.com)?".toRegex() }
+    ),
+    Figma(
+        id = R.drawable.brand_figma,
+        regex = lazy { "(?i)Figma(.com)?".toRegex() }
     ),
     Gitea(
         id = R.drawable.brand_gitea,
@@ -91,6 +115,10 @@ enum class Brand(
         id = R.drawable.brand_jetbrains,
         regex = lazy { "(?i)JetBrains(.com)?".toRegex() }
     ),
+    Jotform(
+        id = R.drawable.brand_jotform,
+        regex = lazy { "(?i)Jotform(.com)?".toRegex() }
+    ),
     Lark(
         id = R.drawable.brand_lark,
         regex = lazy { "(?i)Lark(suite.com)?|Feishu(.cn)?".toRegex() }
@@ -98,6 +126,10 @@ enum class Brand(
     Mega(
         id = R.drawable.brand_mega,
         regex = lazy { "(?i)Mega(.io)?".toRegex() }
+    ),
+    LinkedIn(
+        id = R.drawable.brand_linkedin,
+        regex = lazy { "(?i)LinkedIn(.com)?".toRegex() }
     ),
     Meta(
         id = R.drawable.brand_meta,
@@ -107,9 +139,21 @@ enum class Brand(
         id = R.drawable.brand_microsoft,
         regex = lazy { "(?i)Microsoft(.com)?".toRegex() }
     ),
+    Netflix(
+        id = R.drawable.brand_netflix,
+        regex = lazy { "(?i)Netflix(.com)?".toRegex() }
+    ),
+    NVIDIA(
+        id = R.drawable.brand_nvidia,
+        regex = lazy { "(?i)NVIDIA(.com)?".toRegex() }
+    ),
     OKX(
         id = R.drawable.brand_okx,
         regex = lazy { "(?i)OKX(.com)?".toRegex() }
+    ),
+    OneSignal(
+        id = R.drawable.brand_onesignal,
+        regex = lazy { "(?i)OneSignal(.com)?".toRegex() }
     ),
     OnlyFans(
         id = R.drawable.brand_onlyfans,
@@ -118,6 +162,10 @@ enum class Brand(
     OpenAI(
         id = R.drawable.brand_openai,
         regex = lazy { "(?i)(ChatGPT|OpenAI)(.com)?".toRegex() }
+    ),
+    Oracle(
+        id = R.drawable.brand_oracle,
+        regex = lazy { "(?i)Oracle(.com)?".toRegex() }
     ),
     ORCID(
         id = R.drawable.brand_orcid,
@@ -131,9 +179,21 @@ enum class Brand(
         id = R.drawable.brand_paypal,
         regex = lazy { "(?i)PayPal(.com)?".toRegex() }
     ),
+    Pinterest(
+        id = R.drawable.brand_pinterest,
+        regex = lazy { "(?i)Pinterest(.com)?".toRegex() }
+    ),
     Pixiv(
         id = R.drawable.brand_pixiv,
-        regex = lazy { "(?i)Pixiv(.net|.com)?".toRegex() }
+        regex = lazy { "(?i)Pixiv(.net)?".toRegex() }
+    ),
+    Spotify(
+        id = R.drawable.brand_spotify,
+        regex = lazy { "(?i)Spotify(.com)?".toRegex() }
+    ),
+    Stripe(
+        id = R.drawable.brand_stripe,
+        regex = lazy { "(?i)Stripe(.com)?".toRegex() }
     ),
     Tencent(
         id = R.drawable.brand_tencent,
@@ -146,6 +206,10 @@ enum class Brand(
     Threads(
         id = R.drawable.brand_threads,
         regex = lazy { "(?i)Threads(.com)?".toRegex() }
+    ),
+    VK(
+        id = R.drawable.brand_vk,
+        regex = lazy { "(?i)Vk(.com)?".toRegex() }
     ),
     WhatsApp(
         id = R.drawable.brand_whatsapp,
