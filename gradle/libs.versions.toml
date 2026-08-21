@@ -5,8 +5,7 @@ androidxAnnotation = "1.10.0"
 androidxAppCompat = "1.8.0"
 androidxBiometric = "1.4.0-alpha07"
 androidxCamera = "1.6.1"
-androidxCompose = "1.11.4"
-androidxComposeMaterial3 = "1.4.0"
+androidxComposeBom = "2026.08.00"
 androidxCore = "1.19.0"
 androidxCoreSplashscreen = "1.2.0"
 androidxDataStore = "1.2.1"
@@ -35,11 +34,13 @@ androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "a
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidxCamera" }
 androidx-camera-compose = { module = "androidx.camera:camera-compose", version.ref = "androidxCamera" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidxCamera" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidxComposeMaterial3" }
-androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidxCompose" }
-androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "androidxCompose" }
-androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "androidxCompose" }
-androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "androidxCompose" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-datastore-core = { module = "androidx.datastore:datastore", version.ref = "androidxDataStore" }
