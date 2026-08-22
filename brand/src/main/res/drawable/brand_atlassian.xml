@@ -2,24 +2,24 @@
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="1024"
-    android:viewportHeight="1024">
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
         android:fillType="nonZero"
-        android:pathData="M339.1,479.3C326.1,465.1 306.7,466.4 297.7,483.2L88.2,902.3C80.4,919.1 92,938.5 110.1,938.5L401.1,938.5C410.2,938.5 419.3,933.3 423.1,924.3C486.5,794.9 449,597.1 339.1,479.3Z">
+        android:pathData="M7.947,11.234C7.644,10.901 7.189,10.931 6.977,11.325L2.066,21.147C1.884,21.541 2.157,21.996 2.581,21.996L9.401,21.996C9.614,21.996 9.826,21.874 9.917,21.663C11.402,18.632 10.524,13.993 7.947,11.234Z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:endX="232.6"
-                android:endY="926.6"
-                android:startX="453.4"
-                android:startY="544.2"
+                android:endX="5.451"
+                android:endY="21.718"
+                android:startX="10.627"
+                android:startY="12.754"
                 android:type="linear">
                 <item
                     android:color="#FF0052CC"
                     android:offset="0" />
                 <item
                     android:color="#FF2684FF"
-                    android:offset="0.9" />
+                    android:offset="0.92" />
                 <item
                     android:color="#FF2684FF"
                     android:offset="1" />
@@ -29,5 +29,5 @@
     <path
         android:fillColor="#2684FF"
         android:fillType="nonZero"
-        android:pathData="M491.7,99.1C375.3,284 383.1,489.7 459.4,643.6C537,797.5 595.2,916.5 600.3,924.3C604.2,933.3 613.3,938.5 622.3,938.5L913.4,938.5C931.4,938.5 944.4,919.1 935.3,902.3C935.3,902.3 543.4,118.5 533.1,99.1C525.3,81 503.3,81 491.7,99.1Z" />
+        android:pathData="M11.524,2.322C8.796,6.657 8.978,11.477 10.767,15.085C12.585,18.692 13.95,21.48 14.071,21.663C14.161,21.874 14.374,21.996 14.586,21.996L21.407,21.996C21.831,21.996 22.134,21.541 21.922,21.147C21.922,21.147 12.737,2.777 12.494,2.322C12.312,1.898 11.797,1.898 11.524,2.322Z" />
 </vector>
