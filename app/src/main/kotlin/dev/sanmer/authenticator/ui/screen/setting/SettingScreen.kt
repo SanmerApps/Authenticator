@@ -90,7 +90,10 @@ fun SettingScreen(
                     ),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.shield),
+                            painter = painterResource(
+                                if (preference.isEncrypted) R.drawable.lock
+                                else R.drawable.lock_open
+                            ),
                             contentDescription = null
                         )
                     },
