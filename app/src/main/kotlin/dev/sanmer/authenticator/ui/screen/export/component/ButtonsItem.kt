@@ -46,7 +46,7 @@ fun ButtonsItem(
     type: MutableState<ExportViewModel.Input.Type>,
     onImport: (Context, Uri) -> Unit,
     onExport: (Context, Uri) -> Unit,
-    isNotEmpty: Boolean,
+    isEmpty: Boolean,
     modifier: Modifier = Modifier
 ) = Column(
     modifier = modifier
@@ -118,7 +118,7 @@ fun ButtonsItem(
         )
         FilledTonalIconButton(
             onClick = { importer.launch(type.value.mimeType) },
-            enabled = !isNotEmpty
+            enabled = isEmpty
         ) {
             Icon(
                 painter = painterResource(R.drawable.download),
@@ -132,7 +132,7 @@ fun ButtonsItem(
         )
         FilledTonalIconButton(
             onClick = { exporter.launch("auth") },
-            enabled = isNotEmpty
+            enabled = !isEmpty
         ) {
             Icon(
                 painter = painterResource(R.drawable.upload),

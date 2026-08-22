@@ -54,13 +54,9 @@ fun ExportScreen(
         },
         floatingActionButton = {
             ActionButton(
-                onClick = if (viewModel.isNotEmpty) {
-                    viewModel::dbExport
-                } else {
-                    viewModel::dbImport
-                },
-                isSave = viewModel.isNotEmpty,
-                visible = isScrollingUp,
+                onClick = if (viewModel.isEmpty) viewModel::dbImport else viewModel::dbExport,
+                isSave = !viewModel.isEmpty,
+                visible = isScrollingUp && (viewModel.isEmpty || viewModel.isExternal)
             )
         }
     ) { contentPadding ->
@@ -80,7 +76,7 @@ fun ExportScreen(
                     type = viewModel.input.type,
                     onImport = viewModel::import,
                     onExport = viewModel::export,
-                    isNotEmpty = viewModel.isNotEmpty
+                    isEmpty = viewModel.isEmpty
                 )
             }
 
@@ -103,7 +99,7 @@ fun ExportScreen(
             }
 
             item {
-                viewModel.data.onFailure {
+                viewModel.source.onFailure {
                     ErrorItem(
                         error = it
                     )

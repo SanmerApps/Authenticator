@@ -34,15 +34,15 @@ class ExportViewModel(
 ) : ViewModel() {
     val input = Input()
 
-    var data by mutableStateOf<LoadData<List<Pair<AuthProperties, Result<StateFlow<String>>>>>>(
-        LoadData.Pending
-    )
-    val list by derivedStateOf {
-        data.getOrElse({ it }, ::emptyList)
+    var source by mutableStateOf<LoadData<Source>>(LoadData.Pending)
+    val isExternal by derivedStateOf {
+        source.getOrElse({ it == Source.External }) { false }
     }
 
+    val list = mutableStateListOf<Pair<AuthProperties, Result<StateFlow<String>>>>()
+    val isEmpty inline get() = list.isEmpty()
+
     private val _selected = mutableStateListOf<AuthProperties>()
-    val isNotEmpty get() = _selected.isNotEmpty()
 
     private val logger = Logger.Android("ExportViewModel")
 
@@ -60,15 +60,16 @@ class ExportViewModel(
 
     fun clear() {
         _selected.clear()
-        data = LoadData.Pending
+        source = LoadData.Pending
+        list.clear()
     }
 
     fun import(context: Context, uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             val cr = context.contentResolver
             val stream = cr.openInputStream(uri) ?: return@launch
-            data = loadData {
-                when (input.typeValue) {
+            source = loadData {
+                val elements = when (input.typeValue) {
                     Input.Type.Json -> {
                         val set = stream.use(AuthSet::decodeFromJson)
                         val password = input.passwordValue
@@ -106,6 +107,8 @@ class ExportViewModel(
                         }
                     }
                 }
+                list.addAll(elements)
+                Source.External
             }
         }
     }
@@ -127,13 +130,11 @@ class ExportViewModel(
                             auth.protectValue { key.encrypt(it) }
                         }.toAuthSet()
                         stream.use(set::encodeToJson)
-                        clear()
                     }
 
                     Input.Type.Uri -> {
                         val set = _selected.toAuthSet()
                         stream.use(set::encodeToUri)
-                        clear()
                     }
                 }
             }.onFailure {
@@ -144,8 +145,8 @@ class ExportViewModel(
 
     fun dbImport() {
         viewModelScope.launch {
-            data = loadData {
-                dbRepository.getAllAuthProperties()
+            source = loadData {
+                val elements = dbRepository.getAllAuthProperties()
                     .map {
                         if (it.auth.trashedAt.isZero) _selected.add(it)
                         it to runCatching {
@@ -156,6 +157,8 @@ class ExportViewModel(
                                 )
                         }
                     }
+                list.addAll(elements)
+                Source.Internal
             }
         }
     }
@@ -169,7 +172,6 @@ class ExportViewModel(
                     logger.e(it)
                 }
             }
-            clear()
         }
     }
 
@@ -195,5 +197,10 @@ class ExportViewModel(
             Json("application/json"),
             Uri("text/plain")
         }
+    }
+
+    enum class Source {
+        Internal,
+        External
     }
 }
