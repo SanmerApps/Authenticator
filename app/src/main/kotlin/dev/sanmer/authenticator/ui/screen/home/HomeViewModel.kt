@@ -9,6 +9,7 @@ import dev.sanmer.auth.ntp.NtpServer
 import dev.sanmer.authenticator.Const.TIME_DISPLAY
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.Auth
+import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.ktx.stateIn
 import dev.sanmer.authenticator.model.LoadData
 import dev.sanmer.authenticator.repository.DbRepository
@@ -51,15 +52,19 @@ class HomeViewModel(
             dbRepository.getUntrashedAuthPropertiesAsFlow()
                 .collectLatest { list ->
                     data = LoadData.Success(
-                        list.sortedBy { it.auth.name.lowercase() }
-                            .sortedBy { it.auth.issuer.lowercase() }
-                            .map {
-                                it.auth to otpRepository.otp(it)
-                                    .stateIn(
-                                        scope = viewModelScope,
-                                        started = SharingStarted.Eagerly
-                                    )
+                        list.sortedWith(
+                            compareBy<AuthProperties> {
+                                it.auth.issuer.lowercase()
+                            }.thenBy {
+                                it.auth.name.lowercase()
                             }
+                        ).map {
+                            it.auth to otpRepository.otp(it)
+                                .stateIn(
+                                    scope = viewModelScope,
+                                    started = SharingStarted.Eagerly
+                                )
+                        }
                     )
                 }
         }
