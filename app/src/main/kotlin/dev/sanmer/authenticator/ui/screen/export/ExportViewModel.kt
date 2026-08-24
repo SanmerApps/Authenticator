@@ -137,6 +137,7 @@ class ExportViewModel(
                         stream.use(set::encodeToUri)
                     }
                 }
+                _selected.clear()
             }.onFailure {
                 logger.e(it)
             }
@@ -172,6 +173,7 @@ class ExportViewModel(
                     logger.e(it)
                 }
             }
+            _selected.clear()
         }
     }
 
