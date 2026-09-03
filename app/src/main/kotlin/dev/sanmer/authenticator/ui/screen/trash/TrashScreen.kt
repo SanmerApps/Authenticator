@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -112,7 +113,7 @@ private fun TopBar(
                 onClick = onDelete
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.trash_x),
+                    painter = painterResource(R.drawable.trash_simple),
                     contentDescription = null
                 )
             }
@@ -131,10 +132,11 @@ private fun ActionButton(
     exit = scaleOut() + fadeOut()
 ) {
     FloatingActionButton(
-        onClick = onClick
+        onClick = onClick,
+        shape = CircleShape
     ) {
         Icon(
-            painter = painterResource(R.drawable.restore),
+            painter = painterResource(R.drawable.arrow_counter_clockwise),
             contentDescription = null
         )
     }

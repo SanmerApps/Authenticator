@@ -34,7 +34,7 @@ fun TypeItem(
     hash: MutableState<Otp.Hash>,
     enabled: Boolean = true
 ) = IconRow(
-    leadingIcon = { FixedIcon(painter = painterResource(R.drawable.math_function)) }
+    leadingIcon = { FixedIcon(painter = painterResource(R.drawable.function)) }
 ) {
     val (typeExpanded, onTypeExpandedChange) = remember { mutableStateOf(false) }
     val (hashExpanded, onHashExpandedChange) = remember { mutableStateOf(false) }

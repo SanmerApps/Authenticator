@@ -95,7 +95,7 @@ fun ScanScreen(
 private fun CameraOff(
     onClick: () -> Unit
 ) = Icon(
-    painter = painterResource(R.drawable.camera_off),
+    painter = painterResource(R.drawable.camera_slash),
     contentDescription = null,
     tint = MaterialTheme.colorScheme.onSurfaceVariant,
     modifier = Modifier
@@ -169,7 +169,7 @@ private fun BottomBar(
         onClick = { picker.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly)) }
     ) {
         Icon(
-            painter = painterResource(R.drawable.photo),
+            painter = painterResource(R.drawable.image_fill),
             contentDescription = null
         )
     }
@@ -184,8 +184,8 @@ private fun BottomBar(
         ) {
             Icon(
                 painter = painterResource(
-                    if (torchEnabled) R.drawable.bolt
-                    else R.drawable.bolt_off
+                    if (torchEnabled) R.drawable.lightning_fill
+                    else R.drawable.lightning_slash_fill
                 ),
                 contentDescription = null
             )

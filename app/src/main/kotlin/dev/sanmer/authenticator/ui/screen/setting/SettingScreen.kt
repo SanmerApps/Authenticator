@@ -110,7 +110,7 @@ fun SettingScreen(
                     value = stringResource(R.string.setting_biometric_desc),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.fingerprint),
+                            painter = painterResource(R.drawable.fingerprint_simple),
                             contentDescription = null
                         )
                     },
@@ -128,7 +128,7 @@ fun SettingScreen(
                     value = stringResource(R.string.setting_prevent_screenshot_desc),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.spy),
+                            painter = painterResource(R.drawable.detective),
                             contentDescription = null
                         )
                     },
@@ -152,13 +152,16 @@ fun SettingScreen(
                     else stringResource(R.string.trash_empty),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.trash),
+                            painter = painterResource(
+                                if (viewModel.isTrashNotEmpty) R.drawable.trash
+                                else R.drawable.trash_simple
+                            ),
                             contentDescription = null
                         )
                     },
                     trailingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.chevron_right),
+                            painter = painterResource(R.drawable.caret_right),
                             contentDescription = null
                         )
                     },
@@ -178,7 +181,7 @@ fun SettingScreen(
                     },
                     trailingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.chevron_right),
+                            painter = painterResource(R.drawable.caret_right),
                             contentDescription = null
                         )
                     },
@@ -195,13 +198,13 @@ fun SettingScreen(
                     value = preference.ntp.name(),
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.timezone),
+                            painter = painterResource(R.drawable.hourglass),
                             contentDescription = null
                         )
                     },
                     trailingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.chevron_right),
+                            painter = painterResource(R.drawable.caret_right),
                             contentDescription = null
                         )
                     },
@@ -220,7 +223,7 @@ fun SettingScreen(
                     },
                     trailingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.chevron_right),
+                            painter = painterResource(R.drawable.caret_right),
                             contentDescription = null
                         )
                     },
@@ -257,7 +260,7 @@ private fun TopBar(
             }
         ) {
             Icon(
-                painter = painterResource(R.drawable.brand_github_2),
+                painter = painterResource(dev.sanmer.brand.R.drawable.brand_github),
                 contentDescription = null
             )
         }

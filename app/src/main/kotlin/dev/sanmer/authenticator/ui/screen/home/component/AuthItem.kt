@@ -79,7 +79,7 @@ fun AuthItem(
         }
 
         Image(
-            painter = painterResource(brand?.id ?: R.drawable.fingerprint_thin),
+            painter = painterResource(brand?.id ?: R.drawable.fingerprint_simple),
             contentDescription = null,
             modifier = Modifier.size(45.dp),
             colorFilter = if (brand != null) null else
@@ -110,7 +110,7 @@ fun AuthItem(
         }
 
         if (isSelected) Icon(
-            painter = painterResource(R.drawable.circle_check_filled),
+            painter = painterResource(R.drawable.check_circle_fill),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(30.dp)

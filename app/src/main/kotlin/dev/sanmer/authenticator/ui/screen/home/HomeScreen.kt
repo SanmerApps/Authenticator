@@ -130,7 +130,7 @@ private fun TopBar(
             onClick = onSetting
         ) {
             Icon(
-                painter = painterResource(R.drawable.settings_2),
+                painter = painterResource(R.drawable.gear),
                 contentDescription = null
             )
         }
@@ -148,7 +148,8 @@ private fun ActionButton(
     exit = scaleOut() + fadeOut()
 ) {
     FloatingActionButton(
-        onClick = onClick
+        onClick = onClick,
+        shape = CircleShape
     ) {
         Icon(
             painter = painterResource(R.drawable.plus),

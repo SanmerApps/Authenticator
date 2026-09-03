@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -131,7 +132,7 @@ private fun TopBar(
             onClick = onClear
         ) {
             Icon(
-                painter = painterResource(R.drawable.clear_all),
+                painter = painterResource(R.drawable.arrow_counter_clockwise),
                 contentDescription = null
             )
         }
@@ -150,12 +151,13 @@ private fun ActionButton(
     exit = scaleOut() + fadeOut()
 ) {
     FloatingActionButton(
-        onClick = onClick
+        onClick = onClick,
+        shape = CircleShape
     ) {
         Icon(
             painter = painterResource(
-                if (isSave) R.drawable.device_floppy
-                else R.drawable.database_import
+                if (isSave) R.drawable.floppy_disk_back_fill
+                else R.drawable.arrow_bend_right_up
             ),
             contentDescription = null
         )

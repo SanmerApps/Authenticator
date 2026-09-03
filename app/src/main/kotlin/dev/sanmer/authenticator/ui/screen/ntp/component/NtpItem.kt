@@ -41,7 +41,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 private fun Ntp.brand() = when (this) {
-    Ntp.Custom -> R.drawable.clock_record_thin
+    Ntp.Custom -> R.drawable.hourglass
     Ntp.Alibaba -> dev.sanmer.brand.R.drawable.brand_aliyun
     Ntp.Apple -> dev.sanmer.brand.R.drawable.brand_apple
     Ntp.Amazon -> dev.sanmer.brand.R.drawable.brand_aws
@@ -130,7 +130,7 @@ fun NtpItem(
     }
 
     if (isSelected) Icon(
-        painter = painterResource(R.drawable.circle_check_filled),
+        painter = painterResource(R.drawable.check_circle_fill),
         contentDescription = null,
         tint = MaterialTheme.colorScheme.primary,
         modifier = Modifier

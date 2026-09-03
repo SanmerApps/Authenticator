@@ -41,7 +41,7 @@ fun SecretItem(
             }
         ) {
             Icon(
-                painter = painterResource(R.drawable.arrows_shuffle),
+                painter = painterResource(R.drawable.shuffle_simple),
                 contentDescription = null
             )
         } else IconButton(
@@ -50,8 +50,8 @@ fun SecretItem(
         ) {
             Icon(
                 painter = painterResource(
-                    if (hidden.value) R.drawable.sparkles_2
-                    else R.drawable.sparkles_2_off
+                    if (hidden.value) R.drawable.eye_closed
+                    else R.drawable.eye
                 ),
                 contentDescription = null
             )

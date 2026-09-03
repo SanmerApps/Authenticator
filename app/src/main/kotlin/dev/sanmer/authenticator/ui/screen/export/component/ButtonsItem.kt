@@ -75,8 +75,8 @@ fun ButtonsItem(
             ) {
                 Icon(
                     painter = painterResource(
-                        if (hidden.value) R.drawable.sparkles_2
-                        else R.drawable.sparkles_2_off
+                        if (hidden.value) R.drawable.eye_closed
+                        else R.drawable.eye
                     ),
                     contentDescription = null
                 )
@@ -105,7 +105,7 @@ fun ButtonsItem(
                         index,
                         ExportViewModel.Input.Type.entries.size
                     ),
-                    label = { Text(text = value.name) },
+                    label = { Text(text = value.name.uppercase()) },
                     icon = { SegmentedButtonDefaults.Check(type.value == value) }
                 )
             }
@@ -121,7 +121,7 @@ fun ButtonsItem(
             enabled = isEmpty
         ) {
             Icon(
-                painter = painterResource(R.drawable.download),
+                painter = painterResource(R.drawable.download_simple),
                 contentDescription = null
             )
         }
@@ -135,7 +135,7 @@ fun ButtonsItem(
             enabled = !isEmpty
         ) {
             Icon(
-                painter = painterResource(R.drawable.upload),
+                painter = painterResource(R.drawable.upload_simple),
                 contentDescription = null
             )
         }

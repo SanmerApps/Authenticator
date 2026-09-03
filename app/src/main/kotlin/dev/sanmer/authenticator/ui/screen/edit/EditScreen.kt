@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButton
@@ -175,7 +176,7 @@ fun EditScreen(
                 }
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.qrcode),
+                    painter = painterResource(R.drawable.qr_code),
                     contentDescription = null
                 )
             }
@@ -235,7 +236,7 @@ private fun TopBar(
             ) {
                 Icon(
                     painter = painterResource(
-                        if (isTrashed) R.drawable.trash_x
+                        if (isTrashed) R.drawable.trash_simple
                         else R.drawable.trash
                     ),
                     contentDescription = null
@@ -263,11 +264,12 @@ private fun ActionButton(
             keyboardController?.hide()
             if (isTrashed) onRestore() else onSave()
         },
+        shape = CircleShape
     ) {
         Icon(
             painter = painterResource(
-                if (isTrashed) R.drawable.restore
-                else R.drawable.device_floppy
+                if (isTrashed) R.drawable.arrow_counter_clockwise
+                else R.drawable.floppy_disk_back_fill
             ),
             contentDescription = null
         )

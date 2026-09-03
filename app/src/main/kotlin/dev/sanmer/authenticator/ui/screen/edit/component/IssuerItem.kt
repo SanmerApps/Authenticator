@@ -42,7 +42,7 @@ fun IssuerItem(
             onClick = onMatchesBrand
         ) {
             Icon(
-                painter = painterResource(R.drawable.search),
+                painter = painterResource(R.drawable.magnifying_glass),
                 contentDescription = null
             )
         }

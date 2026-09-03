@@ -79,8 +79,8 @@ fun PasswordBottomSheet(
                 ) {
                     Icon(
                         painter = painterResource(
-                            if (hidden.value) R.drawable.sparkles_2
-                            else R.drawable.sparkles_2_off
+                            if (hidden.value) R.drawable.eye_closed
+                            else R.drawable.eye
                         ),
                         contentDescription = null
                     )

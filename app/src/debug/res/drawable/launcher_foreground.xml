@@ -1,18 +1,15 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:viewportWidth="256"
+    android:viewportHeight="256">
     <group
-        android:scaleX="0.44"
-        android:scaleY="0.44"
-        android:translateX="6.72"
-        android:translateY="6.72">
+        android:scaleX="0.48"
+        android:scaleY="0.48"
+        android:translateX="66.56"
+        android:translateY="66.56">
         <path
-            android:pathData="M8,22v-14a4,4 0,0 1,4 -4h0.5a3.5,3.5 0,0 1,0 7h-0.5h0.5a4.5,4.5 0,1 1,-4.5 4.5v-0.5"
-            android:strokeLineJoin="round"
-            android:strokeWidth="2"
-            android:strokeColor="@color/launcher_tint"
-            android:strokeLineCap="round" />
+            android:fillColor="@color/launcher_tint"
+            android:pathData="M191.83,51.48l13.83,-13.82a8,8 0,0 0,-11.32 -11.32L179.79,40.9a87.81,87.81 0,0 0,-103.58 0L61.66,26.34A8,8 0,0 0,50.34 37.66L64.17,51.48A87.72,87.72 0,0 0,40 112v40a88,88 0,0 0,176 0L216,112A87.72,87.72 0,0 0,191.83 51.48ZM128,40a72.08,72.08 0,0 1,72 72v8L56,120v-8A72.08,72.08 0,0 1,128 40ZM128,224a72.08,72.08 0,0 1,-72 -72L56,136L200,136v16A72.08,72.08 0,0 1,128 224ZM144,92a12,12 0,1 1,12 12A12,12 0,0 1,144 92ZM88,92a12,12 0,1 1,12 12A12,12 0,0 1,88 92Z" />
     </group>
 </vector>

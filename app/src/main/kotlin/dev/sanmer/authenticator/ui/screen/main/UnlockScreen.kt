@@ -63,7 +63,7 @@ fun UnlockScreen(
                 onClick = { viewModel.decryptByBiometric(preference.keyEncryptedByBiometric) }
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.fingerprint),
+                    painter = painterResource(R.drawable.fingerprint_simple),
                     contentDescription = null
                 )
             }
