@@ -1,6 +1,15 @@
 package dev.sanmer.authenticator.di
 
+import android.net.Uri
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.metadata
+import androidx.navigation3.runtime.result.LocalResultEventBus
+import androidx.navigation3.runtime.result.ResultEffect
+import androidx.navigation3.ui.NavDisplay
 import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.brand.BrandScreen
 import dev.sanmer.authenticator.ui.screen.edit.EditScreen
@@ -12,6 +21,7 @@ import dev.sanmer.authenticator.ui.screen.home.HomeViewModel
 import dev.sanmer.authenticator.ui.screen.main.MainViewModel
 import dev.sanmer.authenticator.ui.screen.ntp.NtpScreen
 import dev.sanmer.authenticator.ui.screen.ntp.NtpViewModel
+import dev.sanmer.authenticator.ui.screen.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screen.scan.ScanViewModel
 import dev.sanmer.authenticator.ui.screen.setting.SettingScreen
 import dev.sanmer.authenticator.ui.screen.setting.SettingViewModel
@@ -49,8 +59,44 @@ val Navigation = module {
 
         navigation<Screen.Edit> {
             val backStack = get<NavBackStack<Screen>>()
+            val viewModel = koinViewModel<EditViewModel> { parametersOf(it.authId, it.otpUri) }
+
+            ResultEffect<Uri> { uri ->
+                viewModel.fromOtpUri(uri)
+            }
+
             EditScreen(
-                viewModel = koinViewModel { parametersOf(it.authId, it.otpUri) },
+                viewModel = viewModel,
+                goTo = backStack::add,
+                goBack = backStack::removeLastOrNull
+            )
+        }
+
+        navigation<Screen.Scan>(
+            metadata = metadata {
+                val transitionSpec = fadeIn(
+                    animationSpec = tween(500)
+                ) togetherWith fadeOut(
+                    animationSpec = tween(500)
+                )
+                put(NavDisplay.TransitionKey) { transitionSpec }
+                put(NavDisplay.PopTransitionKey) { transitionSpec }
+                put(NavDisplay.PredictivePopTransitionKey) { transitionSpec }
+            }
+        ) {
+            val backStack = get<NavBackStack<Screen>>()
+            val resultBus = LocalResultEventBus.current
+            val viewModel = koinViewModel<ScanViewModel> {
+                parametersOf(
+                    ScanViewModel.Callback { uri ->
+                        resultBus.sendResult(uri)
+                        backStack.removeLastOrNull()
+                    }
+                )
+            }
+
+            ScanScreen(
+                viewModel = viewModel,
                 goBack = backStack::removeLastOrNull
             )
         }

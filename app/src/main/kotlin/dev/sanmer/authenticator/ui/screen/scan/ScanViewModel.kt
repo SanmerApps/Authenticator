@@ -23,17 +23,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.OtpUri.Default.isOtpUri
 import dev.sanmer.auth.QRCode
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.compat.PermissionCompat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class ScanViewModel(
-    private val onUri: (Uri) -> Unit
+    private val callback: Callback
 ) : ViewModel() {
     var isAllowed by mutableStateOf(false)
         private set
@@ -70,7 +73,7 @@ class ScanViewModel(
                         height = image.height,
                     )
                     val uri = Uri.parse(content)
-                    if (uri.isOtpUri()) onUri(uri)
+                    if (uri.isOtpUri()) callback.onUri(uri)
                 } catch (_: Throwable) {
 
                 } finally {
@@ -150,14 +153,16 @@ class ScanViewModel(
     }
 
     fun fromImage(context: Context, uri: Uri) {
-        runCatching {
-            val cr = context.contentResolver
-            val stream = cr.openInputStream(uri) ?: return
-            val content = stream.use(QRCode::decodeFromStream) ?: return
-            val uri = Uri.parse(content)
-            if (uri.isOtpUri()) onUri(uri)
-        }.onFailure {
-            logger.e(it)
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val cr = context.contentResolver
+                val stream = cr.openInputStream(uri) ?: return@launch
+                val content = stream.use(QRCode::decodeFromStream) ?: return@launch
+                val uri = Uri.parse(content)
+                if (uri.isOtpUri()) callback.onUri(uri)
+            }.onFailure {
+                logger.e(it)
+            }
         }
     }
 
@@ -166,5 +171,9 @@ class ScanViewModel(
         val dst = ByteArray(remaining())
         get(dst)
         return dst
+    }
+
+    fun interface Callback {
+        fun onUri(uri: Uri)
     }
 }

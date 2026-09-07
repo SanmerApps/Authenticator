@@ -76,7 +76,7 @@ class EditViewModel(
         }
     }
 
-    private fun fromOtpUri(uri: Uri) {
+    fun fromOtpUri(uri: Uri) {
         if (!uri.isOtpUri()) return
         runCatching {
             val otpUri = uri.toOtpUri()
@@ -86,11 +86,6 @@ class EditViewModel(
         }.onFailure {
             logger.e(it)
         }
-    }
-
-    fun fromScan(uri: Uri) {
-        fromOtpUri(uri)
-        bottomSheet = BottomSheet.None
     }
 
     fun matchesBrand() {
@@ -261,10 +256,12 @@ class EditViewModel(
 
     sealed interface BottomSheet {
         data object None : BottomSheet
-        data object Scan : BottomSheet
-        data class Preview(val preview: Result<Pair<AuthProperties, StateFlow<String>>>) :
-            BottomSheet
+        data class Preview(
+            val preview: Result<Pair<AuthProperties, StateFlow<String>>>
+        ) : BottomSheet
 
-        data class Qrcode(val qrcode: Result<Pair<String, ImageBitmap>>) : BottomSheet
+        data class Qrcode(
+            val qrcode: Result<Pair<String, ImageBitmap>>
+        ) : BottomSheet
     }
 }

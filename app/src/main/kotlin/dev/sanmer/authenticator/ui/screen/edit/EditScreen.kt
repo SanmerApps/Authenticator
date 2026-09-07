@@ -1,10 +1,12 @@
 package dev.sanmer.authenticator.ui.screen.edit
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.scaleToBounds
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -32,13 +34,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.plus
+import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.edit.EditViewModel.BottomSheet
 import dev.sanmer.authenticator.ui.screen.edit.component.DigitsItem
 import dev.sanmer.authenticator.ui.screen.edit.component.IssuerItem
@@ -47,49 +52,35 @@ import dev.sanmer.authenticator.ui.screen.edit.component.PreviewBottomSheet
 import dev.sanmer.authenticator.ui.screen.edit.component.QrcodeBottomSheet
 import dev.sanmer.authenticator.ui.screen.edit.component.SecretItem
 import dev.sanmer.authenticator.ui.screen.edit.component.TypeItem
-import dev.sanmer.authenticator.ui.screen.scan.ScanScreen
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
+import dev.sanmer.authenticator.ui.screen.main.LocalSharedTransitionScope
 
 @Composable
 fun EditScreen(
     viewModel: EditViewModel,
+    goTo: (Screen) -> Unit,
     goBack: () -> Unit
-) = AnimatedContent(
-    targetState = viewModel.bottomSheet,
-    transitionSpec = {
-        fadeIn(
-            animationSpec = tween(500)
-        ) togetherWith fadeOut(
-            animationSpec = tween(500)
-        )
-    },
-    contentKey = { it == BottomSheet.Scan }
 ) {
-    when (it) {
-        BottomSheet.Scan -> ScanScreen(
-            viewModel = koinViewModel { parametersOf(viewModel::fromScan) },
-            goBack = { viewModel.bottomSheet = BottomSheet.None }
-        )
-
-        else -> EditScreen(
+    with(LocalSharedTransitionScope.current) {
+        EditContent(
             viewModel = viewModel,
+            goTo = goTo,
             goBack = goBack,
-            onScan = { viewModel.bottomSheet = BottomSheet.Scan }
+            animatedContentScope = LocalNavAnimatedContentScope.current
         )
     }
 }
 
 @Composable
-fun EditScreen(
+fun SharedTransitionScope.EditContent(
     viewModel: EditViewModel,
+    goTo: (Screen) -> Unit,
     goBack: () -> Unit,
-    onScan: () -> Unit
+    animatedContentScope: AnimatedContentScope
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     when (val bs = viewModel.bottomSheet) {
-        BottomSheet.None, BottomSheet.Scan -> {}
+        BottomSheet.None -> {}
         is BottomSheet.Preview -> PreviewBottomSheet(
             onClose = { viewModel.bottomSheet = BottomSheet.None },
             preview = bs.preview,
@@ -171,9 +162,14 @@ fun EditScreen(
                     if (viewModel.isEdit) {
                         viewModel.qrcode(density, color)
                     } else {
-                        onScan()
+                        goTo(Screen.Scan)
                     }
-                }
+                },
+                modifier = Modifier.sharedBounds(
+                    sharedContentState = rememberSharedContentState(Screen.Scan),
+                    animatedVisibilityScope = animatedContentScope,
+                    resizeMode = scaleToBounds(ContentScale.None)
+                )
             ) {
                 Icon(
                     painter = painterResource(R.drawable.qr_code),

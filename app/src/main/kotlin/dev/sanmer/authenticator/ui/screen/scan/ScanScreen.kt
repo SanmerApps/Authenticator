@@ -3,14 +3,16 @@ package dev.sanmer.authenticator.ui.screen.scan
 import android.content.Context
 import android.net.Uri
 import android.util.Size
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.SurfaceRequest
 import androidx.camera.viewfinder.compose.MutableCoordinateTransformer
+import androidx.camera.viewfinder.core.ImplementationMode
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -47,21 +49,40 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.sanmer.authenticator.R
+import dev.sanmer.authenticator.ui.screen.Screen
+import dev.sanmer.authenticator.ui.screen.main.LocalSharedTransitionScope
 
 @Composable
 fun ScanScreen(
     viewModel: ScanViewModel,
     goBack: () -> Unit
 ) {
-    val context = LocalContext.current
+    with(LocalSharedTransitionScope.current) {
+        ScanContent(
+            viewModel = viewModel,
+            goBack = goBack,
+            animatedContentScope = LocalNavAnimatedContentScope.current
+        )
+    }
+}
 
-    BackHandler(
-        onBack = goBack
-    )
+@Composable
+private fun SharedTransitionScope.ScanContent(
+    viewModel: ScanViewModel,
+    goBack: () -> Unit,
+    animatedContentScope: AnimatedContentScope
+) {
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
+            .sharedBounds(
+                sharedContentState = rememberSharedContentState(Screen.Scan),
+                animatedVisibilityScope = animatedContentScope,
+                clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.large)
+            )
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -127,6 +148,7 @@ private fun CameraPreview(
         CameraXViewfinder(
             surfaceRequest = it,
             coordinateTransformer = coordinateTransformer,
+            implementationMode = ImplementationMode.EXTERNAL,
             contentScale = ContentScale.Crop,
             modifier = modifier
                 .pointerInput(Unit) {
