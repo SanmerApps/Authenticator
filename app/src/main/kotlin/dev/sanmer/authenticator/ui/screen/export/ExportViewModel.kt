@@ -50,6 +50,14 @@ class ExportViewModel(
         logger.d("init")
     }
 
+    private fun <T> List<Pair<AuthProperties, T>>.asSorted() = sortedWith(
+        compareBy<Pair<AuthProperties, T>> {
+            it.first.auth.issuer.lowercase()
+        }.thenBy {
+            it.first.auth.name.lowercase()
+        }
+    )
+
     fun isSelected(auth: AuthProperties) = _selected.contains(auth)
 
     fun pick(auth: AuthProperties) = if (isSelected(auth)) {
@@ -107,7 +115,7 @@ class ExportViewModel(
                         }
                     }
                 }
-                list.addAll(elements)
+                list.addAll(elements.asSorted())
                 Source.External
             }
         }
@@ -158,7 +166,7 @@ class ExportViewModel(
                                 )
                         }
                     }
-                list.addAll(elements)
+                list.addAll(elements.asSorted())
                 Source.Internal
             }
         }
