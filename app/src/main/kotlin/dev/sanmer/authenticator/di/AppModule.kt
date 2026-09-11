@@ -15,36 +15,22 @@ import dev.sanmer.authenticator.ui.screen.brand.BrandScreen
 import dev.sanmer.authenticator.ui.screen.edit.EditScreen
 import dev.sanmer.authenticator.ui.screen.edit.EditViewModel
 import dev.sanmer.authenticator.ui.screen.export.ExportScreen
-import dev.sanmer.authenticator.ui.screen.export.ExportViewModel
 import dev.sanmer.authenticator.ui.screen.home.HomeScreen
-import dev.sanmer.authenticator.ui.screen.home.HomeViewModel
-import dev.sanmer.authenticator.ui.screen.main.MainViewModel
 import dev.sanmer.authenticator.ui.screen.ntp.NtpScreen
-import dev.sanmer.authenticator.ui.screen.ntp.NtpViewModel
 import dev.sanmer.authenticator.ui.screen.scan.ScanScreen
 import dev.sanmer.authenticator.ui.screen.scan.ScanViewModel
 import dev.sanmer.authenticator.ui.screen.setting.SettingScreen
-import dev.sanmer.authenticator.ui.screen.setting.SettingViewModel
 import dev.sanmer.authenticator.ui.screen.trash.TrashScreen
-import dev.sanmer.authenticator.ui.screen.trash.TrashViewModel
-import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.scope.dsl.activityRetainedScope
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
-val Navigation = module {
-    viewModelOf(::MainViewModel)
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::EditViewModel)
-    viewModelOf(::ScanViewModel)
-    viewModelOf(::SettingViewModel)
-    viewModelOf(::TrashViewModel)
-    viewModelOf(::NtpViewModel)
-    viewModelOf(::ExportViewModel)
+val AppModule = module {
+    includes(ViewModelsModule)
 
     activityRetainedScope {
         scoped { NavBackStack(Screen.Home) }

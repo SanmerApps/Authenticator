@@ -1,24 +1,23 @@
 package dev.sanmer.authenticator.di
 
-import android.content.Context
-import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStoreFile
 import dev.sanmer.authenticator.datastore.PreferenceSerializer
 import dev.sanmer.authenticator.datastore.model.Preference
-import org.koin.core.module.dsl.bind
-import org.koin.core.module.dsl.factoryOf
+import org.koin.android.ext.koin.androidContext
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.factory
 
-val DataStore = module {
-    factoryOf(::PreferenceSerializer) { bind<Serializer<Preference>>() }
+val DataStoreModule = module {
+    factory<PreferenceSerializer>() bind Serializer::class
 
-    factory<DataStore<Preference>> {
+    factory {
         DataStoreFactory.create(
-            serializer = get()
+            serializer = get<Serializer<Preference>>()
         ) {
-            get<Context>().createDeviceProtectedStorageContext().dataStoreFile("preference.pb")
+            androidContext().createDeviceProtectedStorageContext().dataStoreFile("preference.pb")
         }
     }
 }

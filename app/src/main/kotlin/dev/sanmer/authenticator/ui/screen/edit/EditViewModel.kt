@@ -36,10 +36,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 
 class EditViewModel(
-    private val authId: Long,
-    private val otpUri: Uri,
+    @InjectedParam private val authId: Long,
+    @InjectedParam private val otpUri: Uri,
     private val dbRepository: DbRepository,
     private val otpRepository: OtpRepository,
     private val timeRepository: TimeRepository
@@ -256,11 +257,14 @@ class EditViewModel(
 
     sealed interface BottomSheet {
         data object None : BottomSheet
-        data class Preview(
+
+        @JvmInline
+        value class Preview(
             val preview: Result<Pair<AuthProperties, StateFlow<String>>>
         ) : BottomSheet
 
-        data class Qrcode(
+        @JvmInline
+        value class Qrcode(
             val qrcode: Result<Pair<String, ImageBitmap>>
         ) : BottomSheet
     }

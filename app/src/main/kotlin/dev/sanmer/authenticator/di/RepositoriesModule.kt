@@ -8,13 +8,14 @@ import dev.sanmer.authenticator.repository.PreferenceRepository
 import dev.sanmer.authenticator.repository.PreferenceRepositoryImpl
 import dev.sanmer.authenticator.repository.TimeRepository
 import dev.sanmer.authenticator.repository.TimeRepositoryImpl
-import org.koin.core.module.dsl.bind
-import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.plugin.module.dsl.single
 
-val Repositories = module {
-    singleOf(::PreferenceRepositoryImpl) { bind<PreferenceRepository>() }
-    singleOf(::DbRepositoryImpl) { bind<DbRepository>() }
-    singleOf(::TimeRepositoryImpl) { bind<TimeRepository>() }
-    singleOf(::OtpRepositoryImpl) { bind<OtpRepository>() }
+val RepositoriesModule = module {
+    includes(DataStoreModule, DatabaseModule)
+    single<PreferenceRepositoryImpl>() bind PreferenceRepository::class
+    single<DbRepositoryImpl>() bind DbRepository::class
+    single<TimeRepositoryImpl>() bind TimeRepository::class
+    single<OtpRepositoryImpl>() bind OtpRepository::class
 }
