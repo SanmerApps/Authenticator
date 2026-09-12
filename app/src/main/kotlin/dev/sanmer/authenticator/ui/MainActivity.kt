@@ -2,6 +2,7 @@ package dev.sanmer.authenticator.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -22,6 +23,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation3.runtime.NavBackStack
 import dev.sanmer.authenticator.crypto.BiometricKey
 import dev.sanmer.authenticator.datastore.compose.LocalPreference
+import dev.sanmer.authenticator.model.OtpUri.Default.toOtpUri
 import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.main.MainScreen
 import dev.sanmer.authenticator.ui.screen.main.MainViewModel
@@ -49,9 +51,13 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         }
     }
 
+    private fun toEdit(uri: Uri) = runCatching {
+        backStack.add(Screen.Edit(otpUri = uri.toOtpUri()))
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent.data?.let { backStack.add(Screen.Edit(otpUri = it)) }
+        intent.data?.let(::toEdit)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +67,9 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
         )
         super.onCreate(savedInstanceState)
 
+        intent.data?.let(::toEdit)
         BiometricKey.init(this)
         splashScreen.setKeepOnScreenCondition { viewModel.preference.isPending }
-        intent.data?.let { backStack.add(Screen.Edit(otpUri = it)) }
 
         setContent {
             viewModel.preference.onSuccess { preference ->

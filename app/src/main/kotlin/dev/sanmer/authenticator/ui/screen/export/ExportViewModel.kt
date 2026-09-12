@@ -17,10 +17,10 @@ import dev.sanmer.authenticator.Const.isZero
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.ktx.stateIn
+import dev.sanmer.authenticator.model.AuthSet
+import dev.sanmer.authenticator.model.AuthSet.Default.toAuthSet
 import dev.sanmer.authenticator.model.LoadData
 import dev.sanmer.authenticator.model.LoadData.Default.loadData
-import dev.sanmer.authenticator.model.serializable.AuthSet
-import dev.sanmer.authenticator.model.serializable.AuthSet.Default.toAuthSet
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.OtpRepository
 import kotlinx.coroutines.Dispatchers

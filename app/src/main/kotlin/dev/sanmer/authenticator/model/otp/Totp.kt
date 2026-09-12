@@ -1,10 +1,10 @@
 package dev.sanmer.authenticator.model.otp
 
 import dev.sanmer.auth.Otp
-import dev.sanmer.auth.OtpUri
 import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.database.model.AuthProperty
+import dev.sanmer.authenticator.model.OtpUri
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -25,13 +25,13 @@ data class Totp(
         period = auth.getValue(AuthProperty.Key.Period, String::toLong)
     )
 
-    constructor(uri: OtpUri) : this(
-        name = uri.name,
-        issuer = uri.issuer,
-        secret = uri.secret,
-        hash = uri.algorithm?.let(Otp.Hash::valueOf) ?: Otp.Hash.SHA1,
-        digits = uri.digits ?: 6,
-        period = uri.period ?: 30
+    constructor(otpUri: OtpUri) : this(
+        name = otpUri.name,
+        issuer = otpUri.issuer,
+        secret = otpUri.secret,
+        hash = otpUri.hash,
+        digits = otpUri.digits,
+        period = otpUri.period
     )
 
     fun toAuth(id: Long = 0) = AuthProperties.build(
@@ -50,11 +50,11 @@ data class Totp(
     )
 
     fun toUri() = OtpUri(
-        type = "totp",
+        type = OtpUri.Type.TOTP,
         name = name,
         issuer = issuer,
         secret = secret,
-        algorithm = hash.name,
+        hash = hash,
         digits = digits,
         period = period
     ).toUri()

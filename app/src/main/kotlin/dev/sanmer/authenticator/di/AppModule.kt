@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.di
 
-import android.net.Uri
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -10,6 +9,7 @@ import androidx.navigation3.runtime.metadata
 import androidx.navigation3.runtime.result.LocalResultEventBus
 import androidx.navigation3.runtime.result.ResultEffect
 import androidx.navigation3.ui.NavDisplay
+import dev.sanmer.authenticator.model.OtpUri
 import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.brand.BrandScreen
 import dev.sanmer.authenticator.ui.screen.edit.EditScreen
@@ -47,8 +47,8 @@ val AppModule = module {
             val backStack = get<NavBackStack<Screen>>()
             val viewModel = koinViewModel<EditViewModel> { parametersOf(it.authId, it.otpUri) }
 
-            ResultEffect<Uri> { uri ->
-                viewModel.fromOtpUri(uri)
+            ResultEffect<OtpUri> { otpUri ->
+                viewModel.fromOtpUri(otpUri)
             }
 
             EditScreen(
@@ -74,9 +74,9 @@ val AppModule = module {
             val resultBus = LocalResultEventBus.current
             val viewModel = koinViewModel<ScanViewModel> {
                 parametersOf(
-                    ScanViewModel.Callback { uri ->
-                        resultBus.sendResult(uri)
-                        backStack.removeLastOrNull()
+                    ScanViewModel.Callback { otpUri ->
+                        resultBus.sendResult(otpUri)
+                        backStack.remove(Screen.Scan)
                     }
                 )
             }

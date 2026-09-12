@@ -1,8 +1,7 @@
 package dev.sanmer.authenticator.ui.screen
 
-import android.net.Uri
 import androidx.navigation3.runtime.NavKey
-import dev.sanmer.authenticator.model.serializable.UriSerializer
+import dev.sanmer.authenticator.model.OtpUri
 import kotlinx.serialization.Serializable
 
 sealed interface Screen : NavKey {
@@ -12,8 +11,7 @@ sealed interface Screen : NavKey {
     @Serializable
     data class Edit(
         val authId: Long = -1,
-        @Serializable(UriSerializer::class)
-        val otpUri: Uri = Uri.EMPTY
+        val otpUri: OtpUri? = null
     ) : Screen
 
     @Serializable

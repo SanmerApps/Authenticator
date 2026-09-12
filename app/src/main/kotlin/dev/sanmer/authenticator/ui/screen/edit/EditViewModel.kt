@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.ui.screen.edit
 
-import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.MutableState
@@ -17,8 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.Otp
-import dev.sanmer.auth.OtpUri.Default.isOtpUri
-import dev.sanmer.auth.OtpUri.Default.toOtpUri
 import dev.sanmer.auth.QRCode
 import dev.sanmer.authenticator.Const.INSTANT_ZERO
 import dev.sanmer.authenticator.Const.isZero
@@ -27,6 +24,7 @@ import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.database.model.AuthProperty
 import dev.sanmer.authenticator.ktx.stateIn
+import dev.sanmer.authenticator.model.OtpUri
 import dev.sanmer.authenticator.model.otp.Totp
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.OtpRepository
@@ -40,7 +38,7 @@ import org.koin.core.annotation.InjectedParam
 
 class EditViewModel(
     @InjectedParam private val authId: Long,
-    @InjectedParam private val otpUri: Uri,
+    @InjectedParam private val otpUri: OtpUri?,
     private val dbRepository: DbRepository,
     private val otpRepository: OtpRepository,
     private val timeRepository: TimeRepository
@@ -71,21 +69,15 @@ class EditViewModel(
                         input.update(it)
                         isTrashed = !it.auth.trashedAt.isZero
                     }
-            } else {
+            } else if (otpUri != null) {
                 fromOtpUri(otpUri)
             }
         }
     }
 
-    fun fromOtpUri(uri: Uri) {
-        if (!uri.isOtpUri()) return
-        runCatching {
-            val otpUri = uri.toOtpUri()
-            if (otpUri.type.equals("totp", ignoreCase = true)) {
-                input.update(Totp(otpUri).toAuth())
-            }
-        }.onFailure {
-            logger.e(it)
+    fun fromOtpUri(otpUri: OtpUri) {
+        when (otpUri.type) {
+            OtpUri.Type.TOTP -> input.update(Totp(otpUri).toAuth())
         }
     }
 

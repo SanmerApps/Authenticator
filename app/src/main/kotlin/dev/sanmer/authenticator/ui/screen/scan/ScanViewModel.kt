@@ -24,10 +24,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.sanmer.auth.OtpUri.Default.isOtpUri
 import dev.sanmer.auth.QRCode
 import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.compat.PermissionCompat
+import dev.sanmer.authenticator.model.OtpUri
+import dev.sanmer.authenticator.model.OtpUri.Default.toOtpUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
@@ -74,7 +75,7 @@ class ScanViewModel(
                         height = image.height,
                     )
                     val uri = Uri.parse(content)
-                    if (uri.isOtpUri()) callback.onUri(uri)
+                    callback.onOtpUri(uri.toOtpUri())
                 } catch (_: Throwable) {
 
                 } finally {
@@ -160,9 +161,9 @@ class ScanViewModel(
                 val stream = cr.openInputStream(uri) ?: return@launch
                 val content = stream.use(QRCode::decodeFromStream) ?: return@launch
                 val uri = Uri.parse(content)
-                if (uri.isOtpUri()) callback.onUri(uri)
+                callback.onOtpUri(uri.toOtpUri())
             }.onFailure {
-                logger.e(it)
+                logger.w(it)
             }
         }
     }
@@ -175,6 +176,6 @@ class ScanViewModel(
     }
 
     fun interface Callback {
-        fun onUri(uri: Uri)
+        fun onOtpUri(otpUri: OtpUri)
     }
 }

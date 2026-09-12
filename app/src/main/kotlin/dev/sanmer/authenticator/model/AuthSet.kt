@@ -1,9 +1,9 @@
-package dev.sanmer.authenticator.model.serializable
+package dev.sanmer.authenticator.model
 
 import android.net.Uri
-import dev.sanmer.auth.OtpUri.Default.toOtpUri
 import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.database.model.AuthProperties
+import dev.sanmer.authenticator.model.OtpUri.Default.toOtpUri
 import dev.sanmer.authenticator.model.otp.Totp
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -17,7 +17,7 @@ data class AuthSet(
     val totp: List<Totp>
 ) {
     inline fun <T> map(action: (AuthProperties) -> T): List<T> {
-        val list = ArrayList<T>()
+        val list = mutableListOf<T>()
         totp.mapTo(list) { action(it.toAuth()) }
         return list
     }
@@ -38,7 +38,7 @@ data class AuthSet(
         }
 
         fun List<AuthProperties>.toAuthSet(): AuthSet {
-            val totp = ArrayList<Totp>()
+            val totp = mutableListOf<Totp>()
             forEach {
                 when (it.auth.type) {
                     Auth.Type.TOTP -> totp.add(Totp(it))
@@ -52,12 +52,12 @@ data class AuthSet(
         fun decodeFromJson(input: InputStream) = endpointJson.decodeFromStream<AuthSet>(input)
 
         fun decodeFromUri(input: InputStream): AuthSet {
-            val totp = ArrayList<Totp>()
+            val totp = mutableListOf<Totp>()
             input.bufferedReader().forEachLine {
                 runCatching {
-                    val uri = Uri.parse(it).toOtpUri()
-                    if (uri.type.equals("totp", ignoreCase = true)) {
-                        totp.add(Totp(uri))
+                    val otpUri = Uri.parse(it).toOtpUri()
+                    when (otpUri.type) {
+                        OtpUri.Type.TOTP -> totp.add(Totp(otpUri))
                     }
                 }
             }
