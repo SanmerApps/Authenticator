@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.self.application)
     alias(libs.plugins.self.compose)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.koin)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
@@ -13,14 +14,13 @@ val baseVersionName = "1.0.1"
 val gitCommitTag = gitCommitTag()
 val gitCommitSha = gitCommitSha()
 val gitCommitNum = gitCommitNum()
-val devSuffix = if (gitCommitTag.isEmpty()) ".dev" else ""
 
 android {
     namespace = "dev.sanmer.authenticator"
 
     defaultConfig {
         applicationId = namespace
-        versionName = "${baseVersionName}.${gitCommitSha}${devSuffix}"
+        versionName = baseVersionName + if (gitCommitTag.isEmpty()) ".$gitCommitSha" else ""
         versionCode = gitCommitNum
         ndk.abiFilters += listOf("arm64-v8a", "x86_64")
     }
@@ -103,7 +103,6 @@ dependencies {
     implementation(libs.androidx.camera.compose)
     implementation(libs.androidx.camera.lifecycle)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -119,8 +118,11 @@ dependencies {
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
+    implementation(libs.koin.annotations)
     implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.navigation3)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.datetime)

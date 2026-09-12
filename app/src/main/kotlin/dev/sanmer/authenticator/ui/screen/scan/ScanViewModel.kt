@@ -31,12 +31,13 @@ import dev.sanmer.authenticator.compat.PermissionCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.InjectedParam
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class ScanViewModel(
-    private val callback: Callback
+    @InjectedParam private val callback: Callback
 ) : ViewModel() {
     var isAllowed by mutableStateOf(false)
         private set
