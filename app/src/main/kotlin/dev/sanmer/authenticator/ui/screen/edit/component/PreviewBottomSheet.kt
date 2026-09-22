@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.database.model.AuthProperties
-import dev.sanmer.authenticator.ui.component.DragHandle
 import dev.sanmer.authenticator.ui.component.Finished
 import dev.sanmer.authenticator.ui.ktx.bottom
 import dev.sanmer.authenticator.ui.screen.home.component.AuthItem
@@ -36,12 +35,12 @@ fun PreviewBottomSheet(
     shape = MaterialTheme.shapes.large.bottom(0.dp),
     dragHandle = null
 ) {
-    DragHandle()
-
     Text(
         text = stringResource(R.string.token_preview),
         style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(top = 30.dp)
     )
 
     Column(

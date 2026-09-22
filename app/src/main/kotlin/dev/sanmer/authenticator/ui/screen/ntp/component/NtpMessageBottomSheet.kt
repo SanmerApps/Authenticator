@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.auth.ntp.NtpMessage
 import dev.sanmer.authenticator.Const.DATETIME_DISPLAY
 import dev.sanmer.authenticator.datastore.model.Ntp
-import dev.sanmer.authenticator.ui.component.DragHandle
 import dev.sanmer.authenticator.ui.ktx.bottom
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -36,12 +35,12 @@ fun NtpMessageBottomSheet(
     shape = MaterialTheme.shapes.large.bottom(0.dp),
     dragHandle = null
 ) {
-    DragHandle()
-
     Text(
         text = ntp.name(),
         style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(top = 30.dp)
     )
 
     Column(

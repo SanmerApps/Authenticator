@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.datastore.compose.LocalPreference
-import dev.sanmer.authenticator.ui.component.DragHandle
 import dev.sanmer.authenticator.ui.ktx.bottom
 
 @Composable
@@ -50,12 +49,12 @@ fun PasswordBottomSheet(
     shape = MaterialTheme.shapes.large.bottom(0.dp),
     dragHandle = null
 ) {
-    DragHandle()
-
     Text(
         text = stringResource(R.string.setting_password),
         style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .padding(top = 30.dp)
     )
 
     Column(

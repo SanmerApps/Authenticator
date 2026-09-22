@@ -14,7 +14,7 @@ fun SegmentedButtonDefaults.Check(
     active = active,
     activeContent = {
         androidx.compose.material3.Icon(
-            painter = painterResource(R.drawable.check),
+            painter = painterResource(R.drawable.check_bold),
             contentDescription = null,
             modifier = Modifier.size(IconSize)
         )
