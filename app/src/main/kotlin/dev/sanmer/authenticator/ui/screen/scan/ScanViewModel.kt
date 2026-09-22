@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.ui.screen.scan
 import android.Manifest
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.util.Size
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -25,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.QRCode
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.compat.PermissionCompat
 import dev.sanmer.authenticator.model.OtpUri
 import dev.sanmer.authenticator.model.OtpUri.Default.toOtpUri
@@ -88,10 +88,8 @@ class ScanViewModel(
     var torchEnabled by mutableStateOf(false)
         private set
 
-    private val logger = Logger.Android("ScanViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
     }
 
     fun isAllowed(context: Context) = if (isAllowed) {
@@ -157,13 +155,12 @@ class ScanViewModel(
     fun fromImage(context: Context, uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val cr = context.contentResolver
-                val stream = cr.openInputStream(uri) ?: return@launch
+                val stream = context.contentResolver.openInputStream(uri) ?: return@launch
                 val content = stream.use(QRCode::decodeFromStream) ?: return@launch
                 val uri = Uri.parse(content)
                 callback.onOtpUri(uri.toOtpUri())
             }.onFailure {
-                logger.w(it)
+                Log.e(TAG, "fromImage", it)
             }
         }
     }
@@ -177,5 +174,9 @@ class ScanViewModel(
 
     fun interface Callback {
         fun onOtpUri(otpUri: OtpUri)
+    }
+
+    private companion object Default {
+        const val TAG = "ScanViewModel"
     }
 }

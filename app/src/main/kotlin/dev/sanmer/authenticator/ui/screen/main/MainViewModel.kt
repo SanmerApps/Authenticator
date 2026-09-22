@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.crypto.SessionKey
 import dev.sanmer.auth.decodeBase64
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.crypto.BiometricKey.Default.decryptKeyByBiometric
 import dev.sanmer.authenticator.datastore.model.Preference
 import dev.sanmer.authenticator.model.LoadData
@@ -35,10 +35,8 @@ class MainViewModel(
     var isError by mutableStateOf(false)
         private set
 
-    private val logger = Logger.Android("MainViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
     }
 
@@ -46,7 +44,6 @@ class MainViewModel(
         viewModelScope.launch {
             preferenceRepository.data
                 .onEach {
-                    logger.d("$it")
                     preference = LoadData.Success(it)
                 }
                 .distinctUntilChanged { old, new ->
@@ -83,5 +80,9 @@ class MainViewModel(
                 isEncrypted = true
             }
         }
+    }
+
+    private companion object Default {
+        const val TAG = "MainViewModel"
     }
 }

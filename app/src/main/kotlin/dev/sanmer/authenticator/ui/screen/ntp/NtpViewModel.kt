@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.ntp
 
+import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
@@ -14,7 +15,6 @@ import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.ntp.NtpClock
 import dev.sanmer.auth.ntp.NtpMessage
 import dev.sanmer.auth.ntp.NtpServer
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.model.LoadData
 import dev.sanmer.authenticator.model.LoadData.Default.loadData
@@ -51,10 +51,8 @@ class NtpViewModel(
     val ntpAddress = TextFieldState()
     var bottomSheet by mutableStateOf<BottomSheet>(BottomSheet.None)
 
-    private val logger = Logger.Android("NtpViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
         syncAll()
     }
@@ -88,7 +86,7 @@ class NtpViewModel(
                     clocks[server.address] = loadData {
                         server.sync()
                     }.onFailure {
-                        logger.w(it)
+                        Log.w(TAG, "sync ${server.address}", it)
                     }
                 }
             }.awaitAll()
@@ -108,7 +106,7 @@ class NtpViewModel(
                     }.onSuccess {
                         listState.requestScrollToItem(0)
                     }.onFailure {
-                        logger.w(it)
+                        Log.w(TAG, "sync ${server.address}", it)
                     }
                 }
 
@@ -137,5 +135,9 @@ class NtpViewModel(
         data object None : BottomSheet
         data object Custom : BottomSheet
         data class NtpMsg(val ntp: Ntp, val msg: NtpMessage) : BottomSheet
+    }
+
+    private companion object Default {
+        const val TAG = "NtpViewModel"
     }
 }

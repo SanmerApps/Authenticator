@@ -2,6 +2,7 @@ package dev.sanmer.authenticator.ui.screen.export
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
@@ -14,7 +15,6 @@ import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.crypto.Crypto
 import dev.sanmer.auth.crypto.PasswordKey
 import dev.sanmer.authenticator.Const.isZero
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.ktx.stateIn
 import dev.sanmer.authenticator.model.AuthSet
@@ -44,10 +44,8 @@ class ExportViewModel(
 
     private val _selected = mutableStateListOf<AuthProperties>()
 
-    private val logger = Logger.Android("ExportViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
     }
 
     private fun <T> List<Pair<AuthProperties, T>>.asSorted() = sortedWith(
@@ -147,7 +145,7 @@ class ExportViewModel(
                 }
                 _selected.clear()
             }.onFailure {
-                logger.e(it)
+                Log.e(TAG, "export", it)
             }
         }
     }
@@ -177,8 +175,6 @@ class ExportViewModel(
             _selected.forEach { auth ->
                 runCatching {
                     dbRepository.upsert(auth)
-                }.onFailure {
-                    logger.e(it)
                 }
             }
             _selected.clear()
@@ -212,5 +208,9 @@ class ExportViewModel(
     enum class Source {
         Internal,
         External
+    }
+
+    private companion object Default {
+        const val TAG = "ExportViewModel"
     }
 }

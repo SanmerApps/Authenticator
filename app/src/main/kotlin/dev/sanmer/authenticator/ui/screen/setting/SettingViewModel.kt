@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.setting
 
+import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.getValue
@@ -10,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.crypto.SessionKey
 import dev.sanmer.auth.encodeBase64
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.crypto.BiometricKey.Default.getKeyEncryptedByBiometric
 import dev.sanmer.authenticator.repository.DbRepository
 import dev.sanmer.authenticator.repository.PreferenceRepository
@@ -29,10 +29,8 @@ class SettingViewModel(
 
     var bottomSheet by mutableStateOf<BottomSheet>(BottomSheet.None)
 
-    private val logger = Logger.Android("SettingViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
     }
 
@@ -97,5 +95,9 @@ class SettingViewModel(
     sealed interface BottomSheet {
         data object None : BottomSheet
         data object Password : BottomSheet
+    }
+
+    private companion object Default {
+        const val TAG = "SettingViewModel"
     }
 }

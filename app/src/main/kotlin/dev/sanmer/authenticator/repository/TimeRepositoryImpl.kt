@@ -1,8 +1,8 @@
 package dev.sanmer.authenticator.repository
 
+import android.util.Log
 import dev.sanmer.auth.ntp.NtpClock
 import dev.sanmer.auth.ntp.NtpServer
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.model.LoadData
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -30,8 +30,6 @@ class TimeRepositoryImpl : TimeRepository {
         }
     }
 
-    private val logger = Logger.Android("NTP")
-
     override fun now() = clock.value.getOrElse({ it }) { Clock.System }.now()
 
     override suspend fun sync(server: NtpServer) {
@@ -45,9 +43,13 @@ class TimeRepositoryImpl : TimeRepository {
                 delay(200.milliseconds * times)
             } catch (e: Throwable) {
                 data = LoadData.Failure(e)
-                logger.e(e)
+                Log.e(TAG, "sync ${server.address}", e)
             }
         }
         _clock.update { data }
+    }
+
+    private companion object Default {
+        const val TAG = "NTP"
     }
 }

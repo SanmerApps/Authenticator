@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.ntp.NtpServer
 import dev.sanmer.authenticator.Const.TIME_DISPLAY
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.ktx.stateIn
@@ -40,10 +40,8 @@ class HomeViewModel(
     var data by mutableStateOf<LoadData<List<Pair<Auth, StateFlow<String>>>>>(LoadData.Loading)
         private set
 
-    private val logger = Logger.Android("HomeViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
     }
 
@@ -74,5 +72,9 @@ class HomeViewModel(
         viewModelScope.launch {
             timeRepository.sync(server)
         }
+    }
+
+    private companion object Default {
+        const val TAG = "HomeViewModel"
     }
 }

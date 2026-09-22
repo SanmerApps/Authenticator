@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.trash
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -7,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.authenticator.Const.INSTANT_ZERO
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.model.LoadData
 import dev.sanmer.authenticator.repository.DbRepository
@@ -23,10 +23,8 @@ class TrashViewModel(
     val selected get() = _selected.size
     val isPick get() = _selected.isNotEmpty()
 
-    private val logger = Logger.Android("TrashViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
     }
 
@@ -58,8 +56,6 @@ class TrashViewModel(
             _selected.forEach { authId ->
                 runCatching {
                     dbRepository.trash(authId, INSTANT_ZERO)
-                }.onFailure {
-                    logger.e(it)
                 }
             }
             clearSelected()
@@ -71,11 +67,13 @@ class TrashViewModel(
             _selected.forEach { authId ->
                 runCatching {
                     dbRepository.delete(authId)
-                }.onFailure {
-                    logger.e(it)
                 }
             }
             clearSelected()
         }
+    }
+
+    private companion object Default {
+        const val TAG = "TrashViewModel"
     }
 }

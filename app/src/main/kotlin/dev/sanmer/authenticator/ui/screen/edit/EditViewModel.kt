@@ -1,5 +1,6 @@
 package dev.sanmer.authenticator.ui.screen.edit
 
+import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.MutableState
@@ -19,7 +20,6 @@ import dev.sanmer.auth.Otp
 import dev.sanmer.auth.QRCode
 import dev.sanmer.authenticator.Const.INSTANT_ZERO
 import dev.sanmer.authenticator.Const.isZero
-import dev.sanmer.authenticator.Logger
 import dev.sanmer.authenticator.database.model.Auth
 import dev.sanmer.authenticator.database.model.AuthProperties
 import dev.sanmer.authenticator.database.model.AuthProperty
@@ -54,10 +54,8 @@ class EditViewModel(
 
     var bottomSheet by mutableStateOf<BottomSheet>(BottomSheet.None)
 
-    private val logger = Logger.Android("EditViewModel")
-
     init {
-        logger.d("init")
+        Log.d(TAG, "init")
         loadData()
     }
 
@@ -104,7 +102,7 @@ class EditViewModel(
                     }
                 }
             }.onFailure {
-                logger.e(it)
+                Log.e(TAG, "preview", it)
             }
             bottomSheet = BottomSheet.Preview(preview)
         }
@@ -112,13 +110,9 @@ class EditViewModel(
 
     fun save(auth: AuthProperties, onBack: () -> Unit = {}) {
         viewModelScope.launch {
-            runCatching {
-                dbRepository.upsert(auth)
-                bottomSheet = BottomSheet.None
-                if (!isEdit) onBack()
-            }.onFailure {
-                logger.e(it)
-            }
+            dbRepository.upsert(auth)
+            bottomSheet = BottomSheet.None
+            if (!isEdit) onBack()
         }
     }
 
@@ -127,8 +121,6 @@ class EditViewModel(
             runCatching {
                 runCatching {
                     dbRepository.trash(authId, timeRepository.now())
-                }.onFailure {
-                    logger.e(it)
                 }
             }
         }
@@ -138,8 +130,6 @@ class EditViewModel(
         viewModelScope.launch {
             runCatching {
                 dbRepository.trash(authId, INSTANT_ZERO)
-            }.onFailure {
-                logger.e(it)
             }
         }
     }
@@ -149,8 +139,6 @@ class EditViewModel(
             runCatching {
                 dbRepository.delete(authId)
                 onBack()
-            }.onFailure {
-                logger.e(it)
             }
         }
     }
@@ -168,8 +156,6 @@ class EditViewModel(
                     foregroundColor = color.toArgb(),
                     backgroundColor = Color.Transparent.toArgb()
                 ).asImageBitmap()
-            }.onFailure {
-                logger.e(it)
             }
             bottomSheet = BottomSheet.Qrcode(qrcode)
         }
@@ -259,5 +245,9 @@ class EditViewModel(
         value class Qrcode(
             val qrcode: Result<Pair<String, ImageBitmap>>
         ) : BottomSheet
+    }
+
+    private companion object Default {
+        const val TAG = "EditViewModel"
     }
 }
