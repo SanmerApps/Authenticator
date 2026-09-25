@@ -3,6 +3,7 @@ package dev.sanmer.authenticator.ui.screen.edit
 import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -13,7 +14,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.sanmer.auth.Otp
@@ -152,7 +152,7 @@ class EditViewModel(
                 val content = uri.toString()
                 content to QRCode.encodeToBitmap(
                     content = content,
-                    size = with(density) { 360.dp.roundToPx() },
+                    size = with(density) { BottomSheetDefaults.SheetMaxWidth.roundToPx() },
                     foregroundColor = color.toArgb(),
                     backgroundColor = Color.Transparent.toArgb()
                 ).asImageBitmap()

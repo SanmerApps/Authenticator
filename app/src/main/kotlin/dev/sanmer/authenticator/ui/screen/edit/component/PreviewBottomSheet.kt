@@ -32,7 +32,7 @@ fun PreviewBottomSheet(
 ) = ModalBottomSheet(
     onDismissRequest = onClose,
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    shape = MaterialTheme.shapes.large.bottom(0.dp),
+    shape = MaterialTheme.shapes.extraLarge.bottom(0.dp),
     dragHandle = null
 ) {
     Text(
@@ -40,7 +40,7 @@ fun PreviewBottomSheet(
         style = MaterialTheme.typography.headlineSmall,
         modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .padding(top = 30.dp)
+            .padding(top = 30.dp, bottom = 10.dp)
     )
 
     Column(
