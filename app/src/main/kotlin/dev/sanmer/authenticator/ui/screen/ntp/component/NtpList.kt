@@ -2,6 +2,7 @@ package dev.sanmer.authenticator.ui.screen.ntp.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -14,7 +15,6 @@ import dev.sanmer.auth.ntp.NtpMessage
 import dev.sanmer.auth.ntp.NtpServer
 import dev.sanmer.authenticator.datastore.model.Ntp
 import dev.sanmer.authenticator.model.LoadData
-import dev.sanmer.authenticator.ui.ktx.plus
 
 @Composable
 fun NtpList(

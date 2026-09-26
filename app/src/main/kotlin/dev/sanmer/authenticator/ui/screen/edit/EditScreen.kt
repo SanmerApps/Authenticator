@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.sanmer.authenticator.R
-import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.edit.EditViewModel.BottomSheet
 import dev.sanmer.authenticator.ui.screen.edit.component.DigitsItem
@@ -71,7 +71,7 @@ fun EditScreen(
 }
 
 @Composable
-fun SharedTransitionScope.EditContent(
+private fun SharedTransitionScope.EditContent(
     viewModel: EditViewModel,
     goTo: (Screen) -> Unit,
     goBack: () -> Unit,

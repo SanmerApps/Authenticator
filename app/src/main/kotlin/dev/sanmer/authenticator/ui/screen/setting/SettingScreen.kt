@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -30,7 +31,6 @@ import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.crypto.BiometricKey
 import dev.sanmer.authenticator.datastore.compose.LocalPreference
 import dev.sanmer.authenticator.ui.ktx.bottomWith
-import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.ktx.topWith
 import dev.sanmer.authenticator.ui.screen.Screen
 import dev.sanmer.authenticator.ui.screen.ntp.component.name

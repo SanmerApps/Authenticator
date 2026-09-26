@@ -2,6 +2,7 @@ package dev.sanmer.authenticator.ui.screen.home.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -10,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.database.model.Auth
-import dev.sanmer.authenticator.ui.ktx.plus
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable

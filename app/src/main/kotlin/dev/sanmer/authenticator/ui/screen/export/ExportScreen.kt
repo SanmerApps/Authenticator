@@ -8,6 +8,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.ui.ktx.isScrollingUp
-import dev.sanmer.authenticator.ui.ktx.plus
 import dev.sanmer.authenticator.ui.screen.export.component.AuthItem
 import dev.sanmer.authenticator.ui.screen.export.component.ButtonsItem
 import dev.sanmer.authenticator.ui.screen.export.component.ErrorItem
