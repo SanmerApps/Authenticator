@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +34,7 @@ class ExportViewModel(
     val input = Input()
 
     var source by mutableStateOf<LoadData<Source>>(LoadData.Pending)
-    val isExternal by derivedStateOf {
-        source.getOrElse({ it == Source.External }) { false }
-    }
+    val isExternal inline get() = source.getOrElse({ it == Source.External }) { false }
 
     val list = mutableStateListOf<Pair<AuthProperties, Result<StateFlow<String>>>>()
     val isEmpty inline get() = list.isEmpty()

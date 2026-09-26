@@ -10,9 +10,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -81,17 +78,11 @@ fun NtpMessageBottomSheet(
             )
         }
 
-        val referenceTimestamp by remember {
-            derivedStateOf {
-                message.referenceTimestamp
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .format(DATETIME_DISPLAY)
-            }
-        }
-
         ValueItem(
             name = "Reference Timestamp",
-            value = referenceTimestamp
+            value = message.referenceTimestamp
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .format(DATETIME_DISPLAY)
         )
     }
 }

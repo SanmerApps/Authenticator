@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -74,9 +73,7 @@ fun AuthItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(13.dp)
     ) {
-        val brand by remember(auth.id) {
-            derivedStateOf { Brand.valueOfOrNull(auth.issuer) }
-        }
+        val brand = remember(auth.id) { Brand.valueOfOrNull(auth.issuer) }
 
         Image(
             painter = painterResource(brand?.id ?: R.drawable.fingerprint_simple),

@@ -19,8 +19,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -143,12 +141,8 @@ fun NtpItem(
 private fun RTTLabel(
     rtt: Duration
 ) {
-    val value by remember(rtt) {
-        derivedStateOf { rtt.toLong(DurationUnit.MILLISECONDS) }
-    }
-    val display by remember(rtt) {
-        derivedStateOf { rtt.toString(DurationUnit.MILLISECONDS) }
-    }
+    val value = remember(rtt) { rtt.toLong(DurationUnit.MILLISECONDS) }
+    val display = remember(rtt) { rtt.toString(DurationUnit.MILLISECONDS) }
 
     LabelText(
         text = display,
@@ -172,13 +166,9 @@ private fun RTTLabel(
 private fun OffsetLabel(
     offset: Duration
 ) {
-    val display by remember(offset) {
-        derivedStateOf {
-            offset.toString(DurationUnit.MILLISECONDS)
-                .let {
-                    if (offset.isPositive()) "+$it" else it
-                }
-        }
+    val display = remember(offset) {
+        offset.toString(DurationUnit.MILLISECONDS)
+            .let { if (offset.isPositive()) "+$it" else it }
     }
 
     LabelText(text = display)

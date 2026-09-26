@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -41,11 +40,10 @@ class NtpViewModel(
 
     private val clocks = mutableStateMapOf<String, LoadData<NtpClock>>()
 
-    val list by derivedStateOf {
-        _list.sortedBy { (_, server) ->
+    val list
+        get() = _list.sortedBy { (_, server) ->
             clock(server.address).getOrElse({ it.rtt }, Duration::INFINITE)
         }
-    }
     val listState = LazyListState()
 
     val ntpAddress = TextFieldState()
