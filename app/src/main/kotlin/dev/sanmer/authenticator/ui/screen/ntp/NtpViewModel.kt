@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,7 +27,7 @@ import kotlin.time.Duration
 class NtpViewModel(
     private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
-    private val _list = mutableStateListOf(
+    private val _list = mutableListOf(
         Ntp.Alibaba to NtpServer.Alibaba,
         Ntp.Apple to NtpServer.Apple,
         Ntp.Amazon to NtpServer.Amazon,
@@ -40,10 +40,11 @@ class NtpViewModel(
 
     private val clocks = mutableStateMapOf<String, LoadData<NtpClock>>()
 
-    val list
-        get() = _list.sortedBy { (_, server) ->
+    val list by derivedStateOf {
+        _list.sortedBy { (_, server) ->
             clock(server.address).getOrElse({ it.rtt }, Duration::INFINITE)
         }
+    }
     val listState = LazyListState()
 
     val ntpAddress = TextFieldState()
@@ -55,23 +56,29 @@ class NtpViewModel(
         syncAll()
     }
 
+    private fun syncCustom(address: String) {
+        if (address.isNotEmpty()) {
+            val server = NtpServer.Custom(address).also(::sync)
+            if (_list.size == Ntp.entries.size) {
+                val (_, old) = _list[_list.lastIndex]
+                clocks.remove(old.address)
+                _list[_list.lastIndex] = Ntp.Custom to server
+            } else {
+                _list.add(Ntp.Custom to server)
+            }
+        } else if (_list.size == Ntp.entries.size) {
+            val (_, old) = _list.removeAt(_list.lastIndex)
+            clocks.remove(old.address)
+        }
+    }
+
     private fun loadData() {
         viewModelScope.launch {
             preferenceRepository.data
                 .distinctUntilChangedBy { it.ntpAddress }
                 .collect {
                     ntpAddress.setTextAndPlaceCursorAtEnd(it.ntpAddress)
-                    val index = _list.indexOfFirst { (ntp, _) -> ntp == Ntp.Custom }
-                    if (it.ntpAddress.isNotEmpty()) {
-                        val server = NtpServer.Custom(it.ntpAddress).also(::sync)
-                        if (index == -1) {
-                            _list.add(Ntp.Custom to server)
-                        } else {
-                            _list[index] = Ntp.Custom to server
-                        }
-                    } else if (index != -1) {
-                        _list.removeAt(index)
-                    }
+                    syncCustom(it.ntpAddress)
                 }
         }
     }
