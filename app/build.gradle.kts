@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-val baseVersionName = "1.0.2"
+val baseVersionName = "1.0.3"
 val gitCommitTag = gitCommitTag()
 val gitCommitSha = gitCommitSha()
 val gitCommitNum = gitCommitNum()
