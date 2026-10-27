@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedSecureTextField
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -24,8 +25,10 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import dev.sanmer.authenticator.R
 import dev.sanmer.authenticator.datastore.compose.LocalPreference
 import dev.sanmer.authenticator.ui.ktx.bottom
+import kotlinx.coroutines.launch
 
 @Composable
 fun PasswordBottomSheet(
@@ -43,12 +47,16 @@ fun PasswordBottomSheet(
     onSet: () -> Unit,
     onRemove: () -> Unit,
     onChange: () -> Unit,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) = ModalBottomSheet(
     onDismissRequest = onClose,
-    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    sheetState = sheetState,
     shape = MaterialTheme.shapes.extraLarge.bottom(0.dp),
     dragHandle = null
 ) {
+    val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Text(
         text = stringResource(R.string.setting_password),
         style = MaterialTheme.typography.headlineSmall,
@@ -100,7 +108,13 @@ fun PasswordBottomSheet(
         ) {
             if (preference.isEncrypted) {
                 OutlinedButton(
-                    onClick = onRemove,
+                    onClick = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion {
+                                keyboardController?.hide()
+                                onRemove()
+                            }
+                    },
                     enabled = isEmpty,
                     modifier = Modifier.weight(1f)
                 ) {
@@ -108,7 +122,13 @@ fun PasswordBottomSheet(
                 }
 
                 Button(
-                    onClick = onChange,
+                    onClick = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion {
+                                keyboardController?.hide()
+                                onChange()
+                            }
+                    },
                     enabled = !isEmpty,
                     modifier = Modifier.weight(1f)
                 ) {
@@ -116,7 +136,13 @@ fun PasswordBottomSheet(
                 }
             } else {
                 Button(
-                    onClick = onSet,
+                    onClick = {
+                        scope.launch { sheetState.hide() }
+                            .invokeOnCompletion {
+                                keyboardController?.hide()
+                                onSet()
+                            }
+                    },
                     enabled = !isEmpty,
                     modifier = Modifier.weight(1f)
                 ) {

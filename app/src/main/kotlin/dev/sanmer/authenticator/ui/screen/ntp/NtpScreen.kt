@@ -1,6 +1,5 @@
 package dev.sanmer.authenticator.ui.screen.ntp
 
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -44,7 +43,6 @@ fun NtpScreen(
     }
 
     Scaffold(
-        modifier = Modifier.imePadding(),
         topBar = {
             TopBar(
                 onBack = goBack,

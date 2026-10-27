@@ -1,10 +1,10 @@
 package dev.sanmer.authenticator.ui.screen.setting
 
 import android.content.Intent
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.rememberScrollState
@@ -71,7 +71,7 @@ fun SettingScreen(
     ) { contentPadding ->
         Column(
             modifier = Modifier
-                .animateContentSize()
+                .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(PaddingValues(15.dp) + contentPadding),
