@@ -87,9 +87,10 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
                             targetState = viewModel.isDecrypted(preference),
                             transitionSpec = {
                                 fadeIn(
-                                    animationSpec = tween(500)
+                                    animationSpec = tween(600),
+                                    initialAlpha = 0.75f
                                 ) togetherWith fadeOut(
-                                    animationSpec = tween(500)
+                                    animationSpec = tween(150)
                                 )
                             }
                         ) { isDecrypted ->
