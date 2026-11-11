@@ -26,7 +26,7 @@ koinPlugin = "1.2.3"
 kotlin = "2.4.21"
 kotlinxCoroutines = "1.11.0"
 kotlinxDatetime = "0.8.0"
-kotlinxSerialization = "1.12.0"
+kotlinxSerialization = "1.13.0"
 ksp = "2.3.13"
 
 [libraries]
