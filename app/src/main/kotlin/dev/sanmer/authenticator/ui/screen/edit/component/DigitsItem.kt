@@ -7,7 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.maxLength
+import androidx.compose.foundation.text.input.maxLengthReject
 import androidx.compose.foundation.text.input.then
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,7 +31,7 @@ fun DigitsItem(
     OutlinedTextField(
         state = digits,
         enabled = enabled,
-        inputTransformation = InputTransformation.maxLength(2).then {
+        inputTransformation = InputTransformation.maxLengthReject(2).then {
             if (!asCharSequence().isDigitsOnly()) {
                 revertAllChanges()
             }
@@ -53,7 +53,7 @@ fun DigitsItem(
     OutlinedTextField(
         state = period,
         enabled = enabled,
-        inputTransformation = InputTransformation.maxLength(2).then {
+        inputTransformation = InputTransformation.maxLengthReject(2).then {
             if (!asCharSequence().isDigitsOnly()) {
                 revertAllChanges()
             }
