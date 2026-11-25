@@ -2,9 +2,9 @@ name: Android
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -22,8 +22,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
         with:
           build-scan-publish: false
-          build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
-          build-scan-terms-of-use-agree: "yes"
+          build-scan-terms-of-use-url: https://gradle.com/help/legal-terms-of-use
+          build-scan-terms-of-use-agree: yes
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -34,14 +34,14 @@ jobs:
         id: build
         run: |
           if [ ! -z "${{ secrets.KEY_STORE }}" ]; then
-            echo key.store.password='${{ secrets.KEY_STORE_PASSWORD }}' > signing.properties
-            echo key.alias='${{ secrets.KEY_ALIAS }}' >> signing.properties
-            echo key.password='${{ secrets.KEY_PASSWORD }}' >> signing.properties
-            echo key.store='${{ github.workspace }}/key.jks' >> signing.properties
-            echo ${{ secrets.KEY_STORE }} | base64 --decode > ${{ github.workspace }}/key.jks
+            echo "key.store.password=${{ secrets.KEY_STORE_PASSWORD }}" > signing.properties
+            echo "key.alias=${{ secrets.KEY_ALIAS }}" >> signing.properties
+            echo "key.password=${{ secrets.KEY_PASSWORD }}" >> signing.properties
+            echo "key.store=${{ github.workspace }}/key.jks" >> signing.properties
+            echo "${{ secrets.KEY_STORE }}" | base64 --decode > "${{ github.workspace }}/key.jks"
           fi
           ./gradlew assembleRelease
-          name=`ls app/build/outputs/apk/release/*.apk | awk -F '(/|.apk)' '{print $6}'` && echo "name=${name}" >> $GITHUB_OUTPUT
+          name="$(ls app/build/outputs/apk/release/*.apk | awk -F '(/|.apk)' '{print $6}')" && echo "name=${name}" >> $GITHUB_OUTPUT
 
       - name: Upload apk
         if: success() && github.ref == 'refs/heads/main'
@@ -62,8 +62,8 @@ jobs:
         continue-on-error: true
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            RELEASE=$(find app/build/outputs/apk/release -name "*.apk")
-            ESCAPED=$(python3 -c 'import json,os; print(json.dumps("${{ github.event.head_commit.message }}"))')
+            RELEASE="$(find app/build/outputs/apk/release -name "*.apk")"
+            ESCAPED="$(python3 -c 'import json,os; print(json.dumps("${{ github.event.head_commit.message }}"))')"
             curl -v "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMediaGroup" \
               -F "chat_id=${{ secrets.CHANNEL_ID }}" \
               -F "media=[{\"type\":\"document\",\"media\":\"attach://release\",\"caption\":${ESCAPED}}]" \
